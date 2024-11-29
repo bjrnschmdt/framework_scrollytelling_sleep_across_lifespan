@@ -39,6 +39,11 @@ theme: [midnight, alt]
   z-index: 2;
 }
 
+.scroll-section.inactive {
+  opacity: 0.5; /* Adjust to desired dimming level */
+  transition: opacity 0.3s ease; /* Smooth transition */
+}
+
 .scroll-section:last-of-type {
   margin-bottom: 20vh;
 }
@@ -196,7 +201,7 @@ const sleepTimeValue = Generators.input(sleepTimeInput);
 const estimate = Inputs.range([0, 100], {
   label: "Schätzung in %",
   step: 1,
-  value: 50,
+  value: 0,
   placeholder: "in %",
 });
 const estimateValue = Generators.input(estimate);
@@ -695,7 +700,7 @@ function createXAxis(svg) {
     .call(
       d3
         .axisBottom(xScaleSVG)
-        /* .tickFormat(d3.format("02")) */
+        .tickFormat(d3.format("02"))
         .tickValues(d3.range(ageMin, ageMax + 1, 5))
     )
     .call((g) => {
@@ -1696,6 +1701,8 @@ const observerCallback = (entries, observer) => {
     const step = visibleSection.dataset.step;
 
     if (entry.isIntersecting) {
+      // Section is visible
+      visibleSection.classList.remove("inactive");
       console.log(`Section ${step} is now visible.`);
 
       // Fetch the latest values without making the cell reactive
@@ -1721,16 +1728,20 @@ const observerCallback = (entries, observer) => {
 
       // Additional behavior for the last section (step 8)
       if (step === "8") {
-        // Enable interaction with the graphic
         info.classList.add("interactive");
         console.log("Enabled interactive graphic for the last section.");
       }
-    } else if (step === "8") {
-      // Disable interaction when the last section is no longer visible
-      info.classList.remove("interactive");
-      console.log(
-        "Disabled interactive graphic as the last section is no longer visible."
-      );
+    } else {
+      // Section is not visible
+      visibleSection.classList.add("inactive");
+
+      // Remove interaction if the last section is no longer visible
+      if (step === "8") {
+        info.classList.remove("interactive");
+        console.log(
+          "Disabled interactive graphic as the last section is no longer visible."
+        );
+      }
     }
   });
 };
