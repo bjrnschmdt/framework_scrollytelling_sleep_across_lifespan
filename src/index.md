@@ -7,16 +7,11 @@ theme: [midnight, alt]
 .scroll-container {
   position: relative;
   margin: 1rem auto;
-  /* z-index: 99; */
 }
 
 .scroll-info {
   position: sticky;
-  /* aspect-ratio: 16 / 9; */
-  /* top: calc((100% - 9 / 16 * 100vw) / 2); */
   top: 0;
-  /* height: 72vh; */
-  /* padding: 10vh 0 0; */
   margin: 0 auto;
   background-color: var(--theme-background-alt);
   z-index: -1;
@@ -37,26 +32,11 @@ theme: [midnight, alt]
 .scroll-section {
   transition: all 0.3s ease;
 }
-
-/* .scroll-section {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  margin: 1rem 0;
-  display: flex;
-  align-items: start;
-  justify-content: center;
-  border: solid 1px var(--theme-foreground-focus);
-  background: var(--theme-foreground);
-  padding: 1rem;
-  box-sizing: border-box;
-} */
 .scroll-section {
   position:relative;
   max-width: 32rem;
-  /* margin: 0 auto 56.25%; */
   margin: 0 auto 70vh;
   z-index: 2;
-/*   pointer-events: none; */
 }
 
 .scroll-section:last-of-type {
@@ -116,24 +96,10 @@ const relativeHeight = 0.6;
 // Reactive height based on orientation
 const h = (() => {
   const isLandscape = w > window.innerHeight;
-  /* console.log(isLandscape, window.innerHeight * 0.6); */
   return isLandscape
     ? /* (w / 3) * 2 */ window.innerHeight * relativeHeight
     : window.innerHeight * relativeHeight; // 16:9 for landscape, 60vh for portrait
 })();
-```
-
-<!-- ```js
-const h = Math.round((w / 3) * 2);
-``` -->
-
-```js
-/* const recommendedInput = Inputs.toggle({ label: "Recommended", value: true });
-const recommended = Generators.input(recommendedInput); */
-```
-
-```js
-/* const recommended = Mutable(true); */
 ```
 
 ```js
@@ -141,72 +107,6 @@ const recommended = Mutable(false);
 const setTrue = () => (recommended.value = true);
 const setFalse = () => (recommended.value = false);
 ```
-
-<!-- ```js
-display(
-  Inputs.button([
-    ["true", setTrue],
-    ["false", setFalse],
-  ])
-);
-``` -->
-
-<!-- Count is: ${html`<span class="flash">${count}</span>`}. -->
-
-<!-- ```js
-const percentiles = view(
-  Inputs.checkbox(["A", "B", "C"], {
-    label: "Percentiles",
-    value: ["B", "C"],
-  })
-);
-``` -->
-
-<!-- ```js
-const pointcloud = view(Inputs.toggle({ label: "Pointcloud", value: true }));
-``` -->
-
-<!-- ```js
-const grid = view(Inputs.toggle({ label: "Grid", value: true }));
-``` -->
-
-<!-- ```js
-const caseDots = view(Inputs.toggle({ label: "Cases", value: false }));
-``` -->
-
-<!-- ```js
-const selectedPlot = view(
-  Inputs.radio(["box", "dot", "percentile"], {
-    label: "Select one",
-    value: "dot",
-  })
-);
-``` -->
-
-<!-- ```js
-display(
-  Inputs.button([
-    ["Leo", () => set(chartElement, { age: 8, sleepTime: 12 })],
-    ["Paula", () => set(chartElement, { age: 17, sleepTime: 9 })],
-    ["Karin", () => set(chartElement, { age: 31, sleepTime: 7 })],
-    ["Maria", () => set(chartElement, { age: 75, sleepTime: 6 })],
-    [
-      "recommendedFalse",
-      () => {
-        recommended.value = false;
-      },
-    ],
-    [
-      "recommendedTrue",
-      () => {
-        recommended.value = true;
-      },
-    ],
-    ["recommendedFalse", setFalse],
-    ["recommendedTrue", setTrue],
-  ])
-);
-``` -->
 
 ```js
 const def = {
@@ -222,6 +122,7 @@ const def = {
 
 ```js
 // !!! this may be not needed anymore since input binding is done with separate input declarations
+// Still need this for... (don't recall right now)
 const entity = Inputs.bind(
   Inputs.form({
     age: Inputs.range([ageMin, ageMax], {
@@ -252,68 +153,8 @@ const entity = Inputs.bind(
 ```
 
 ```js
-// This is what the built-in view function does
 const entityValue = Generators.input(entity);
 ```
-
-<!-- ```js
-display(entity);
-``` -->
-
-<!-- ```js
-display(
-  Inputs.bind(
-    Inputs.range([ageMin, ageMax], { step: 1, label: "age" }),
-    entity.children[0]
-  )
-);
-``` -->
-
-<!-- ```js
-display(dataSet.get(chartValue.age));
-``` -->
-
-<!-- ```js
-display(chartValue);
-``` -->
-
-<!-- ```js
-display(chartElement);
-``` -->
-
-<!-- ```js
-const personalization = Inputs.button(
-  [
-    ["Ja", (value) => true],
-    [
-      "Nein",
-      (value) => {
-        /* set(chartElement, { ...entityValue, age: 10, sleepTime: 10.5 }); */
-        return false;
-      },
-    ],
-  ],
-  { value: 0, label: "Fortfahren mit eigenen Angaben?" }
-);
-```
-
-```js
-const personalizationValue = Generators.input(personalization);
-``` -->
-
-<!-- ```js
-const personalizationValue = true;
-```
-
-```js
-const prediction = Inputs.button(
-  [
-    ["Ja", (value) => true],
-    ["Nein", (value) => false],
-  ],
-  { value: 0, label: "Antwort absenden?" }
-);
-``` -->
 
 ```js
 const personalizationValue = true;
@@ -374,17 +215,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   <div class="scroll-section card" data-step="4">Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</div>
    <div class="scroll-section card" data-step="5">
   Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.
-  ${ageInput}${sleepTimeInput}
- <!--  <div class="scroll-section card" data-step="5">Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! ${Inputs.bind(
-    Inputs.range([ageMin, ageMax], { step: 1, label: "Alter" }),
-    entity.children[0]
-  )}${Inputs.bind(
-    Inputs.range([sleepMin, sleepMax], {
-      step: 0.25,
-      label: "Schlafdauer",
-    }),
-    entity.children[1]
-  )} --><!-- ${personalization} --></div>
+  ${ageInput}${sleepTimeInput}</div>
   <div class="scroll-section card" data-step="6">Die hier gezeigten Figuren fassen die Daten der einzelnen Personen zusammen. Die Figuren stehen jeweils für 5% der Daten. Die Figuren beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.</div>
    <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimate}${prediction}${predictionValue ? "Die richtige Antwort ist ... Danke, das war nicht einfach. Versuche es nochmal! Je öfter du schätzt, desto besser können wir sehen, wie gut die Grafik funktioniert" : ""}</div>
    <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
@@ -435,29 +266,18 @@ defs
   .attr("d", icon)
   .attr("fill", "white");
 
-// Fill background of canvas
-/* context.fillStyle = colors.background; */
-/*   context.fillRect(0, 0, canvas.width, canvas.height) */ // Create the pointcloud
 const pointcloud = new Pointcloud(context, canvas);
 
 // Create Axes
 createXAxis(svg);
 createYAxis(svg);
 
-// Draw recommended Area
-/* recommended && drawRecommendedArea(svg); */
-
-// Draw cases as circles
-/* caseDots && drawCases(svg); */
-
 const crosshair = initializeCrosshair(svg);
 
 // Setup the pointer interactions like pointerMoved and pointerClicked
-/* setupPointerInteraction(svg, container); */
 new PointerInteraction(svg, container);
 
 function update(data) {
-  console.log("is Explorable?", container.node().value.isExplorable);
   // Update the pointcloud visibility
   pointcloud.setVisibility(container.node().value.showPointcloud);
 
@@ -488,12 +308,9 @@ function update(data) {
 }
 
 container.node().update = update;
-// return container.node();
 ```
 
 ```js
-// This is what the built-in view function does
-/* const chartElement = chart(); */
 const chartElement = container.node();
 ```
 
@@ -501,22 +318,8 @@ const chartElement = container.node();
 const chartValue = Generators.input(chartElement);
 ```
 
-<!-- ```js
-// Insert the chart element into the DOM correctly
-const scrollInfoDiv = document.querySelector(".scroll-info");
-
-if (scrollInfoDiv && chartElement) {
-  scrollInfoDiv.appendChild(chartElement);
-} else {
-  console.error(
-    "Failed to find .scroll-info container or chartElement is null."
-  );
-}
-``` -->
-
 ```js
 const cases = [
-  /* { name: "Leo", age: 7, tib: 12 }, */
   { name: "Leo", age: 8.1, tib: 12 },
   { name: "Paula", age: 17.35, tib: 9 },
   { name: "Karin", age: 31.15, tib: 7 },
@@ -526,7 +329,6 @@ const cases = [
 
 ```js
 function set(input, value) {
-  /* console.log("Setting input value", value); */
   input.value = value;
   input.dispatchEvent(new Event("input", { bubbles: true }));
 }
@@ -555,20 +357,6 @@ function initializeCrosshair(svg) {
     .append("g")
     .attr("class", "tooltip")
     .style("display", "none");
-
-  // Tooltip rectangle
-  /*   tooltip
-    .append("rect")
-    .attr("class", "tooltip-rect")
-    .attr("x", -30) // Centered above the crosshair
-    .attr("y", -30) // Positioned above the crosshair point
-    .attr("width", 60)
-    .attr("height", 20)
-    .attr("rx", 4)
-    .attr("ry", 4)
-    .attr("fill", "black")
-    .attr("stroke", "white")
-    .attr("stroke-width", 1); */
 
   // Tooltip text
   const tooltipText = tooltip
@@ -759,23 +547,35 @@ class PointerInteraction {
     this.container = container;
     this.isPlotLocked = false;
     this.node = container.node();
-    /* console.log("Pointer interaction initialized"); */
+
+    // Attach event listeners
     this.attachEventListeners();
+
+    // Create a debounced logger
+    this.debouncedLogger = createDebouncedLogger(logInteraction, 500); // 500ms delay
   }
 
+  /**
+   * Calculate the pointer's position and determine if it is within margins.
+   * @param {Event} event - The pointer event.
+   * @returns {Object} - An object with `x`, `y`, and `withinMargins`.
+   */
   calculatePosition(event) {
-    const [mx, my] = d3.pointer(event);
-    return {
-      withinMargins:
-        mx >= margin.left &&
-        mx <= w - margin.right &&
-        my >= margin.top &&
-        my <= h - margin.bottom,
-      x: mx,
-      y: my,
-    };
+    const [x, y] = d3.pointer(event);
+    const withinMargins =
+      x >= margin.left &&
+      x <= w - margin.right &&
+      y >= margin.top &&
+      y <= h - margin.bottom;
+
+    return { x, y, withinMargins };
   }
 
+  /**
+   * Map position to data values or reset if out of bounds.
+   * @param {Object} position - The pointer position (x, y, withinMargins).
+   * @returns {Object} - Updated interaction state.
+   */
   calculateValue({ x, y, withinMargins }) {
     if (!withinMargins) {
       return {
@@ -784,6 +584,7 @@ class PointerInteraction {
         sleepTime: undefined,
       };
     }
+
     return {
       ...this.node.value,
       age: Math.round(xScaleSVG.invert(x)),
@@ -791,12 +592,19 @@ class PointerInteraction {
     };
   }
 
+  /**
+   * Update the cursor style based on the plot lock state.
+   * @param {boolean} locked - Whether the plot is locked.
+   */
   updateInteractionState(locked) {
     this.svg.style("cursor", locked ? "not-allowed" : "crosshair");
   }
 
+  /**
+   * Handle pointer movement and update interaction state.
+   * @param {Event} event - The pointer move event.
+   */
   pointerMoved(event) {
-    /* console.log("Pointer moved"); */
     if (
       !this.isValidEvent(event) ||
       this.isPlotLocked ||
@@ -807,27 +615,69 @@ class PointerInteraction {
     const position = this.calculatePosition(event);
     const newValue = this.calculateValue(position);
 
+    // Trigger an update only if the value changes
     if (!_.isEqual(this.node.value, newValue)) {
       this.node.value = newValue;
       this.node.dispatchEvent(new CustomEvent("input", { bubbles: true }));
+
+      // Log the interaction with a debounce
+      this.debouncedLogger(newValue);
     }
   }
 
+  /**
+   * Toggle the lock state of the plot on pointer click.
+   */
   pointerClicked() {
     this.isPlotLocked = !this.isPlotLocked;
     this.updateInteractionState(this.isPlotLocked);
   }
 
+  /**
+   * Validate the event object.
+   * @param {Event} event - The event to validate.
+   * @returns {boolean} - Whether the event is valid.
+   */
   isValidEvent(event) {
-    return event !== null;
+    return event !== null && typeof event === "object";
   }
 
+  /**
+   * Attach pointer event listeners to the SVG element.
+   */
   attachEventListeners() {
     this.svg
       .on("pointerenter pointermove", this.pointerMoved.bind(this))
       .on("click", this.pointerClicked.bind(this))
-      .on("touchstart", (event) => event.preventDefault());
+      .on("touchstart", (event) => event.preventDefault()); // Prevent default touch behavior
   }
+}
+```
+
+```js
+function createDebouncedLogger(callback, delay) {
+  let timer;
+  return (data) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      callback(data);
+    }, delay);
+  };
+}
+```
+
+```js
+function logInteraction({ age, sleepTime }) {
+  /* console.log(`Logging interaction: Age=${age}, SleepTime=${sleepTime}`); */
+  window["optimizely"] = window["optimizely"] || [];
+  window["optimizely"].push({
+    type: "event",
+    eventName: "kielscn_schlafdauer_sctn_8_input_changed",
+    tags: {
+      age_value: age,
+      sleepTime_value: sleepTime,
+    },
+  });
 }
 ```
 
@@ -1900,135 +1750,6 @@ targets.forEach((target) => {
 invalidation.then(() => observer.disconnect());
 ```
 
-<!-- ```js
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      console.log(
-        `Entry for ${entry.target.dataset.step}: isIntersecting=${entry.isIntersecting}`,
-        entry.boundingClientRect
-      );
-      if (entry.isIntersecting) {
-        set(chartElement, steps[entry.target.dataset.step]);
-        console.log(`Action set for ${entry.target.dataset.step}`);
-      }
-    });
-    /* set(chartElement, steps[0]); */
-  },
-  {
-    rootMargin: "-50% 0px -50% 0px",
-  }
-);
-``` -->
-
-<!-- ```js
-const observer = new IntersectionObserver(
-  (entries) => {
-    for (const target of Array.from(targets).reverse()) {
-      const rect = target.getBoundingClientRect();
-      if (rect.top < innerHeight / 2) {
-        set(chartElement, steps[target.dataset.step]);
-        return;
-      }
-    }
-    set(chartElement, steps[0]);
-  },
-  {
-    rootMargin: "-50% 0% -50% 0%",
-  }
-);
-``` -->
-
-<!-- ```js
-// Create the IntersectionObserver instance
-const observer = new IntersectionObserver(
-  (entries, observer) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        // When the element is visible, call the set() function
-        set(chartElement, steps[entry.target.dataset.step]);
-
-        // Optionally, unobserve the element if you only want to trigger once
-        // observer.unobserve(entry.target);
-      }
-    });
-  },
-  {
-    root: null, // Uses the viewport as the root
-    rootMargin: "-20% 0% -20% 0%", // No margin around the root
-    threshold: 0, // Trigger when any part of the element is visible
-  }
-);
-``` -->
-
-```js
-
-```
-
-<!-- ```js
-for (const target of targets) observer.observe(target);
-``` -->
-
-```js
-
-```
-
-<!-- ```js
-const stepFiveEventListener = function (e) {
-  window["optimizely"] = window["optimizely"] || [];
-  window["optimizely"].push({
-    type: "event",
-    eventName: "kielscn_schlafdauer_sctn_5_input_changed",
-    tags: {
-      age_value: document.querySelector(
-        '.scroll-section.card[data-step="5"] form:nth-child(1) input[type=number]'
-      ).value,
-      tib_value: document.querySelector(
-        '.scroll-section.card[data-step="5"] form:nth-child(2) input[type=number]'
-      ).value,
-    },
-  });
-};
-```
-
-```js
-const stepFiveInputs = document.querySelectorAll(
-  '.scroll-section.card[data-step="5"] input'
-);
-```
-
-```js
-stepFiveInputs.forEach((e) =>
-  e.addEventListener("change", stepFiveEventListener)
-);
-```
-
-```js
-const stepSevenEventListener = function (e) {
-  window["optimizely"] = window["optimizely"] || [];
-  console.log("Event fired");
-  window["optimizely"].push({
-    type: "event",
-    eventName: "kielscn_schlafdauer_sctn_7_input_changed",
-    tags: {
-      estimate_value: document.querySelector(
-        '.scroll-section.card[data-step="7"] input[type=number]'
-      ).value,
-    },
-  });
-};
-```
-
-```js
-const stepSevenInput = document.querySelector(
-  '.scroll-section.card[data-step="7"] input[type=number]'
-);
-```
-
-```js
-stepSevenInput.addEventListener("change", stepSevenEventListener);
-``` -->
-
 ```js
 predictionValue; // run this block when the button is clicked
 window["optimizely"] = window["optimizely"] || [];
@@ -2107,8 +1828,6 @@ function getSteps(age, sleepTime) {
       variant: "none",
     },
     6: {
-      /* age: personalizationValue ? ageValue : 10,
-    sleepTime: personalizationValue ? sleepTimeValue : 10.5, */
       age: age,
       sleepTime: sleepTime,
       showRecommended: false,
@@ -2119,8 +1838,6 @@ function getSteps(age, sleepTime) {
       variant: "dot",
     },
     7: {
-      /* age: personalizationValue ? ageValue : 10,
-    sleepTime: personalizationValue ? sleepTimeValue : 10.5, */
       age: age,
       sleepTime: sleepTime,
       showRecommended: false,
@@ -2131,8 +1848,6 @@ function getSteps(age, sleepTime) {
       variant: "dot",
     },
     8: {
-      /* age: personalizationValue ? ageValue : 10,
-    sleepTime: personalizationValue ? sleepTimeValue : 10.5, */
       age: age,
       sleepTime: sleepTime,
       showRecommended: false,
