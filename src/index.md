@@ -15,9 +15,9 @@ theme: [midnight, alt]
   /* aspect-ratio: 16 / 9; */
   /* top: calc((100% - 9 / 16 * 100vw) / 2); */
   top: 0;
-  /* height: 80%; */
-  padding-top: 8rem;
-  margin: 0 auto 8rem;
+  /* height: 72vh; */
+  /* padding: 10vh 0 0; */
+  margin: 0 auto;
   background-color: var(--theme-background-alt);
   z-index: -1;
   pointer-events: none;
@@ -54,13 +54,13 @@ theme: [midnight, alt]
   position:relative;
   max-width: 32rem;
   /* margin: 0 auto 56.25%; */
-  margin: 0 auto 80vh;
+  margin: 0 auto 70vh;
   z-index: 2;
 /*   pointer-events: none; */
 }
 
 .scroll-section:last-of-type {
-  margin-bottom: 0;
+  margin-bottom: 20vh;
 }
 
 </style>
@@ -109,11 +109,17 @@ const w = width;
 ```
 
 ```js
+const relativeHeight = 0.6;
+```
+
+```js
 // Reactive height based on orientation
 const h = (() => {
   const isLandscape = w > window.innerHeight;
   /* console.log(isLandscape, window.innerHeight * 0.6); */
-  return isLandscape ? (w / 3) * 2 : window.innerHeight * 0.8; // 16:9 for landscape, 60vh for portrait
+  return isLandscape
+    ? /* (w / 3) * 2 */ window.innerHeight * relativeHeight
+    : window.innerHeight * relativeHeight; // 16:9 for landscape, 60vh for portrait
 })();
 ```
 
@@ -1881,7 +1887,7 @@ const observerCallback = (entries, observer) => {
 
 const observerOptions = {
   root: null, // Use the viewport as the root
-  rootMargin: "0% 0% -20% 0%", // Adjust as needed
+  rootMargin: `0% 0% -${90 - relativeHeight * 100}% 0%`, // Adjust as needed
   /* threshold: 0.5, */ // Trigger when 50% of the section is visible
 };
 
