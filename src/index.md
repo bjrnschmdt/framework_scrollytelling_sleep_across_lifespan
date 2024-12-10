@@ -45,7 +45,7 @@ theme: [midnight, alt]
 }
 
 .scroll-section:last-of-type {
-  margin-bottom: 20vh;
+  margin-bottom: 30vh;
 }
 
 </style>
@@ -53,17 +53,9 @@ theme: [midnight, alt]
 ```js
 import { Generators } from "npm:@observablehq/stdlib";
 import { Mutable } from "npm:@observablehq/stdlib";
-```
-
-```js
+import { findNextSmallerPValue } from "./components/helperFunctions.js";
 import { data, dataSet, simulatedData } from "./components/data.js";
-```
-
-```js
 import { settings } from "./components/settings.js";
-```
-
-```js
 import { element } from "./components/element.js";
 ```
 
@@ -200,7 +192,7 @@ const sleepTimeValue = Generators.input(sleepTimeInput);
 ```js
 const estimate = Inputs.range([0, 100], {
   label: "Schätzung in %",
-  step: 1,
+  step: 5,
   value: 0,
   placeholder: "in %",
 });
@@ -222,9 +214,13 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.
   ${ageInput}${sleepTimeInput}</div>
   <div class="scroll-section card" data-step="6">Die hier gezeigten Figuren fassen die Daten der einzelnen Personen zusammen. Die Figuren stehen jeweils für 5% der Daten. Die Figuren beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.</div>
-   <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimate}${prediction}${predictionValue ? "Die richtige Antwort ist ... Danke, das war nicht einfach. Versuche es nochmal! Je öfter du schätzt, desto besser können wir sehen, wie gut die Grafik funktioniert" : ""}</div>
+   <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimate}${prediction}${predictionValue ? `Die richtige Antwort ist ${findNextSmallerPValue(dataSet.get(chartValue.age), chartValue.sleepTime)} Danke, das war nicht einfach. Versuche es nochmal! Je öfter du schätzt, desto besser können wir sehen, wie gut die Grafik funktioniert` : ""}</div>
    <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
 </section>
+<div class="card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
+<div class="card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
+<div class="card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
+<div class="card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
 
 ```js
 const container = d3.select(element("div"));
@@ -283,6 +279,9 @@ const crosshair = initializeCrosshair(svg);
 new PointerInteraction(svg, container);
 
 function update(data) {
+  //console.log(data);
+  const pValue = findNextSmallerPValue(data, container.node().value.sleepTime);
+  /* console.log(container.node().value.age, pValue); */
   // Update the pointcloud visibility
   pointcloud.setVisibility(container.node().value.showPointcloud);
 
@@ -1703,7 +1702,7 @@ const observerCallback = (entries, observer) => {
     if (entry.isIntersecting) {
       // Section is visible
       visibleSection.classList.remove("inactive");
-      console.log(`Section ${step} is now visible.`);
+      /* console.log(`Section ${step} is now visible.`); */
 
       // Fetch the latest values without making the cell reactive
       const currentAgeValue = ageInput.value;
@@ -1726,10 +1725,13 @@ const observerCallback = (entries, observer) => {
       // Update the chartElement with the current step
       set(chartElement, steps[step]);
 
+      // Update the chartElement with the current step
+      set(prediction, undefined);
+
       // Additional behavior for the last section (step 8)
       if (step === "8") {
         info.classList.add("interactive");
-        console.log("Enabled interactive graphic for the last section.");
+        /* console.log("Enabled interactive graphic for the last section."); */
       }
     } else {
       // Section is not visible
@@ -1738,9 +1740,9 @@ const observerCallback = (entries, observer) => {
       // Remove interaction if the last section is no longer visible
       if (step === "8") {
         info.classList.remove("interactive");
-        console.log(
+        /* console.log(
           "Disabled interactive graphic as the last section is no longer visible."
-        );
+        ); */
       }
     }
   });

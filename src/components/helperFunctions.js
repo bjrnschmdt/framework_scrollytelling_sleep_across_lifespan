@@ -48,6 +48,34 @@ export function calculatePercentiles(data) {
   return agePercentiles;
 }
 
+export function findNextSmallerPValue(data, inputValue) {
+  // Check if data or dotPlotData is missing or not an array
+  if (!data || !Array.isArray(data.dotPlotData)) {
+    return null; // Gracefully return null if data is undefined or invalid
+  }
+
+  // Find the next smaller 'q' value
+  const dotPlot = data.dotPlotData;
+  let result = null;
+
+  for (let i = dotPlot.length - 1; i >= 0; i--) {
+    if (dotPlot[i].q < inputValue) {
+      result = dotPlot[i];
+      break;
+    }
+  }
+
+  // If no smaller value is found, return null
+  if (!result) {
+    return null;
+  }
+
+  // Process the pValue: add 0.025, multiply by 100, convert to a string, and append '%'
+  const processedPValue = ((result.p + 0.025) * 100).toFixed(0) + "%";
+
+  return processedPValue;
+}
+
 // probability density function
 
 export function epanechnikov(bandwidth) {
