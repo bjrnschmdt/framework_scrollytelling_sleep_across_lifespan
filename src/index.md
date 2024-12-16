@@ -169,7 +169,7 @@ const entity = Inputs.bind(
       label: "Percentiles",
       value: ["C"],
     }),
-    showTooltip: Inputs.toggle({ label: "Tooltip", value: false }),
+    tooltipText: Inputs.text({ label: "Tooltip text", value: "" }),
     isExplorable: Inputs.toggle({ label: "Explorable?", value: true }),
     variant: Inputs.radio(["box", "dot", "percentile", "none"], {
       label: "Select one",
@@ -297,7 +297,8 @@ container.node().value = {
   showRecommended: false,
   showPointcloud: true,
   showPercentiles: ["B", "C"],
-  showTooltip: false,
+
+  tooltipText: "",
   isExplorable: false,
   variant: "none",
 };
@@ -527,7 +528,20 @@ function updateCrosshairs(
   let pointOpacity = 1;
   let intersect = data.age < 23;
   let labelXOffset = -6;
-  let tooltipVisibility = "block";
+
+  console.log("tooltipText", data.tooltipText);
+
+  // -------------------------
+  // Tooltip visibility logic
+  // -------------------------
+  //
+  // Show the tooltip only if "data.tooltipText" is defined.
+  // Hide it otherwise.
+  const tooltipIsVisible = data.tooltipText !== undefined;
+  // If tooltip is visible, show the text from data.tooltipText
+  if (tooltipIsVisible) {
+    tooltipText.text(data.tooltipText);
+  }
 
   // if cursor outside margins the crosshair get reset
   if (isNaN(x) || isNaN(y)) {
@@ -539,29 +553,27 @@ function updateCrosshairs(
     tickOpacity = 1;
     pointOpacity = 0;
     labelXOffset = 0;
-    tooltipVisibility = "none";
   }
 
+  // Transition the tooltip container
   tooltip
     .transition()
     .duration(duration)
-    .style("display", data.showTooltip ? tooltipVisibility : "none")
+    .style("display", tooltipIsVisible ? "block" : "none")
     .attr("transform", `translate(${x}, ${y})`);
 
-  tooltipText.text("Karin");
-
-  const ticksX = d3
-    .selectAll(".x-axis .tick")
+  // Fade out the axis ticks if the crosshair is active
+  d3.selectAll(".x-axis .tick")
     .transition()
     .duration(200)
     .attr("opacity", tickOpacity);
 
-  const ticksY = d3
-    .selectAll(".y-axis .tick text")
+  d3.selectAll(".y-axis .tick text")
     .transition()
     .duration(200)
     .attr("opacity", tickOpacity);
 
+  // Move the crosshair dot
   crosshairPoint
     .transition()
     .attr("cx", x)
@@ -569,6 +581,7 @@ function updateCrosshairs(
     .duration(duration)
     .attr("opacity", pointOpacity);
 
+  // Move X label & line
   crosshairXLabel
     .transition()
     .duration(duration)
@@ -578,6 +591,7 @@ function updateCrosshairs(
 
   crosshairXLine.transition().duration(duration).attr("x1", x).attr("x2", x);
 
+  // Move Y label & line
   crosshairYLabel
     .transition("dxTransitionLabel")
     .duration(200)
@@ -1873,7 +1887,8 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: false,
       showPercentiles: [],
-      showTooltip: false,
+
+      tooltipText: undefined,
       isExplorable: false,
       variant: "none",
     },
@@ -1883,7 +1898,8 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: false,
       showPercentiles: [],
-      showTooltip: false,
+
+      tooltipText: undefined,
       isExplorable: false,
       variant: "none",
     },
@@ -1893,7 +1909,8 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: [],
-      showTooltip: false,
+
+      tooltipText: undefined,
       isExplorable: false,
       variant: "none",
     },
@@ -1903,7 +1920,8 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
-      showTooltip: false,
+
+      tooltipText: undefined,
       isExplorable: false,
       variant: "none",
     },
@@ -1913,7 +1931,7 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
-      showTooltip: true,
+      tooltipText: "Karin",
       isExplorable: false,
       variant: "none",
     },
@@ -1923,7 +1941,8 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
-      showTooltip: false,
+
+      tooltipText: "Du",
       isExplorable: false,
       variant: "none",
     },
@@ -1933,7 +1952,8 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
-      showTooltip: false,
+
+      tooltipText: undefined,
       isExplorable: false,
       variant: "dot",
     },
@@ -1943,7 +1963,8 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
-      showTooltip: false,
+
+      tooltipText: undefined,
       isExplorable: false,
       variant: "dot",
     },
@@ -1953,6 +1974,8 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
+
+      tooltipText: undefined,
       isExplorable: true,
       variant: "dot",
     },
