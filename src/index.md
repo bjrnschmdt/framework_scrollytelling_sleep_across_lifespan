@@ -5,7 +5,7 @@ theme: [midnight, alt]
 <style>
 
 .scroll-container {
-  position: relative;
+  /* position: relative; */
   margin: 1rem auto;
 }
 
@@ -14,19 +14,19 @@ theme: [midnight, alt]
   top: 0;
   margin: 0 auto;
   background-color: var(--theme-background-alt);
-  z-index: -1;
-  pointer-events: none;
-  transition: z-index 0.3s ease, pointer-events 0.3s ease;
+  /* z-index: -1; */
+  /* pointer-events: none; */
+  /* transition: z-index 0.3s ease, pointer-events 0.3s ease; */
 }
 
-.scroll-info.interactive {
+/* .scroll-info.interactive {
   z-index: 3;
   pointer-events: auto;
-}
+} */
 
-.scroll-info > div {
+/* .scroll-info > div {
   position: relative;
-}
+} */
 
 .scroll-info,
 .scroll-section {
@@ -35,7 +35,7 @@ theme: [midnight, alt]
 .scroll-section {
   position:relative;
   max-width: 32rem;
-  margin: 0 auto 70vh;
+  margin: 0 auto 60vh;
   z-index: 2;
 }
 
@@ -48,12 +48,43 @@ theme: [midnight, alt]
   margin-bottom: 30vh;
 }
 
+/* Style the buttons that are used to open and close the accordion panel */
+/* .accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+} */
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+/* .active, .accordion:hover {
+  background-color: #ccc;
+} */
+
+/* Style the accordion panel. Note: hidden by default */
+.panel {
+  /* padding: 0 18px; */
+  /* background-color: white; */
+  display: none;
+  overflow: hidden;
+}
+
+#answer {
+  display: none;
+  overflow: hidden;
+}
+
 </style>
 
 ```js
 import { Generators } from "npm:@observablehq/stdlib";
 import { Mutable } from "npm:@observablehq/stdlib";
-import { findNextSmallerPValue } from "./components/helperFunctions.js";
+import { getNearestPValue } from "./components/helperFunctions.js";
 import { data, dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
 import { element } from "./components/element.js";
@@ -158,11 +189,33 @@ const personalizationValue = true;
 ```
 
 ```js
-const prediction = Inputs.button("Auflösung anzeigen");
+const isDisabled = Mutable(false);
+const setDisabled = (x) => (isDisabled.value = x);
+```
+
+```js
+const prediction = Inputs.button("Auflösung anzeigen", {
+  value: null,
+  reduce: (value) => buttonClicked(value),
+  disabled: isDisabled,
+});
 ```
 
 ```js
 const predictionValue = Generators.input(prediction);
+```
+
+```js
+const scrollTo = Inputs.button("Nochmal versuchen", {
+  reduce: () => {
+    const target = document.getElementById("user-input");
+    target.scrollIntoView({ behavior: "smooth" });
+  },
+});
+```
+
+```js
+const scrollToValue = Generators.input(scrollTo);
 ```
 
 ```js
@@ -192,7 +245,7 @@ const sleepTimeValue = Generators.input(sleepTimeInput);
 ```js
 const estimate = Inputs.range([0, 100], {
   label: "Schätzung in %",
-  step: 5,
+  step: 1,
   value: 0,
   placeholder: "in %",
 });
@@ -210,20 +263,27 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   <div class="scroll-section card" data-step="2">Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000 Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert. Die Daten der Erwachsenen beruhen auf Selbsteinschätzungen, die der Kinder auf Angaben der Eltern. Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen: Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig.</div>
   <div class="scroll-section card" data-step="3">Die Linien geben Perzentile an und zeigen, wie sich die Datenpunkte in der Stichprobe verteilen. Was das konkret heißt, siehst du im folgenden Bild:</div>
   <div class="scroll-section card" data-step="4">Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</div>
-   <div class="scroll-section card" data-step="5">
+   <div class="scroll-section card" data-step="5" id="user-input">
   Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.
   ${ageInput}${sleepTimeInput}</div>
-  <div class="scroll-section card" data-step="6">Die hier gezeigten Figuren fassen die Daten der einzelnen Personen zusammen. Die Figuren stehen jeweils für 5% der Daten. Die Figuren beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.</div>
-   <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimate}${prediction}${predictionValue ? `Die richtige Antwort ist ${findNextSmallerPValue(dataSet.get(chartValue.age), chartValue.sleepTime)} Danke, das war nicht einfach. Versuche es nochmal! Je öfter du schätzt, desto besser können wir sehen, wie gut die Grafik funktioniert` : ""}</div>
+  <div class="scroll-section card" data-step="6">Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</div> 
+    <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimate}${prediction}
+      <div id="answer">Die richtige Antwort ist ${Math.round(getNearestPValue(dataSet, chartValue.age, chartValue.sleepTime) * 100)}% Versuche es gerne nochmal mit einem anderen Alter/Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
+      </div>
+    </div>  
    <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
+      <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
+
 </section>
-<div class="card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
-<div class="card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
-<div class="card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
-<div class="card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst. Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
 
 ```js
-const container = d3.select(element("div"));
+console.log("dataSet", dataSet);
+```
+
+```js
+/* const container = d3.select(element("div")); */
+console.log("Codeblock executed");
+const container = d3.create("div");
 container.style("position", "relative");
 container.style("background-color", `var(--theme-background)`);
 
@@ -280,8 +340,7 @@ new PointerInteraction(svg, container);
 
 function update(data) {
   //console.log(data);
-  const pValue = findNextSmallerPValue(data, container.node().value.sleepTime);
-  /* console.log(container.node().value.age, pValue); */
+
   // Update the pointcloud visibility
   pointcloud.setVisibility(container.node().value.showPointcloud);
 
@@ -1725,8 +1784,11 @@ const observerCallback = (entries, observer) => {
       // Update the chartElement with the current step
       set(chartElement, steps[step]);
 
-      // Update the chartElement with the current step
-      set(prediction, undefined);
+      // reseting the prediction visibility
+      const target = document.getElementById("answer");
+      target.style.display = "none";
+      setDisabled(false);
+      set(estimate, 0);
 
       // Additional behavior for the last section (step 8)
       if (step === "8") {
@@ -1750,7 +1812,7 @@ const observerCallback = (entries, observer) => {
 
 const observerOptions = {
   root: null, // Use the viewport as the root
-  rootMargin: `0% 0% -${90 - relativeHeight * 100}% 0%`, // Adjust as needed
+  rootMargin: `0% 0% -${100 - relativeHeight * 100}% 0%`, // Adjust as needed
   /* threshold: 0.5, */ // Trigger when 50% of the section is visible
 };
 
@@ -1763,8 +1825,13 @@ targets.forEach((target) => {
 invalidation.then(() => observer.disconnect());
 ```
 
-```js
+<!-- ```js
 predictionValue; // run this block when the button is clicked
+const target = document.getElementById("answer");
+target.style.display = "block";
+
+console.log("code run");
+
 window["optimizely"] = window["optimizely"] || [];
 window["optimizely"].push({
   type: "event",
@@ -1775,6 +1842,26 @@ window["optimizely"].push({
     ).value,
   },
 });
+``` -->
+
+```js
+const buttonClicked = (value) => {
+  setDisabled(true);
+  const target = document.getElementById("answer");
+  target.style.display = "block";
+
+  window["optimizely"] = window["optimizely"] || [];
+  window["optimizely"].push({
+    type: "event",
+    eventName: "kielscn_schlafdauer_sctn_7_input_changed",
+    tags: {
+      estimate_value: document.querySelector(
+        '.scroll-section.card[data-step="7"] input[type=number]'
+      ).value,
+    },
+  });
+  return value + 1;
+};
 ```
 
 ```js
