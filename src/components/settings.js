@@ -5,17 +5,20 @@ import { Generators } from "npm:@observablehq/stdlib";
 const w = Generators.width(document.querySelector("main"));
 
 const margin = {
-  top: 128,
+  top: 64,
   right: 16,
-  bottom: 128,
+  bottom: 64,
   left: 16,
 };
 
 // sleep axis settings
 const sleepMin = 4;
 const sleepMax = 13;
-const nthresholdsSleep = 18;
-const thresholdsSleep = d3.ticks(sleepMin, sleepMax, nthresholdsSleep);
+const sleepStep = 0.25;
+/* const nthresholdsSleep = 18;
+const thresholdsSleep = d3.ticks(sleepMin, sleepMax, nthresholdsSleep); */
+const nthresholdsSleep = 36;
+const thresholdsSleep = d3.range(sleepMin, sleepMax + sleepStep, sleepStep);
 
 const ageMin = 5;
 const ageMax = 95;

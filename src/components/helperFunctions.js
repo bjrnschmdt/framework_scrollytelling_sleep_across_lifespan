@@ -48,32 +48,68 @@ export function calculatePercentiles(data) {
   return agePercentiles;
 }
 
-export function findNextSmallerPValue(data, inputValue) {
-  // Check if data or dotPlotData is missing or not an array
-  if (!data || !Array.isArray(data.dotPlotData)) {
-    return null; // Gracefully return null if data is undefined or invalid
+/**
+ * Retrieves the nearestPValue for a given age and sleeptime from the dataSet Map.
+ * Safely handles undefined values for age or sleeptime.
+ *
+ * @param {Map<number, any>} dataSet - The Map where each key is the bin's start age (e.g., 5, 6, 7...),
+ *                                     and each value is an object that has { ageRange, estimatesData, ... }.
+ * @param {number|undefined} age - The age we want to look up. Might be undefined.
+ * @param {number|undefined} sleeptime - The sleeptime value whose nearestPValue we want to retrieve. Might be undefined.
+ * @returns {number|null} The nearestPValue if found, otherwise null.
+ */
+export function getNearestPValue(dataSet, age, sleeptime) {
+  // 1. Find the correct bin object in the Map for the specified age
+  //    Each entry in dataSet is like:
+  //    key: <startAge>
+  //    value: {
+  //       ageRange: { start, end },
+  //       boxPlotData: { ... },
+  //       dotPlotData: [...],
+  //       estimatesPlotData: [
+  //         { sleeptime: 4, nearestPValue: 0.05 },
+  //         ...
+  //       ],
+  //       percentilePlotData: [...]
+  //    }
+  if (typeof age === "undefined" || typeof sleeptime === "undefined") {
+    console.warn("Either age or sleeptime is undefined; returning null.");
+    return null;
   }
 
-  // Find the next smaller 'q' value
-  const dotPlot = data.dotPlotData;
-  let result = null;
+  let binObj = null;
 
-  for (let i = dotPlot.length - 1; i >= 0; i--) {
-    if (dotPlot[i].q < inputValue) {
-      result = dotPlot[i];
+  for (let [binStartAge, binValue] of dataSet.entries()) {
+    const { start, end } = binValue.ageRange;
+    if (age >= start && age < end) {
+      binObj = binValue;
       break;
     }
   }
 
-  // If no smaller value is found, return null
-  if (!result) {
+  if (!binObj) {
+    console.warn(`No bin found for age ${age}`);
     return null;
   }
 
-  // Process the pValue: add 0.025, multiply by 100, convert to a string, and append '%'
-  const processedPValue = ((result.p + 0.025) * 100).toFixed(0) + "%";
+  // 2. Among this bin’s estimatesData array, find the item whose sleeptime is closest to the requested sleeptime
+  const { estimatesPlotData } = binObj;
+  if (!estimatesPlotData || !Array.isArray(estimatesPlotData)) {
+    console.warn(
+      `No valid estimatesPlotData array found for age range [${binObj.ageRange.start}, ${binObj.ageRange.end})`
+    );
+    return null;
+  }
 
-  return processedPValue;
+  const bestMatch = estimatesPlotData.reduce((acc, cur) => {
+    if (!acc) return cur;
+    const distAcc = Math.abs(acc.sleeptime - sleeptime);
+    const distCur = Math.abs(cur.sleeptime - sleeptime);
+    return distCur < distAcc ? cur : acc;
+  }, null);
+
+  // 3. Return the nearestPValue (or null if nothing was found)
+  return bestMatch ? bestMatch.nearestPValue : null;
 }
 
 // probability density function

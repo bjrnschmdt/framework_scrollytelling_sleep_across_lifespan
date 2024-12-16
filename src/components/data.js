@@ -8,7 +8,15 @@ import {
 
 import { settings } from "./settings.js";
 
-const { ageMin, ageMax, thresholdsAge, qstep, numQuantiles, smooth } = settings;
+const {
+  ageMin,
+  ageMax,
+  thresholdsAge,
+  thresholdsSleep,
+  qstep,
+  numQuantiles,
+  smooth,
+} = settings;
 
 const metaStudy = [
   { name: "ABCD", n: 3444, extent: [0.99, 3.39], mean: 10.6, sd: 0.7 },
@@ -161,6 +169,52 @@ const dataDotPlot = quantiles.map((subArray, i) => {
   return enhancedSubArray;
 });
 
+export const dataEstimates = (() => {
+  // We'll build an array that parallels dataBoxPlot, dataDotPlot, dataPercentilePlot, etc.
+  let estimatesArray = [];
+
+  // Loop over each bin defined by thresholdsAge
+  for (let i = 0; i < thresholdsAge.length - 1; i++) {
+    const x0 = thresholdsAge[i];
+    const x1 = thresholdsAge[i + 1];
+
+    // Find the corresponding percentile data for this bin
+    const percentilePlot = dataPercentilePlot.find(
+      (item) => item.x0 === x0 && item.x1 === x1
+    );
+    if (!percentilePlot) {
+      // no matching percentile data
+      continue;
+    }
+
+    // percentilePlot is an array of { p, q }
+    // For each thresholdsSleep value, find the percentile whose q is closest to that sleepVal
+    const estimatesPlotData = thresholdsSleep.map((sleepVal) => {
+      let nearestQObj = percentilePlot.reduce((acc, cur) => {
+        if (!acc) return cur;
+        let distAcc = Math.abs(acc.q - sleepVal);
+        let distCur = Math.abs(cur.q - sleepVal);
+        return distCur < distAcc ? cur : acc;
+      }, null);
+
+      // Instead of returning nearestQObj.q, we return nearestQObj.p
+      return {
+        sleeptime: sleepVal,
+        nearestPValue: nearestQObj ? nearestQObj.p : null,
+      };
+    });
+
+    // Push the resulting object into the array
+    estimatesArray.push({
+      x0,
+      x1,
+      estimatesPlotData,
+    });
+  }
+
+  return estimatesArray;
+})();
+
 export const dataSet = (() => {
   let combinedData = new Map(); // Using Map to ensure unique keys with more control
 
@@ -175,6 +229,9 @@ export const dataSet = (() => {
     let percentilePlot = dataPercentilePlot.find(
       (item) => item.x0 === x0 && item.x1 === x1
     );
+    const estimates = dataEstimates.find(
+      (item) => item.x0 === x0 && item.x1 === x1
+    );
 
     if (boxPlot && dotPlot && percentilePlot) {
       combinedData.set(x0, {
@@ -182,6 +239,7 @@ export const dataSet = (() => {
         boxPlotData: boxPlot,
         dotPlotData: dotPlot.map((dp) => ({ p: dp.p, q: dp.q, x: dp.x })),
         percentilePlotData: percentilePlot.map((dp) => ({ p: dp.p, q: dp.q })),
+        estimatesPlotData: estimates.estimatesPlotData,
       });
     } else {
       console.warn(`No matching data found for age range: ${x0} to ${x1}`);
@@ -205,6 +263,9 @@ export const data = (() => {
     let percentilePlot = dataPercentilePlot.find(
       (item) => item.x0 === x0 && item.x1 === x1
     );
+    const estimates = dataEstimates.find(
+      (item) => item.x0 === x0 && item.x1 === x1
+    );
 
     if (boxPlot && dotPlot) {
       combinedData.push({
@@ -212,6 +273,7 @@ export const data = (() => {
         boxPlotData: boxPlot,
         dotPlotData: dotPlot.map((dp) => ({ p: dp.p, q: dp.q, x: dp.x })),
         percentilePlotData: percentilePlot.map((dp) => ({ p: dp.p, q: dp.q })),
+        estimatesPlotData: estimates.estimatesPlotData,
       });
     } else {
       console.warn(`No matching data found for age range: ${x0} to ${x1}`);
