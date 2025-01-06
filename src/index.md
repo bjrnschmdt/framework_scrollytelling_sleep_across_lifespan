@@ -101,6 +101,7 @@ import {
 } from "./components/crosshair.js";
 import { PointerInteraction } from "./components/pointerInteraction.js";
 import { createXAxis, createYAxis } from "./components/axes.js";
+import { drawGroupedPercentileLines } from "./components/percentileLines.js";
 import { updatePlot, exitPlot } from "./components/plot.js";
 import { updateDotPlot } from "./components/plotDot.js";
 import { updatePercentilePlot } from "./components/plotPercentile.js";
@@ -397,7 +398,11 @@ function update(data) {
   }
 
   // Draw percentiles
-  drawGroupedPercentileLines(svg, container);
+  drawGroupedPercentileLines(svg, container, {
+    groupedByPercentile,
+    xScaleSVG,
+    yScaleSVG,
+  });
 
   // Draw recommended Area
   drawRecommendedArea(svg, container);
@@ -576,107 +581,6 @@ const qymax = Math.max(
 <!-- ```js
 const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
 ``` -->
-
-<!-- ---
-
-### Percentile Lines Plot -->
-
-```js
-function drawGroupedPercentileLines(svg, container) {
-  const percentiles = container.node().value.showPercentiles;
-
-  // Create or select a group for all percentile lines
-  let allPercentilesGroup = svg.select(".all-percentiles");
-
-  if (allPercentilesGroup.empty()) {
-    allPercentilesGroup = svg.append("g").attr("class", "all-percentiles");
-  }
-
-  // Filter the data based on the percentiles array
-  const visiblePercentiles = groupedByPercentile.filter((value) => {
-    const percentileKey = value[0]; // The percentile key (5, 6, 7, etc.)
-    return (
-      (mostProminent.includes(percentileKey) && percentiles.includes("A")) ||
-      (lessProminent.includes(percentileKey) &&
-        percentileKey % 5 === 0 &&
-        percentiles.includes("B")) ||
-      percentiles.includes("C")
-    );
-  });
-
-  // Bind data to the percentile group
-  const percentileGroups = allPercentilesGroup
-    .selectAll(".percentile-group")
-    .data(visiblePercentiles, (d) => d[0]); // Use the first item in the array as the key
-
-  // Use join to handle enter, update, and exit
-  percentileGroups.join(
-    (enter) => {
-      const group = enter
-        .append("g")
-        .attr("class", "percentile-group")
-        .style("opacity", 0); // Start with 0 opacity for fade-in
-
-      // Draw lines with the provided styles
-      group.each(function (d) {
-        const percentileKey = d[0]; // The percentile key (5, 6, 7, etc.)
-        const percentileData = d[1]; // The array of percentile data objects (age, tst, etc.)
-
-        if (
-          mostProminent.includes(percentileKey) &&
-          percentiles.includes("A")
-        ) {
-          drawPercentileLines(
-            d3.select(this),
-            percentileData,
-            0.4,
-            lineWidths.regular,
-            colors.text
-          );
-        } else if (
-          lessProminent.includes(percentileKey) &&
-          percentileKey % 5 === 0 &&
-          percentiles.includes("B")
-        ) {
-          drawPercentileLines(
-            d3.select(this),
-            percentileData,
-            0.4,
-            lineWidths.thin,
-            colors.text
-          );
-        } else if (percentiles.includes("C")) {
-          drawPercentileLines(
-            d3.select(this),
-            percentileData,
-            0.2,
-            lineWidths.regular,
-            colors.text
-          );
-        }
-      });
-
-      group
-        .transition()
-        .duration(600)
-        .ease(d3.easeCubicInOut)
-        .style("opacity", 1); // Fade in
-    },
-
-    // Update: Keep elements that are still present
-    (update) => update,
-
-    // Exit: Fade out and remove lines when percentiles are no longer visible
-    (exit) =>
-      exit
-        .transition()
-        .duration(600)
-        .ease(d3.easeCubicInOut)
-        .style("opacity", 0)
-        .remove() // Remove after transition
-  );
-}
-```
 
 ```js
 function drawPercentileLines(
