@@ -99,6 +99,7 @@ import {
   initializeCrosshair,
   updateCrosshairs,
 } from "./components/crosshair.js";
+import { PointerInteraction } from "./components/pointerInteraction.js";
 import { createXAxis, createYAxis } from "./components/axes.js";
 import { updatePlot, exitPlot } from "./components/plot.js";
 import { updateDotPlot } from "./components/plotDot.js";
@@ -362,7 +363,14 @@ createYAxis(svg, timeScale, w);
 const crosshair = initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h, margin);
 
 // Setup the pointer interactions like pointerMoved and pointerClicked
-new PointerInteraction(svg, container);
+/* new PointerInteraction(svg, container); */
+new PointerInteraction(svg, container, {
+  margin,
+  w,
+  h,
+  xScaleSVG,
+  yScaleSVG,
+});
 
 function update(data) {
   /* console.log("data", data); */
@@ -435,7 +443,7 @@ const band = 1;
 <!-- ---
 ### Pointer Functions -->
 
-```js
+<!-- ```js
 class PointerInteraction {
   constructor(svg, container) {
     this.svg = svg;
@@ -547,7 +555,7 @@ class PointerInteraction {
       .on("touchstart", (event) => event.preventDefault()); // Prevent default touch behavior
   }
 }
-```
+``` -->
 
 <!-- ---
 

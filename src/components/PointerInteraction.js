@@ -1,44 +1,58 @@
+// pointerInteraction.js
 import * as d3 from "npm:d3";
-import throttle from "npm:lodash/throttle"; // For throttling pointerMoved
+import _ from "npm:lodash";
 
-class PointerInteraction {
-  constructor(svg, container, config) {
+import { createDebouncedLogger, logInteraction } from "./helperFunctions.js";
+
+function roundToStep(value, step) {
+  return Math.round(value / step) * step;
+}
+
+/**
+ * PointerInteraction handles all pointer-based (mouse/touch) interactivity on an SVG.
+ */
+export class PointerInteraction {
+  /**
+   * @param {d3.Selection} svg - A D3 selection of your SVG container.
+   * @param {d3.Selection} container - A D3 selection or DOM element holding shared state (`.node().value`).
+   * @param {object} config - Object to hold all parameters normally referenced as globals:
+   *                         { margin, w, h, xScaleSVG, yScaleSVG }
+   */
+  constructor(svg, container, { margin, w, h, xScaleSVG, yScaleSVG }) {
     this.svg = svg;
     this.container = container;
+    this.margin = margin;
+    this.w = w;
+    this.h = h;
+    this.xScaleSVG = xScaleSVG;
+    this.yScaleSVG = yScaleSVG;
     this.isPlotLocked = false;
     this.node = container.node();
 
-    // Destructure configuration parameters
-    const { margin, width, height, xScale, yScale } = config;
-    this.margin = margin;
-    this.width = width;
-    this.height = height;
-    this.xScale = xScale;
-    this.yScale = yScale;
-
-    // Bind methods once
-    this.pointerMoved = throttle(this.pointerMoved.bind(this), 16); // Throttle to ~60fps
-    this.pointerClicked = this.pointerClicked.bind(this);
-    this.preventTouchStart = this.preventTouchStart.bind(this);
-
+    // Attach event listeners
     this.attachEventListeners();
+
+    // Create a debounced logger
+    this.debouncedLogger = createDebouncedLogger(logInteraction, 500); // 500ms delay
   }
 
+  /**
+   * Calculate the pointer's position and determine if it is within margins.
+   */
   calculatePosition(event) {
-    const [mx, my] = d3.pointer(event, this.svg.node());
-    const { left, right, top, bottom } = this.margin;
-    const { width, height } = this;
-
+    const [x, y] = d3.pointer(event);
     const withinMargins =
-      mx >= left && mx <= width - right && my >= top && my <= height - bottom;
+      x >= this.margin.left &&
+      x <= this.w - this.margin.right &&
+      y >= this.margin.top &&
+      y <= this.h - this.margin.bottom;
 
-    return {
-      withinMargins,
-      x: mx,
-      y: my,
-    };
+    return { x, y, withinMargins };
   }
 
+  /**
+   * Map position to data values or reset if out of bounds.
+   */
   calculateValue({ x, y, withinMargins }) {
     if (!withinMargins) {
       return {
@@ -47,52 +61,68 @@ class PointerInteraction {
         sleepTime: undefined,
       };
     }
+
     return {
       ...this.node.value,
-      age: Math.round(this.xScale.invert(x)),
-      sleepTime: this.roundToStep(this.yScale.invert(y), 0.25),
+      age: Math.round(this.xScaleSVG.invert(x)),
+      sleepTime: roundToStep(this.yScaleSVG.invert(y), 0.25),
     };
   }
 
-  roundToStep(value, step) {
-    return Math.round(value / step) * step;
-  }
-
+  /**
+   * Update the cursor style based on the plot lock state.
+   */
   updateInteractionState(locked) {
     this.svg.style("cursor", locked ? "not-allowed" : "crosshair");
   }
 
+  /**
+   * Handle pointer movement and update interaction state.
+   */
   pointerMoved(event) {
-    if (this.isPlotLocked || this.node.value.isExplorable) return;
+    if (
+      !this.isValidEvent(event) ||
+      this.isPlotLocked ||
+      !this.node.value.isExplorable
+    ) {
+      return;
+    }
 
     const position = this.calculatePosition(event);
     const newValue = this.calculateValue(position);
 
-    const { age, sleepTime } = this.node.value;
-    const { age: newAge, sleepTime: newSleepTime } = newValue;
-
-    // Shallow comparison instead of _.isEqual
-    if (age !== newAge || sleepTime !== newSleepTime) {
+    // Trigger an update only if the value changes
+    if (!_.isEqual(this.node.value, newValue)) {
       this.node.value = newValue;
       this.node.dispatchEvent(new CustomEvent("input", { bubbles: true }));
+
+      // Log the interaction with a debounce
+      this.debouncedLogger(newValue);
     }
   }
 
+  /**
+   * Toggle the lock state of the plot on pointer click.
+   */
   pointerClicked() {
     this.isPlotLocked = !this.isPlotLocked;
     this.updateInteractionState(this.isPlotLocked);
   }
 
-  preventTouchStart(event) {
-    event.preventDefault();
+  /**
+   * Validate the event object.
+   */
+  isValidEvent(event) {
+    return event !== null && typeof event === "object";
   }
 
+  /**
+   * Attach pointer event listeners to the SVG element.
+   */
   attachEventListeners() {
     this.svg
-      .on("pointerenter pointermove", this.pointerMoved)
-      .on("click", this.pointerClicked)
-      .on("touchstart", this.preventTouchStart);
+      .on("pointerenter pointermove", this.pointerMoved.bind(this))
+      .on("click", this.pointerClicked.bind(this))
+      .on("touchstart", (event) => event.preventDefault()); // Prevent default touch behavior
   }
 }
-
-export default PointerInteraction;
