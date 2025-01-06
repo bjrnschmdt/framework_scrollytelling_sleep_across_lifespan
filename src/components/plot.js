@@ -16,7 +16,7 @@ export function updatePlot({
   const svg = d3.select(".svg");
 
   if (!data || !data[plotDataKey] || data[plotDataKey].length === 0) {
-    svg.selectAll(`.${plotClass}`).remove();
+    exitPlot();
     return;
   }
 
@@ -35,9 +35,19 @@ export function updatePlot({
     .selectAll(`g.${plotClass}`)
     // Passing a dummy array of length 1 so that .join() sees “one container”
     .data([null])
-    .join((enter) => enter.append("g").attr("class", plotClass))
-    .attr("transform", `translate(${xScaleSVG(data.ageRange.start)},0)`);
-
+    .join(
+      (enter) =>
+        enter
+          .append("g")
+          .attr("class", plotClass)
+          .attr("transform", `translate(${xScaleSVG(data.ageRange.start)},0)`),
+      (update) =>
+        update
+          .transition("transform")
+          .duration(100)
+          .ease(d3.easeCubic)
+          .attr("transform", `translate(${xScaleSVG(data.ageRange.start)}, 0)`)
+    );
   plot
     .selectAll(`.${plotClass}-element`)
     .data(filteredData, (d) => d.id)
@@ -51,10 +61,5 @@ export function updatePlot({
 export function exitPlot() {
   const svg = d3.select(".svg");
   const plotClasses = ["dot-plot", "box-plot", "percentile-plot"];
-  svg
-    .selectAll(plotClasses.map((cls) => `.${cls}`).join(", "))
-    .transition("opacity")
-    .duration(200)
-    .style("opacity", 0)
-    .remove();
+  svg.selectAll(plotClasses.map((cls) => `.${cls}`).join(", ")).remove();
 }
