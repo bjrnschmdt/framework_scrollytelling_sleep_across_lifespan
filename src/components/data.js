@@ -91,6 +91,11 @@ const dataPercentilePlot = ageBinnedData.map((age) => {
   // Add x0 and x1 to the quantile array as properties
   percentileResults.x0 = age.x0; // Retain x0 from the CDF
   percentileResults.x1 = age.x1; // Retain x1 from the CDF
+
+  // Add a stable "id" to each percentile entry
+  percentileResults.forEach((d) => {
+    d.id = `percentileItem-${d.p}`;
+  });
   return percentileResults;
 });
 
@@ -120,6 +125,7 @@ const dataBoxPlot = d3
 
     // Only return the statistics instead of the whole data points
     return {
+      id: "boxItem",
       quartiles: [q1, q2, q3],
       range: [r0, r1],
       outliers,
@@ -159,6 +165,7 @@ const dataDotPlot = quantiles.map((subArray, i) => {
       p: obj.p, // probability value from quantile
       q: obj.q, // quantile value
       x: dotBins[i][j], // corresponding dot bin value
+      id: `dotItem-${obj.p}`, // unique identifier
     };
   });
 
@@ -236,9 +243,13 @@ export const dataSet = (() => {
     if (boxPlot && dotPlot && percentilePlot) {
       combinedData.set(x0, {
         ageRange: { start: x0, end: x1 },
-        boxPlotData: boxPlot,
-        dotPlotData: dotPlot.map((dp) => ({ p: dp.p, q: dp.q, x: dp.x })),
-        percentilePlotData: percentilePlot.map((dp) => ({ p: dp.p, q: dp.q })),
+        box: [boxPlot],
+        dot: dotPlot.map((dp) => ({ p: dp.p, q: dp.q, x: dp.x, id: dp.id })),
+        percentile: percentilePlot.map((dp) => ({
+          p: dp.p,
+          q: dp.q,
+          id: dp.id,
+        })),
         estimatesPlotData: estimates.estimatesPlotData,
       });
     } else {
@@ -270,9 +281,13 @@ export const data = (() => {
     if (boxPlot && dotPlot) {
       combinedData.push({
         ageRange: { start: x0, end: x1 },
-        boxPlotData: boxPlot,
-        dotPlotData: dotPlot.map((dp) => ({ p: dp.p, q: dp.q, x: dp.x })),
-        percentilePlotData: percentilePlot.map((dp) => ({ p: dp.p, q: dp.q })),
+        box: [boxPlot],
+        dot: dotPlot.map((dp) => ({ p: dp.p, q: dp.q, x: dp.x, id: dp.id })),
+        percentile: percentilePlot.map((dp) => ({
+          p: dp.p,
+          q: dp.q,
+          id: dp.id,
+        })),
         estimatesPlotData: estimates.estimatesPlotData,
       });
     } else {

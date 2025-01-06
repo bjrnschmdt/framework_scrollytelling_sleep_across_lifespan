@@ -84,10 +84,27 @@ theme: [midnight, alt]
 ```js
 import { Generators } from "npm:@observablehq/stdlib";
 import { Mutable } from "npm:@observablehq/stdlib";
-import { getNearestPValue } from "./components/helperFunctions.js";
+import {
+  getNearestPValue,
+  getURLParameter,
+  ageFormat,
+  timeFormat,
+  createDebouncedLogger,
+  logInteraction,
+} from "./components/helperFunctions.js";
 import { data, dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
 import { element } from "./components/element.js";
+import {
+  initializeCrosshair,
+  updateCrosshairs,
+} from "./components/crosshair.js";
+import { createXAxis, createYAxis } from "./components/axes.js";
+import { updatePlot, exitPlot } from "./components/plot.js";
+import { updateDotPlot } from "./components/plotDot.js";
+import { updatePercentilePlot } from "./components/plotPercentile.js";
+import { updateBoxPlot } from "./components/plotBox.js";
+/* import { yScaleSVG, timeScale, yScaleBoxPlot } from "./components/scales.js"; */
 ```
 
 ```js
@@ -99,16 +116,21 @@ const {
   sleepMax,
   nthresholdsSleep,
   thresholdsSleep,
+  startTime,
+  endTime,
   margin,
   qstep,
   qdomain,
+  qradius,
   canvasScaleFactor,
   percentileSelection,
   mostProminent,
   lessProminent,
   fontFamily,
   fontSize,
+  lineWidths,
   icon,
+  colors,
 } = settings;
 ```
 
@@ -134,6 +156,10 @@ const h = (() => {
 const recommended = Mutable(false);
 const setTrue = () => (recommended.value = true);
 const setFalse = () => (recommended.value = false);
+```
+
+```js
+const variant = getURLParameter("v") || "dot";
 ```
 
 ```js
@@ -169,7 +195,7 @@ const entity = Inputs.bind(
       label: "Percentiles",
       value: ["C"],
     }),
-    tooltipText: Inputs.text({ label: "Tooltip text", value: "" }),
+    tooltipText: Inputs.text({ label: "Tooltip text", value: undefined }),
     isExplorable: Inputs.toggle({ label: "Explorable?", value: true }),
     variant: Inputs.radio(["box", "dot", "percentile", "none"], {
       label: "Select one",
@@ -297,8 +323,7 @@ container.node().value = {
   showRecommended: false,
   showPointcloud: true,
   showPercentiles: ["B", "C"],
-
-  tooltipText: "",
+  tooltipText: undefined,
   isExplorable: false,
   variant: "none",
 };
@@ -331,29 +356,30 @@ defs
 const pointcloud = new Pointcloud(context, canvas);
 
 // Create Axes
-createXAxis(svg);
-createYAxis(svg);
+createXAxis(svg, xScaleSVG, h);
+createYAxis(svg, timeScale, w);
 
-const crosshair = initializeCrosshair(svg);
+const crosshair = initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h, margin);
 
 // Setup the pointer interactions like pointerMoved and pointerClicked
 new PointerInteraction(svg, container);
 
 function update(data) {
-  //console.log(data);
+  /* console.log("data", data); */
+  /* console.log("node", container.node().value.variant); */
 
   // Update the pointcloud visibility
   pointcloud.setVisibility(container.node().value.showPointcloud);
 
   switch (container.node().value.variant) {
     case "percentile":
-      updatePercentilePlot(data);
+      updatePercentilePlot(data, xScaleSVG, yScaleSVG);
       break;
     case "dot":
-      updateDotPlot(data, container.node().value);
+      updateDotPlot(data, container.node().value, xScaleSVG, yScaleDotPlot);
       break;
     case "box":
-      updateBoxPlot(data);
+      updateBoxPlot(data, xScaleSVG, yScaleBoxPlot);
       break;
     case "none":
       exitPlot();
@@ -368,7 +394,7 @@ function update(data) {
   // Draw recommended Area
   drawRecommendedArea(svg, container);
 
-  updateCrosshairs(container.node().value, crosshair);
+  updateCrosshairs(container.node().value, crosshair, xScaleSVG, yScaleSVG, w);
 }
 
 container.node().update = update;
@@ -407,214 +433,6 @@ const band = 1;
 ```
 
 <!-- ---
-
-### Crosshairs -->
-
-```js
-function initializeCrosshair(svg) {
-  const x = Number(xScaleSVG(ageMin));
-  const y = Number(yScaleSVG(sleepMax));
-
-  const crosshair = svg.append("g").attr("class", "crosshair");
-
-  const tooltip = crosshair
-    .append("g")
-    .attr("class", "tooltip")
-    .style("display", "none");
-
-  // Tooltip text
-  const tooltipText = tooltip
-    .append("text")
-    .attr("class", "tooltip-text")
-    .attr("x", 0) // Centered above the crosshair
-    .attr("y", -20) // Positioned within the rectangle
-    .attr("text-anchor", "middle")
-    .attr("alignment-baseline", "middle")
-    .attr("fill", "white")
-    .style("font", `${fontSize} ${fontFamily}`)
-    .text("Name"); // Default placeholder text
-
-  const crosshairPoint = crosshair
-    .append("circle")
-    .attr("class", "crosshairPoint")
-    .attr("cx", x)
-    .attr("cy", y)
-    .attr("r", "4px")
-    .attr("fill", "white")
-    .attr("opacity", 0);
-
-  const crosshairXLabel = crosshair
-    .append("text")
-    .attr("class", "crosshairLabel")
-    .attr("x", x)
-    .attr("y", h - margin.bottom)
-    .attr("dy", 9)
-    .style("fill", "white")
-    .style("stroke", "black")
-    .style("stroke-width", "6")
-    .style("paint-order", "stroke")
-    .style("font", `${fontSize} ${fontFamily}`)
-    .style("text-anchor", "start")
-    .style("alignment-baseline", "hanging")
-    .text(`${ageFormat(ageMin)} Jahre (Alter)`);
-
-  const crosshairXLine = crosshair
-    .append("line")
-    .attr("class", "crosshairLine")
-    .attr("x1", x)
-    .attr("x2", x)
-    .attr("y1", h - margin.bottom)
-    .attr("y2", h - margin.bottom + 6)
-    .style("stroke", "white")
-    .style("stroke-width", lineWidths.regular);
-
-  const crosshairYLabel = crosshair
-    .append("text")
-    .attr("class", "crosshairLabel")
-    .attr("x", margin.left)
-    .attr("y", y)
-    .attr("dy", -4)
-    .style("fill", "white")
-    .style("stroke", "black")
-    .style("stroke-width", "4")
-    .style("paint-order", "stroke")
-    .style("font", `${fontSize} ${fontFamily}`)
-    .style("text-anchor", "start")
-    .style("alignment-baseline", "baseline")
-    .text(`${convertDecimalToTimeFormat(sleepMax)} Stunden (Schlafdauer)`);
-
-  const crosshairYLine = crosshair
-    .append("line")
-    .attr("class", "crosshairLine")
-    .attr("x1", margin.left)
-    .attr("x2", w - margin.right)
-    .attr("y1", y)
-    .attr("y2", y)
-    .style("stroke", "white")
-    .attr("stroke-opacity", 1)
-    .style("stroke-width", 1);
-
-  return {
-    crosshairPoint: crosshairPoint,
-    crosshairXLine: crosshairXLine,
-    crosshairXLabel: crosshairXLabel,
-    crosshairYLine: crosshairYLine,
-    crosshairYLabel: crosshairYLabel,
-    tooltip: tooltip,
-    tooltipText: tooltipText,
-  };
-}
-```
-
-```js
-function updateCrosshairs(
-  data,
-  {
-    crosshairPoint,
-    crosshairXLine,
-    crosshairXLabel,
-    crosshairYLine,
-    crosshairYLabel,
-    tooltip,
-    tooltipText,
-  }
-) {
-  let x = Number(xScaleSVG(data.age));
-  let y = Number(yScaleSVG(data.sleepTime));
-  let textAge = data.age;
-  let textSleep = data.sleepTime;
-  let duration = 100;
-  let tickOpacity = 0.4;
-  let pointOpacity = 1;
-  let intersect = data.age < 23;
-  let labelXOffset = -6;
-
-  console.log("tooltipText", data.tooltipText);
-
-  // -------------------------
-  // Tooltip visibility logic
-  // -------------------------
-  //
-  // Show the tooltip only if "data.tooltipText" is defined.
-  // Hide it otherwise.
-  const tooltipIsVisible = data.tooltipText !== undefined;
-  // If tooltip is visible, show the text from data.tooltipText
-  if (tooltipIsVisible) {
-    tooltipText.text(data.tooltipText);
-  }
-
-  // if cursor outside margins the crosshair get reset
-  if (isNaN(x) || isNaN(y)) {
-    x = Number(xScaleSVG(ageMin));
-    y = Number(yScaleSVG(sleepMax));
-    textAge = ageMin;
-    textSleep = sleepMax;
-    duration = 400;
-    tickOpacity = 1;
-    pointOpacity = 0;
-    labelXOffset = 0;
-  }
-
-  // Transition the tooltip container
-  tooltip
-    .transition()
-    .duration(duration)
-    .style("display", tooltipIsVisible ? "block" : "none")
-    .attr("transform", `translate(${x}, ${y})`);
-
-  // Fade out the axis ticks if the crosshair is active
-  d3.selectAll(".x-axis .tick")
-    .transition()
-    .duration(200)
-    .attr("opacity", tickOpacity);
-
-  d3.selectAll(".y-axis .tick text")
-    .transition()
-    .duration(200)
-    .attr("opacity", tickOpacity);
-
-  // Move the crosshair dot
-  crosshairPoint
-    .transition()
-    .attr("cx", x)
-    .attr("cy", y)
-    .duration(duration)
-    .attr("opacity", pointOpacity);
-
-  // Move X label & line
-  crosshairXLabel
-    .transition()
-    .duration(duration)
-    .attr("x", x)
-    .attr("dx", labelXOffset)
-    .text(`${ageFormat(textAge)} Jahre (Alter)`);
-
-  crosshairXLine.transition().duration(duration).attr("x1", x).attr("x2", x);
-
-  // Move Y label & line
-  crosshairYLabel
-    .transition("dxTransitionLabel")
-    .duration(200)
-    .attr("x", intersect ? w - margin.right : margin.left);
-
-  crosshairYLabel
-    .transition("textanchorTransitionLabel")
-    .duration(100)
-    .delay(100)
-    .style("text-anchor", intersect ? "end" : "start");
-
-  crosshairYLabel
-    .transition("xyTextTransitionLabel")
-    .duration(duration)
-    .attr("y", y)
-    .text(`${convertDecimalToTimeFormat(textSleep)} Stunden (Schlafdauer)`);
-
-  crosshairYLine.transition().duration(duration).attr("y1", y).attr("y2", y);
-}
-```
-
-<!-- ---
-
 ### Pointer Functions -->
 
 ```js
@@ -731,230 +549,9 @@ class PointerInteraction {
 }
 ```
 
-```js
-function createDebouncedLogger(callback, delay) {
-  let timer;
-  return (data) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      callback(data);
-    }, delay);
-  };
-}
-```
-
-```js
-function logInteraction({ age, sleepTime }) {
-  /* console.log(`Logging interaction: Age=${age}, SleepTime=${sleepTime}`); */
-  window["optimizely"] = window["optimizely"] || [];
-  window["optimizely"].push({
-    type: "event",
-    eventName: "kielscn_schlafdauer_sctn_8_input_changed",
-    tags: {
-      age_value: age,
-      sleepTime_value: sleepTime,
-    },
-  });
-}
-```
-
-<!-- ---
-
-### Axes -->
-
-```js
-function createXAxis(svg) {
-  // Append the x-axis group to the SVG and set its position based on height and margin
-  const xAxis = svg
-    .append("g")
-    .attr("class", "x-axis")
-    .attr("transform", `translate(0,${h - margin.bottom})`)
-    .call(
-      d3
-        .axisBottom(xScaleSVG)
-        .tickFormat(d3.format("02"))
-        .tickValues(d3.range(ageMin, ageMax + 1, 5))
-    )
-    .call((g) => {
-      // Styling specific ticks and lines
-      g.selectAll(".tick text")
-        .style("fill", "white")
-        .style("font", `${fontSize} ${fontFamily}`);
-      g.selectAll(".tick:first-of-type text").style("text-anchor", "start");
-      g.selectAll(".tick line").attr("stroke", "white");
-      g.select(".domain").attr("stroke", "white");
-    });
-}
-```
-
-```js
-// Convert sleep time hours to JavaScript date objects
-const startTime = new Date();
-startTime.setHours(sleepMin, 0, 0, 0); // Set hours, minutes, seconds, milliseconds
-```
-
-```js
-// Convert sleep time hours to JavaScript date objects
-const endTime = new Date();
-endTime.setHours(sleepMax, 0, 0, 0); // Set hours, minutes, seconds, milliseconds
-```
-
-```js
-function createYAxis(svg) {
-  // Append the y-axis group to the SVG and set its position based on margin
-  const yAxis = svg
-    .append("g")
-    .attr("class", "y-axis")
-    .attr("transform", `translate(${margin.left},0)`)
-    .call(
-      d3
-        .axisRight(timeScale)
-        .tickSize(w - margin.left - margin.right)
-        .tickFormat(d3.timeFormat("%H:%M"))
-    )
-    .call((g) => {
-      // Custom styling for ticks and lines
-      g.selectAll(".tick text")
-        .style("fill", "white")
-        .style("font", `${fontSize} ${fontFamily}`)
-        .style("stroke", "black")
-        .style("stroke-width", "2")
-        .style("paint-order", "stroke")
-        .attr("x", 0)
-        .attr("dy", -4);
-      g.selectAll(".tick line").attr("stroke", "white");
-      g.selectAll(".tick:not(:first-of-type) line")
-        .attr("stroke-opacity", 0.4)
-        .attr("stroke-dasharray", "2,2");
-      g.selectAll(".tick:first-of-type").remove(); // Removes the first tick if necessary
-      g.select(".domain").remove(); // Removes the axis line
-    });
-}
-```
-
-```js
-function formatTickX(d) {
-  // Check if the previous element sibling of the parent node is a 'path', which would mean this is the first tick
-  return this.parentNode.previousElementSibling &&
-    this.parentNode.previousElementSibling.tagName === "path"
-    ? `${d} Jahre (Alter)`
-    : `${d}`;
-}
-```
-
-```js
-function formatTickY(d) {
-  // Check if the previous element sibling of the parent node is a 'path', which would mean this is the first tick
-  return this.parentNode.nextSibling ? `${d}` : `${d} Stunden (Schlafdauer)`;
-}
-```
-
 <!-- ---
 
 ### Helper Functions -->
-
-```js
-function transitionPlot(selection, data) {
-  selection
-    .transition("transform")
-    .duration(100)
-    .ease(d3.easeCubic)
-    .attr("transform", `translate(${xScaleSVG(data.ageRange.start)}, 0)`);
-}
-```
-
-```js
-function updatePlot({
-  data,
-  plotClass,
-  plotDataKey,
-  enterFn,
-  updateFn,
-  preprocessFn = () => ({}),
-  filterFn = (data) => data,
-  useElements = true, // New parameter to switch between the two methods
-}) {
-  const svg = d3.select(".svg");
-
-  // Check if data is undefined, empty
-  if (!data || !data[plotDataKey] || data[plotDataKey].length === 0) {
-    svg
-      .selectAll(`.${plotClass}`)
-      .transition("opacity")
-      .duration(200)
-      .style("opacity", 0)
-      .remove();
-    return;
-  }
-
-  // Apply the filter function
-  const filteredData = filterFn(data[plotDataKey]);
-
-  // Run preprocessing function and get preprocessed data
-  const preprocessData = preprocessFn(filteredData);
-
-  // Bind data, considering whether it's an array or a single object
-  let plot = svg.selectAll(`.${plotClass}`).data([filteredData], () => 1);
-  let plotEnter;
-  if (useElements) {
-    // For dot and percentile plots
-    plotEnter = plot
-      .enter()
-      .append("g")
-      .attr("class", plotClass)
-      .attr("transform", `translate(${xScaleSVG(data.ageRange.start)}, 0)`)
-      .style("opacity", 0);
-
-    plotEnter.transition("opacity").duration(200).style("opacity", 1);
-
-    plot = plot.merge(plotEnter);
-
-    plot.call(transitionPlot, data);
-
-    plot
-      .selectAll(`.${plotClass}-element`)
-      .data(
-        (d) => d || [],
-        (d) => d.p
-      )
-      .join(
-        (enter) => enterFn(enter, preprocessData),
-        (update) => updateFn(update, preprocessData),
-        (exit) => exit.remove()
-      );
-  } else {
-    // For box plots
-    // Apply transitions to the box plot based on data.
-    transitionPlot(plot, data);
-    plot.join(
-      (enter) => enterFn(enter, { ageRange: data.ageRange }),
-      (update) => updateFn(update, { ageRange: data.ageRange }),
-      (exit) => exit.remove()
-    );
-  }
-}
-```
-
-```js
-/**
- * Exits any currently visible plot by fading it out and removing it from the DOM.
- * The function targets plots with classes 'dot', 'box', and 'percentile'.
- */
-function exitPlot() {
-  const svg = d3.select(".svg");
-
-  // Define the possible plot classes
-  const plotClasses = ["dot-plot", "box-plot", "percentile-plot"];
-
-  // Select all plots with the specified classes and apply the exit transition
-  svg
-    .selectAll(plotClasses.map((cls) => `.${cls}`).join(", "))
-    .transition("opacity")
-    .duration(200)
-    .style("opacity", 0)
-    .remove();
-}
-```
 
 ```js
 function roundToStep(value, step) {
@@ -962,278 +559,7 @@ function roundToStep(value, step) {
 }
 ```
 
-```js
-const timeFormat = d3.timeFormat("%H:%M");
-```
-
-```js
-const ageFormat = d3.format("02");
-```
-
-```js
-function convertDecimalToTimeFormat(decimalHour) {
-  const hours = Math.floor(decimalHour); // Get the whole number part for hours
-  const minutes = Math.round((decimalHour - hours) * 60); // Convert the decimal part to minutes
-
-  const date = new Date();
-  date.setHours(hours, minutes, 0, 0);
-
-  return timeFormat(date); // Format the date to HH:MM
-}
-```
-
 <!-- ---
-
-### Box Plot -->
-
-```js
-const updateBox = (update) => {
-  update
-    .select(".range")
-    .transition()
-    .duration(400)
-    .attr(
-      "d",
-      (d) => `M0,${yScaleBoxPlot(d.range[1])} V${yScaleBoxPlot(d.range[0])}`
-    );
-
-  update
-    .select(".quartiles")
-    .transition()
-    .duration(400)
-    .attr(
-      "d",
-      (d) => `
-          M${-10},${yScaleBoxPlot(d.quartiles[2])}
-          H${10}
-          V${yScaleBoxPlot(d.quartiles[0])}
-          H${-10}
-          Z
-        `
-    );
-
-  update
-    .select(".median")
-    .transition()
-    .duration(400)
-    .attr("d", (d) => `M${-10},${yScaleBoxPlot(d.quartiles[1])} H${10}`);
-
-  return update;
-};
-```
-
-```js
-const enterBox = (enter, { ageRange }) => {
-  let boxEnter = enter
-    .append("g")
-    .attr("class", "box")
-    .attr("transform", `translate(${xScaleSVG(ageRange.start)}, 0)`)
-    .attr("opacity", 0);
-
-  boxEnter
-    .append("path")
-    .attr("class", "range")
-    .attr("stroke", "white")
-    .attr("stroke-width", lineWidths.regular);
-
-  boxEnter
-    .append("path")
-    .attr("class", "quartiles")
-    .attr("stroke", "white")
-    .attr("stroke-width", lineWidths.regular);
-
-  boxEnter
-    .append("path")
-    .attr("class", "median")
-    .attr("stroke", "white")
-    .attr("stroke-width", lineWidths.regular);
-
-  boxEnter.transition().duration(400).attr("opacity", 1);
-
-  return boxEnter;
-};
-```
-
-```js
-function updateBoxPlot(data) {
-  const enterBoxPlot = (enter, { ageRange }) => enterBox(enter, { ageRange });
-  const updateBoxPlot = (update) => updateBox(update);
-
-  updatePlot({
-    data: data,
-    plotClass: "box",
-    plotDataKey: "boxPlotData",
-    enterFn: enterBoxPlot,
-    updateFn: updateBoxPlot,
-    useElements: false,
-  });
-}
-```
-
-<!-- ---
-
-### Dot Plot -->
-
-```js
-function precalculateHeights(data) {
-  const totalHeightMap = new Map();
-  data.forEach((dot) => {
-    const x = dot.x;
-    const count = totalHeightMap.get(x) || 0;
-    totalHeightMap.set(x, count + 2 * qradius);
-  });
-  return totalHeightMap;
-}
-```
-
-```js
-function getStackOffset(x, radius, stackMap) {
-  let currentHeight = stackMap.get(x) || 0;
-  stackMap.set(x, currentHeight + 2 * radius);
-  return currentHeight;
-}
-```
-
-```js
-function calculateCX(d, stackMap, totalHeightMap) {
-  const offset = getStackOffset(d.x, qradius, stackMap);
-  const totalHeight = totalHeightMap.get(d.x);
-  return totalHeight / 2 - offset - qradius;
-}
-```
-
-```js
-function enterDot(enter, values, stackMap, totalHeightMap) {
-  return enter
-    .append("use")
-    .attr("href", "#man-icon")
-    .attr("class", "dot-plot-element")
-    .attr("x", (d) => calculateCX(d, stackMap, totalHeightMap) - 12)
-    .attr("y", (d) => yScaleDotPlot(d.x) - 12) // offset of half the height
-    .attr("width", 24)
-    .attr("height", 24)
-    .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
-    .style("stroke", "white")
-    .style("stroke-width", 32);
-}
-```
-
-```js
-function updateDot(update, values, stackMap, totalHeightMap) {
-  return update
-    .transition()
-    .delay(100)
-    .duration(400)
-    .ease(d3.easeCubic)
-    .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
-    .attr("x", (d) => calculateCX(d, stackMap, totalHeightMap) - 12)
-    .attr("y", (d) => yScaleDotPlot(d.x) - 12); // offset of half the height
-}
-```
-
-```js
-function updateDotPlot(data, values) {
-  const preprocessDotPlot = (plotData) => {
-    return {
-      stackMap: new Map(),
-      totalHeightMap: precalculateHeights(plotData),
-    };
-  };
-
-  const enterDotPlot = (enter, { stackMap, totalHeightMap }) =>
-    enterDot(enter, values, stackMap, totalHeightMap);
-  const updateDotPlot = (update, { stackMap, totalHeightMap }) =>
-    updateDot(update, values, stackMap, totalHeightMap);
-
-  updatePlot({
-    data: data,
-    plotClass: "dot-plot",
-    plotDataKey: "dotPlotData",
-    enterFn: enterDotPlot,
-    updateFn: updateDotPlot,
-    preprocessFn: preprocessDotPlot,
-  });
-}
-```
-
-<!-- ---
-
-### Percentile Plot -->
-
-```js
-function enterPercentile(enter) {
-  return enter
-    .append("text")
-    .attr("class", "percentile-plot-element")
-    .attr("y", (d) => yScaleSVG(d.q))
-    .text((d) => `${Math.round(d.p * 100)}%`) // Improved percentage display
-    .style("fill", "white")
-    .style("font", "10px Roboto")
-    .attr("text-anchor", "middle")
-    .attr("alignment-baseline", "middle");
-}
-```
-
-```js
-function updatePercentile(update) {
-  return update
-    .transition()
-    .duration(100)
-    .ease(d3.easeCubic)
-    .attr("y", (d) => yScaleSVG(d.q));
-}
-```
-
-```js
-function updatePercentilePlot(data) {
-  const filterPercentilePlot = (plotData) => {
-    return plotData.filter((item) => percentileSelection.includes(item.p));
-  };
-
-  const enterPercentilePlot = (enter) => enterPercentile(enter); // Assuming enterDot doesn't require additional data
-  const updatePercentilePlot = (update) => updatePercentile(update); // Assuming updateDot doesn't require additional data
-
-  updatePlot({
-    data: data,
-    plotClass: "percentile-plot",
-    plotDataKey: "percentilePlotData",
-    enterFn: enterPercentilePlot,
-    updateFn: updatePercentilePlot,
-    filterFn: filterPercentilePlot,
-  });
-}
-```
-
-<!-- ---
-
-### Settings -->
-
-```js
-const lineWidths = {
-  thin: 0.5,
-  regular: 1,
-  medium: 1.5,
-  thick: 2,
-};
-```
-
-```js
-const colors = {
-  background: "black",
-  grid: "white",
-  recommended: "#2e807d",
-  acceptable: "#3d1438",
-  text: "white",
-  strokeOutline: "black",
-};
-```
-
-<!-- ---
-
-### Setup
-
----
-
 ### Scales -->
 
 ```js
@@ -1292,21 +618,21 @@ const yScaleBoxPlot = d3
 const rangeSteps = d3.range(4, 13.5, 0.5); // Creates an array from 4 to 13 with steps of 0.5
 ```
 
-```js
+<!-- ```js
 const rangeValues = d3.range(
   h - margin.bottom,
   margin.top,
   ((margin.top - (h - margin.bottom)) / rangeSteps.length) * -1
 );
-```
+``` -->
 
-```js
+<!-- ```js
 d3.range(
   h - margin.bottom,
   margin.top,
   ((margin.top - (h - margin.bottom)) / rangeSteps.length) * -1
 );
-```
+``` -->
 
 ```js
 const yScaleCrosshair = d3
@@ -1322,6 +648,8 @@ const yScaleCrosshair1 = d3
   .range(thresholdsSleep);
 ```
 
+### 9
+
 ```js
 const yScaleQuantize = d3
   .scaleQuantize()
@@ -1333,9 +661,9 @@ const yScaleQuantize = d3
 
 ### Quantile Dot Plots -->
 
-```js
+<!-- ```js
 const qwidth = h - margin.top - margin.bottom;
-```
+``` -->
 
 ```js
 // find the maximum amount of stacked dots
@@ -1344,7 +672,7 @@ const qymax = Math.max(
     Math.max(
       ...d3
         .rollup(
-          obj.dotPlotData,
+          obj.dot,
           (v) => v.length, // Count the entries
           (d) => d.x // Group by the x value
         )
@@ -1354,9 +682,9 @@ const qymax = Math.max(
 );
 ```
 
-```js
+<!-- ```js
 const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
-```
+``` -->
 
 <!-- ---
 
@@ -1739,7 +1067,7 @@ const groupedByPercentile = d3.groups(flattenedData, (d) => d.percentile);
 
 ```js
 const flattenedData = data.flatMap((d) =>
-  d.percentilePlotData.map((p) => ({
+  d.percentile.map((p) => ({
     age: d.ageRange.start,
     percentile: Math.round(p.p * 100),
     tst: p.q,
@@ -1887,7 +1215,6 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: false,
       showPercentiles: [],
-
       tooltipText: undefined,
       isExplorable: false,
       variant: "none",
@@ -1898,7 +1225,6 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: false,
       showPercentiles: [],
-
       tooltipText: undefined,
       isExplorable: false,
       variant: "none",
@@ -1920,7 +1246,6 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
-
       tooltipText: undefined,
       isExplorable: false,
       variant: "none",
@@ -1941,7 +1266,6 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
-
       tooltipText: "Du",
       isExplorable: false,
       variant: "none",
@@ -1952,10 +1276,9 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
-
       tooltipText: undefined,
       isExplorable: false,
-      variant: "dot",
+      variant: variant,
     },
     7: {
       age: age,
@@ -1963,10 +1286,9 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
-
       tooltipText: undefined,
       isExplorable: false,
-      variant: "dot",
+      variant: variant,
     },
     8: {
       age: age,
@@ -1974,10 +1296,9 @@ function getSteps(age, sleepTime) {
       showRecommended: false,
       showPointcloud: true,
       showPercentiles: ["C"],
-
       tooltipText: undefined,
       isExplorable: true,
-      variant: "dot",
+      variant: variant,
     },
   };
 }

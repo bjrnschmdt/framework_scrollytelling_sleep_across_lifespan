@@ -122,3 +122,45 @@ export function epanechnikov(bandwidth) {
 export function kde(kernel, thresholds, data) {
   return thresholds.map((t) => [t, d3.mean(data, (d) => kernel(t - d))]);
 }
+
+// Helper function to parse URL parameters
+export function getURLParameter(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
+
+export const ageFormat = d3.format("02");
+
+export const timeFormat = d3.timeFormat("%H:%M");
+
+export function convertDecimalToTimeFormat(decimalHour) {
+  const hours = Math.floor(decimalHour); // Get the whole number part for hours
+  const minutes = Math.round((decimalHour - hours) * 60); // Convert the decimal part to minutes
+
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+
+  return timeFormat(date); // Format the date to HH:MM
+}
+
+export function createDebouncedLogger(callback, delay) {
+  let timer;
+  return (data) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      callback(data);
+    }, delay);
+  };
+}
+
+export function logInteraction({ age, sleepTime }) {
+  window["optimizely"] = window["optimizely"] || [];
+  window["optimizely"].push({
+    type: "event",
+    eventName: "kielscn_schlafdauer_sctn_8_input_changed",
+    tags: {
+      age_value: age,
+      sleepTime_value: sleepTime,
+    },
+  });
+}
