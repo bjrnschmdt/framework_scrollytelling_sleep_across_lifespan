@@ -101,6 +101,7 @@ import {
 } from "./components/crosshair.js";
 import { PointerInteraction } from "./components/pointerInteraction.js";
 import { createXAxis, createYAxis } from "./components/axes.js";
+import { Pointcloud } from "./components/pointcloud.js";
 import { drawGroupedPercentileLines } from "./components/percentileLines.js";
 import { drawRecommendedArea } from "./components/recommendedArea.js";
 import { updatePlot, exitPlot } from "./components/plot.js";
@@ -356,7 +357,11 @@ defs
   .attr("d", icon)
   .attr("fill", "white");
 
-const pointcloud = new Pointcloud(context, canvas);
+const pointcloud = new Pointcloud(context, canvas, {
+  simulatedData,
+  xScale: xScaleSVG,
+  yScale: yScaleSVG,
+});
 
 // Create Axes
 createXAxis(svg, xScaleSVG, h);
@@ -624,109 +629,6 @@ const sleepGuidelines = [
   { ageRange: "41–65", recommended: [7, 9], acceptable: [6, 10] },
   { ageRange: "66–98", recommended: [7, 8], acceptable: [5, 9] },
 ];
-```
-
-<!-- ---
-
-### Point Cloud -->
-
-```js
-class Pointcloud {
-  constructor(context, canvas) {
-    if (
-      !context ||
-      !canvas ||
-      !simulatedData ||
-      !xScaleSVG ||
-      !yScaleSVG ||
-      !colors ||
-      typeof ageMin === "undefined" ||
-      typeof ageMax === "undefined" ||
-      typeof canvasScaleFactor === "undefined"
-    ) {
-      throw new Error("Missing required parameters");
-    }
-
-    this.context = context;
-    this.simulatedData = simulatedData;
-    this.xScale = xScaleSVG;
-    this.yScale = yScaleSVG;
-    this.canvas = canvas;
-    this.colors = colors;
-    this.alpha = 0; // Initial transparency
-    this.alphaMax = 0.3;
-    this.visible = false;
-    this.fadeDuration = 600;
-  }
-
-  // Draw points on the canvas with the specified alpha transparency
-  draw(alpha) {
-    this.context.fillStyle = this.colors.background;
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.context.fillStyle = this.colors.text;
-    this.context.globalAlpha = alpha;
-
-    this.simulatedData
-      .filter((d) => d.age >= ageMin && d.age <= ageMax)
-      .forEach((point) => {
-        this.context.beginPath();
-        this.context.arc(
-          this.xScale(point.age) * canvasScaleFactor,
-          this.yScale(point.sleepTime) * canvasScaleFactor,
-          0.5,
-          0,
-          2 * Math.PI
-        );
-        this.context.fill();
-      });
-
-    this.context.globalAlpha = 1; // Reset alpha to default
-  }
-
-  // Fade in the points by gradually increasing the alpha value
-  fadeIn() {
-    const startTime = performance.now();
-    const fade = () => {
-      const elapsed = performance.now() - startTime;
-      const progress = Math.min(elapsed / this.fadeDuration, this.alphaMax);
-      this.alpha = progress;
-      this.draw(this.alpha);
-      if (progress < this.alphaMax) {
-        requestAnimationFrame(fade);
-      }
-    };
-    requestAnimationFrame(fade);
-    this.visible = true;
-  }
-
-  // Fade out the points by gradually decreasing the alpha value
-  fadeOut() {
-    const startTime = performance.now();
-    const fade = () => {
-      const elapsed = performance.now() - startTime;
-      const progress = Math.min(elapsed / this.fadeDuration, this.alphaMax);
-      this.alpha = this.alphaMax - progress;
-      this.draw(this.alpha);
-      if (progress < this.alphaMax) {
-        requestAnimationFrame(fade);
-      } else {
-        this.context.fillStyle = this.colors.background;
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-      }
-    };
-    requestAnimationFrame(fade);
-    this.visible = false;
-  }
-
-  // Set the visibility of the points and trigger the appropriate fade method
-  setVisibility(visible) {
-    if (visible && !this.visible) {
-      this.fadeIn();
-    } else if (!visible && this.visible) {
-      this.fadeOut();
-    }
-  }
-}
 ```
 
 <!-- ---
