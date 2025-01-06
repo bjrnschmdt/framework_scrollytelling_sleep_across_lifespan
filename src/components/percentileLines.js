@@ -11,14 +11,14 @@ const { mostProminent, lessProminent, lineWidths, colors } = settings;
  * @param {d3.Selection} svg - D3 selection of your SVG.
  * @param {d3.Selection} container - D3 selection whose .node().value holds state (e.g., showPercentiles).
  * @param {object} config - Holds references to scales, data, and styling.
- * @param {array} config.groupedByPercentile - An array of [percentile, data[]] pairs (from d3.groups).
+ * @param {array} config.dataArray - An array of plot data.
  * @param {function} config.xScaleSVG - A D3 scale for x positions (age).
  * @param {function} config.yScaleSVG - A D3 scale for y positions (sleepTime).
  */
 export function drawGroupedPercentileLines(
   svg,
   container,
-  { groupedByPercentile, xScaleSVG, yScaleSVG }
+  { dataArray, xScaleSVG, yScaleSVG }
 ) {
   // Grab which percentiles to show from your container’s “state”
   const percentiles = container.node().value.showPercentiles || [];
@@ -29,6 +29,15 @@ export function drawGroupedPercentileLines(
     allPercentilesGroup = svg.append("g").attr("class", "all-percentiles");
   }
 
+  const flattenedData = dataArray.flatMap((d) =>
+    d.percentile.map((p) => ({
+      age: d.ageRange.start,
+      percentile: Math.round(p.p * 100),
+      tst: p.q,
+    }))
+  );
+
+  const groupedByPercentile = d3.groups(flattenedData, (d) => d.percentile);
   // Filter the data based on the percentiles array
   const visiblePercentiles = groupedByPercentile.filter((value) => {
     const percentileKey = value[0]; // The percentile key (5, 6, 7, etc.)

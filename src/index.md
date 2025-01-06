@@ -92,7 +92,7 @@ import {
   createDebouncedLogger,
   logInteraction,
 } from "./components/helperFunctions.js";
-import { data, dataSet, simulatedData } from "./components/data.js";
+import { dataArray, dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
 import { element } from "./components/element.js";
 import {
@@ -405,7 +405,7 @@ function update(data) {
 
   // Draw percentiles
   drawGroupedPercentileLines(svg, container, {
-    groupedByPercentile,
+    dataArray,
     xScaleSVG,
     yScaleSVG,
   });
@@ -587,7 +587,7 @@ function drawCases(svg) {
 
 ### data -->
 
-```js
+<!-- ```js
 const groupedByPercentile = d3.groups(flattenedData, (d) => d.percentile);
 ```
 
@@ -599,7 +599,7 @@ const flattenedData = data.flatMap((d) =>
     tst: p.q,
   }))
 );
-```
+``` -->
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');

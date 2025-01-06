@@ -260,7 +260,7 @@ export const dataSet = (() => {
   return combinedData;
 })();
 
-export const data = (() => {
+export const dataArray = (() => {
   let combinedData = [];
 
   // Iterate through each threshold range defined by consecutive thresholds
