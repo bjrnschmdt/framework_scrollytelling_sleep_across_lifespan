@@ -431,15 +431,6 @@ const chartValue = Generators.input(chartElement);
 ```
 
 ```js
-const cases = [
-  { name: "Leo", age: 8.1, tib: 12 },
-  { name: "Paula", age: 17.35, tib: 9 },
-  { name: "Karin", age: 31.15, tib: 7 },
-  { name: "Maria", age: 75, tib: 6 },
-];
-```
-
-```js
 function set(input, value) {
   input.value = value;
   input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -563,24 +554,6 @@ const qymax = Math.max(
     )
   )
 );
-```
-
-<!-- ---
-
-### Cases -->
-
-```js
-function drawCases(svg) {
-  const casesGroup = svg.append("g").attr("id", "casesGroup");
-  casesGroup
-    .selectAll("circle")
-    .data(cases) // Bind data for each case
-    .join("circle") // Create a circle for each case
-    .attr("cx", (d) => xScaleSVG(d.age)) // Set the x-coordinate based on the age
-    .attr("cy", (d) => yScaleSVG(d.tib)) // Set the y-coordinate based on the tib
-    .attr("r", 2.5) // Radius of the circle
-    .attr("fill", colors.text); // Fill color of the circles
-}
 ```
 
 <style>

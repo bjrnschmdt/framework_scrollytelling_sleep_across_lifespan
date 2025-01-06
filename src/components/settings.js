@@ -67,6 +67,13 @@ startTime.setHours(sleepMin, 0, 0, 0); // Set hours, minutes, seconds, milliseco
 const endTime = new Date();
 endTime.setHours(sleepMax, 0, 0, 0); // Set hours, minutes, seconds, milliseconds
 
+const casesData = [
+  { name: "Leo", age: 8.1, tib: 12 },
+  { name: "Paula", age: 17.35, tib: 9 },
+  { name: "Karin", age: 31.15, tib: 7 },
+  { name: "Maria", age: 75, tib: 6 },
+];
+
 export const settings = {
   w,
   h,
@@ -99,4 +106,5 @@ export const settings = {
   colors,
   startTime,
   endTime,
+  casesData,
 };
