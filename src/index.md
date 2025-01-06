@@ -412,7 +412,6 @@ function update(data) {
 
   // Draw recommended Area
   drawRecommendedArea(svg, container, {
-    sleepData,
     xScaleSVG,
     yScaleSVG,
   });
@@ -524,22 +523,6 @@ const yScaleBoxPlot = d3
 const rangeSteps = d3.range(4, 13.5, 0.5); // Creates an array from 4 to 13 with steps of 0.5
 ```
 
-<!-- ```js
-const rangeValues = d3.range(
-  h - margin.bottom,
-  margin.top,
-  ((margin.top - (h - margin.bottom)) / rangeSteps.length) * -1
-);
-``` -->
-
-<!-- ```js
-d3.range(
-  h - margin.bottom,
-  margin.top,
-  ((margin.top - (h - margin.bottom)) / rangeSteps.length) * -1
-);
-``` -->
-
 ```js
 const yScaleCrosshair = d3
   .scaleThreshold()
@@ -565,10 +548,6 @@ const yScaleQuantize = d3
 
 ### Quantile Dot Plots -->
 
-<!-- ```js
-const qwidth = h - margin.top - margin.bottom;
-``` -->
-
 ```js
 // find the maximum amount of stacked dots
 const qymax = Math.max(
@@ -584,51 +563,6 @@ const qymax = Math.max(
     )
   )
 );
-```
-
-<!-- ```js
-const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
-``` -->
-
-```js
-// Process sleep data in an observable notebook cell
-const sleepData = sleepGuidelines
-  .flatMap((group) => {
-    const [startAge, endAge] = group.ageRange.split("–").map(Number);
-
-    return [
-      ...(startAge < ageMin && endAge >= ageMin
-        ? [{ age: ageMin, ...group }]
-        : []),
-      ...(startAge >= ageMin ? [{ age: startAge, ...group }] : []),
-      ...(endAge > ageMin && endAge <= ageMax
-        ? [{ age: endAge, ...group }]
-        : []),
-    ];
-  })
-  .concat(
-    sleepGuidelines.at(-1).ageRange.split("–")[1] > ageMax
-      ? [
-          {
-            age: ageMax,
-            ...sleepGuidelines.at(-1),
-          },
-        ]
-      : []
-  );
-```
-
-```js
-const sleepGuidelines = [
-  { ageRange: "1–2", recommended: [11, 14], acceptable: [9, 16] },
-  { ageRange: "3–5", recommended: [10, 13], acceptable: [8, 14] },
-  { ageRange: "6–13", recommended: [9, 11], acceptable: [7, 12] },
-  { ageRange: "14–17", recommended: [8, 10], acceptable: [7, 11] },
-  { ageRange: "18–25", recommended: [7, 9], acceptable: [6, 11] },
-  { ageRange: "26–40", recommended: [7, 9], acceptable: [6, 10] },
-  { ageRange: "41–65", recommended: [7, 9], acceptable: [6, 10] },
-  { ageRange: "66–98", recommended: [7, 8], acceptable: [5, 9] },
-];
 ```
 
 <!-- ---
@@ -652,15 +586,6 @@ function drawCases(svg) {
 <!-- ---
 
 ### data -->
-
-```js
-const ageGroups = [
-  { ageRange: "5–10", name: "bis 10 Jahre" },
-  { ageRange: "11–17", name: "11–17 Jahre" },
-  { ageRange: "18–65", name: "18–65 Jahre" },
-  { ageRange: "66–95", name: "über 66 Jahre" },
-];
-```
 
 ```js
 const groupedByPercentile = d3.groups(flattenedData, (d) => d.percentile);

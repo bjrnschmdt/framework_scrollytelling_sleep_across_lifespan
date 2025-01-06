@@ -2,7 +2,43 @@
 import * as d3 from "npm:d3";
 
 import { settings } from "./settings.js";
-const { lineWidths, colors } = settings;
+const { ageMin, ageMax, lineWidths, colors } = settings;
+
+const sleepGuidelines = [
+  { ageRange: "1–2", recommended: [11, 14], acceptable: [9, 16] },
+  { ageRange: "3–5", recommended: [10, 13], acceptable: [8, 14] },
+  { ageRange: "6–13", recommended: [9, 11], acceptable: [7, 12] },
+  { ageRange: "14–17", recommended: [8, 10], acceptable: [7, 11] },
+  { ageRange: "18–25", recommended: [7, 9], acceptable: [6, 11] },
+  { ageRange: "26–40", recommended: [7, 9], acceptable: [6, 10] },
+  { ageRange: "41–65", recommended: [7, 9], acceptable: [6, 10] },
+  { ageRange: "66–98", recommended: [7, 8], acceptable: [5, 9] },
+];
+
+const sleepData = sleepGuidelines
+  .flatMap((group) => {
+    const [startAge, endAge] = group.ageRange.split("–").map(Number);
+
+    return [
+      ...(startAge < ageMin && endAge >= ageMin
+        ? [{ age: ageMin, ...group }]
+        : []),
+      ...(startAge >= ageMin ? [{ age: startAge, ...group }] : []),
+      ...(endAge > ageMin && endAge <= ageMax
+        ? [{ age: endAge, ...group }]
+        : []),
+    ];
+  })
+  .concat(
+    sleepGuidelines.at(-1).ageRange.split("–")[1] > ageMax
+      ? [
+          {
+            age: ageMax,
+            ...sleepGuidelines.at(-1),
+          },
+        ]
+      : []
+  );
 
 /**
  * Draws a recommended “area band” on the chart and transitions it in/out.
@@ -10,15 +46,10 @@ const { lineWidths, colors } = settings;
  * @param {d3.Selection} svg           - The main D3 SVG selection.
  * @param {d3.Selection} container     - A D3 selection whose `.node().value` holds current “state”.
  * @param {object}        config       - Configuration object containing everything needed to draw.
- * @param {array}         config.sleepData     - Preprocessed array of data with recommended sleep ranges.
  * @param {function}      config.xScaleSVG     - A D3 scale for x-position (age).
  * @param {function}      config.yScaleSVG     - A D3 scale for y-position (sleepTime).
  */
-export function drawRecommendedArea(
-  svg,
-  container,
-  { sleepData, xScaleSVG, yScaleSVG }
-) {
+export function drawRecommendedArea(svg, container, { xScaleSVG, yScaleSVG }) {
   // Check the “showRecommended” flag from container’s “state”
   const recommendedData = container.node().value.showRecommended
     ? [sleepData]
