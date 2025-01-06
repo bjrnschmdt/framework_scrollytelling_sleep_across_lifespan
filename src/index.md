@@ -102,6 +102,7 @@ import {
 import { PointerInteraction } from "./components/pointerInteraction.js";
 import { createXAxis, createYAxis } from "./components/axes.js";
 import { drawGroupedPercentileLines } from "./components/percentileLines.js";
+import { drawRecommendedArea } from "./components/recommendedArea.js";
 import { updatePlot, exitPlot } from "./components/plot.js";
 import { updateDotPlot } from "./components/plotDot.js";
 import { updatePercentilePlot } from "./components/plotPercentile.js";
@@ -405,7 +406,11 @@ function update(data) {
   });
 
   // Draw recommended Area
-  drawRecommendedArea(svg, container);
+  drawRecommendedArea(svg, container, {
+    sleepData,
+    xScaleSVG,
+    yScaleSVG,
+  });
 
   updateCrosshairs(container.node().value, crosshair, xScaleSVG, yScaleSVG, w);
 }
@@ -544,8 +549,6 @@ const yScaleCrosshair1 = d3
   .range(thresholdsSleep);
 ```
 
-### 9
-
 ```js
 const yScaleQuantize = d3
   .scaleQuantize()
@@ -581,105 +584,6 @@ const qymax = Math.max(
 <!-- ```js
 const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
 ``` -->
-
-```js
-function drawPercentileLines(
-  selection,
-  data,
-  opacity,
-  strokeWidth,
-  strokeColor
-) {
-  selection
-    .append("path")
-    .datum(data) // Bind the data to the path
-    .attr("fill", "none")
-    .attr("stroke", strokeColor)
-    .attr("stroke-width", strokeWidth)
-    .attr("stroke-opacity", opacity)
-    .attr("d", lineGenerator); // Use the line generator to set the "d" attribute
-}
-```
-
-```js
-const lineGenerator = d3
-  .line()
-  .curve(d3.curveNatural)
-  .x((d) => xScaleSVG(d.age))
-  .y((d) => yScaleSVG(d.tst));
-```
-
-<!-- ---
-
-### Recommended Area -->
-
-```js
-function drawRecommendedArea(svg, container) {
-  const recommendedData = container.node().value.showRecommended
-    ? [sleepData]
-    : [];
-
-  const group = svg.selectAll(".recommended-group").data(recommendedData);
-
-  group.join(
-    // Enter: Draw the area and lines when recommendedData has content
-    (enter) => {
-      const g = enter
-        .append("g") // Append a group for the recommended area
-        .attr("class", "recommended-group")
-        .style("opacity", 0) // Start invisible
-        .call((g) =>
-          g
-            .transition() // Apply fade-in transition
-            .duration(600)
-            .ease(d3.easeCubicInOut)
-            .style("opacity", 1)
-        );
-
-      g.append("path")
-        .attr("fill", colors.recommended)
-        .attr("fill-opacity", 0.2)
-        .attr("d", areaGenerator);
-
-      const lowerLine = areaGenerator.lineY0();
-      const upperLine = areaGenerator.lineY1();
-
-      g.append("path")
-        .attr("d", lowerLine)
-        .attr("stroke", colors.recommended)
-        .attr("stroke-width", lineWidths.medium)
-        .attr("fill", "none");
-
-      g.append("path")
-        .attr("d", upperLine)
-        .attr("stroke", colors.recommended)
-        .attr("stroke-width", lineWidths.medium)
-        .attr("fill", "none");
-    },
-
-    // Update: Keep the group in place if it remains the same
-    (update) => update,
-
-    // Exit: Remove the area and lines when recommendedData is empty
-    (exit) =>
-      exit
-        .transition() // Apply fade-out transition
-        .duration(600)
-        .ease(d3.easeCubicInOut)
-        .style("opacity", 0)
-        .remove()
-  );
-}
-```
-
-```js
-const areaGenerator = d3
-  .area()
-  .x((d) => xScaleSVG(d.age))
-  .y0((d) => yScaleSVG(d.recommended[0]))
-  .y1((d) => yScaleSVG(d.recommended[1]))
-  .curve(d3.curveStepAfter);
-```
 
 ```js
 // Process sleep data in an observable notebook cell
