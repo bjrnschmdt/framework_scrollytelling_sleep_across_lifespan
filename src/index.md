@@ -583,24 +583,6 @@ function drawCases(svg) {
 }
 ```
 
-<!-- ---
-
-### data -->
-
-<!-- ```js
-const groupedByPercentile = d3.groups(flattenedData, (d) => d.percentile);
-```
-
-```js
-const flattenedData = data.flatMap((d) =>
-  d.percentile.map((p) => ({
-    age: d.ageRange.start,
-    percentile: Math.round(p.p * 100),
-    tst: p.q,
-  }))
-);
-``` -->
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 </style>
