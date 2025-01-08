@@ -3,6 +3,7 @@ theme: [midnight, alt]
 ---
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 .scroll-container {
   /* position: relative; */
@@ -108,7 +109,7 @@ import { updatePlot, exitPlot } from "./components/plot.js";
 import { updateDotPlot } from "./components/plotDot.js";
 import { updatePercentilePlot } from "./components/plotPercentile.js";
 import { updateBoxPlot } from "./components/plotBox.js";
-/* import { yScaleSVG, timeScale, yScaleBoxPlot } from "./components/scales.js"; */
+import { setupIntersectionObserver } from "./components/intersectionObserver.js";
 ```
 
 ```js
@@ -307,12 +308,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 </section>
 
 ```js
-console.log("dataSet", dataSet);
-```
-
-```js
 /* const container = d3.select(element("div")); */
-console.log("Codeblock executed");
 const container = d3.create("div");
 container.style("position", "relative");
 container.style("background-color", `var(--theme-background)`);
@@ -441,22 +437,7 @@ function set(input, value) {
 const update = chartElement.update(dataSet.get(chartValue.age));
 ```
 
-```js
-const band = 1;
-```
-
-<!-- ---
-
-### Helper Functions -->
-
-```js
-function roundToStep(value, step) {
-  return Math.round(value / step) * step;
-}
-```
-
-<!-- ---
-### Scales -->
+<!-- --- ### Scales -->
 
 ```js
 const xScaleSVG = d3
@@ -480,6 +461,23 @@ const timeScale = d3
   .domain([startTime, endTime])
   .range([h - margin.bottom, margin.top])
   .clamp(true);
+```
+
+```js
+// find the maximum amount of stacked dots
+const qymax = Math.max(
+  ...data.map((obj) =>
+    Math.max(
+      ...d3
+        .rollup(
+          obj.dot,
+          (v) => v.length, // Count the entries
+          (d) => d.x // Group by the x value
+        )
+        .values()
+    )
+  )
+);
 ```
 
 ```js
@@ -535,137 +533,28 @@ const yScaleQuantize = d3
   .range([4, 13]); // Assuming equal step in pixel space
 ```
 
-<!-- ---
-
-### Quantile Dot Plots -->
-
-```js
-// find the maximum amount of stacked dots
-const qymax = Math.max(
-  ...data.map((obj) =>
-    Math.max(
-      ...d3
-        .rollup(
-          obj.dot,
-          (v) => v.length, // Count the entries
-          (d) => d.x // Group by the x value
-        )
-        .values()
-    )
-  )
-);
-```
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-</style>
-
-```js
-const targetSection = document.querySelector(
-  '.scroll-section.card[data-step="5"]'
-);
-```
-
-```js
-const lastSection = document.querySelector(
-  '.scroll-section.card[data-step="8"]'
-);
-```
+<!-- --- ### Observer -->
 
 ```js
 const info = document.querySelector(".scroll-info");
 const targets = document.querySelectorAll(".scroll-section");
-
-const observerCallback = (entries, observer) => {
-  entries.forEach((entry) => {
-    const visibleSection = entry.target;
-    const step = visibleSection.dataset.step;
-
-    if (entry.isIntersecting) {
-      // Section is visible
-      visibleSection.classList.remove("inactive");
-      /* console.log(`Section ${step} is now visible.`); */
-
-      // Fetch the latest values without making the cell reactive
-      const currentAgeValue = ageInput.value;
-      const currentSleepTimeValue = sleepTimeInput.value;
-
-      // Get the steps object
-      const steps = getSteps(currentAgeValue, currentSleepTimeValue);
-
-      window["optimizely"] = window["optimizely"] || [];
-      window["optimizely"].push({
-        type: "event",
-        eventName: "kielscn_schlafdauer_sctn_visible",
-        tags: {
-          section: step,
-          age_value: steps[step].age,
-          sleepTime_value: steps[step].sleepTime,
-        },
-      });
-
-      // Update the chartElement with the current step
-      set(chartElement, steps[step]);
-
-      // reseting the prediction visibility
-      const target = document.getElementById("answer");
-      target.style.display = "none";
-      setDisabled(false);
-      set(estimate, 0);
-
-      // Additional behavior for the last section (step 8)
-      if (step === "8") {
-        info.classList.add("interactive");
-        /* console.log("Enabled interactive graphic for the last section."); */
-      }
-    } else {
-      // Section is not visible
-      visibleSection.classList.add("inactive");
-
-      // Remove interaction if the last section is no longer visible
-      if (step === "8") {
-        info.classList.remove("interactive");
-        /* console.log(
-          "Disabled interactive graphic as the last section is no longer visible."
-        ); */
-      }
-    }
-  });
-};
-
-const observerOptions = {
-  root: null, // Use the viewport as the root
-  rootMargin: `0% 0% -${100 - relativeHeight * 100}% 0%`, // Adjust as needed
-  /* threshold: 0.5, */ // Trigger when 50% of the section is visible
-};
-
-const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-targets.forEach((target) => {
-  observer.observe(target);
-});
-
-invalidation.then(() => observer.disconnect());
 ```
 
-<!-- ```js
-predictionValue; // run this block when the button is clicked
-const target = document.getElementById("answer");
-target.style.display = "block";
-
-console.log("code run");
-
-window["optimizely"] = window["optimizely"] || [];
-window["optimizely"].push({
-  type: "event",
-  eventName: "kielscn_schlafdauer_sctn_7_input_changed",
-  tags: {
-    estimate_value: document.querySelector(
-      '.scroll-section.card[data-step="7"] input[type=number]'
-    ).value,
-  },
+```js
+setupIntersectionObserver({
+  targets,
+  info,
+  getSteps,
+  set,
+  chartElement,
+  setDisabled,
+  ageInput,
+  sleepTimeInput,
+  estimate,
+  relativeHeight,
+  invalidation,
 });
-``` -->
+```
 
 ```js
 const buttonClicked = (value) => {
