@@ -2,9 +2,9 @@ import * as d3 from "npm:d3";
 import { updatePlot } from "./plot.js";
 import { settings } from "./settings.js";
 
-const { qradius } = settings;
+const { sleepMin, sleepMax, margin, qstep } = settings;
 
-function precalculateHeights(data) {
+function precalculateHeights(data, qradius) {
   const totalHeightMap = new Map();
   data.forEach((dot) => {
     const x = dot.x;
@@ -20,31 +20,31 @@ function getStackOffset(x, radius, stackMap) {
   return currentHeight;
 }
 
-function calculateCX(d, stackMap, totalHeightMap) {
+function calculateCX(d, stackMap, totalHeightMap, qradius) {
   const offset = getStackOffset(d.x, qradius, stackMap);
   const totalHeight = totalHeightMap.get(d.x);
   return totalHeight / 2 - offset - qradius;
 }
 
 function enterDot(enter, context) {
-  const { scales, stackMap, totalHeightMap, values } = context;
+  const { scales, stackMap, totalHeightMap, values, qradius } = context;
   const { yScaleDotPlot } = scales;
 
   return enter
     .append("use")
     .attr("href", "#man-icon")
     .attr("class", "dot-plot-element")
-    .attr("x", (d) => calculateCX(d, stackMap, totalHeightMap) - 12)
+    .attr("x", (d) => calculateCX(d, stackMap, totalHeightMap, qradius) - 12)
     .attr("y", (d) => yScaleDotPlot(d.x) - 12)
-    .attr("width", 24)
-    .attr("height", 24)
+    .attr("width", 2 * qradius)
+    .attr("height", 2 * qradius)
     .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
     .style("stroke", "white")
     .style("stroke-width", 32);
 }
 
 function updateDot(update, context) {
-  const { scales, stackMap, totalHeightMap, values } = context;
+  const { scales, stackMap, totalHeightMap, values, qradius } = context;
   const { yScaleDotPlot } = scales;
 
   return update
@@ -53,15 +53,20 @@ function updateDot(update, context) {
     .duration(400)
     .ease(d3.easeCubic)
     .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
-    .attr("x", (d) => calculateCX(d, stackMap, totalHeightMap) - 12)
+    .attr("x", (d) => calculateCX(d, stackMap, totalHeightMap, qradius) - 12)
     .attr("y", (d) => yScaleDotPlot(d.x) - 12);
 }
 
-export function updateDotPlot(data, values, xScaleSVG, yScaleDotPlot) {
+export function updateDotPlot(data, values, xScaleSVG, yScaleDotPlot, h) {
+  // Calculate qradius
+  const qdomain = [sleepMin, sleepMax];
+  const qwidth = h - margin.top - margin.bottom;
+  const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
+
   const preprocessDotPlot = (plotData) => {
     return {
       stackMap: new Map(),
-      totalHeightMap: precalculateHeights(plotData),
+      totalHeightMap: precalculateHeights(plotData, qradius),
       values,
     };
   };
@@ -70,8 +75,8 @@ export function updateDotPlot(data, values, xScaleSVG, yScaleDotPlot) {
     data: data,
     plotClass: "dot-plot",
     plotDataKey: "dot",
-    enterFn: enterDot,
-    updateFn: updateDot,
+    enterFn: (enter, context) => enterDot(enter, { ...context, qradius }),
+    updateFn: (update, context) => updateDot(update, { ...context, qradius }),
     preprocessFn: preprocessDotPlot,
     xScaleSVG: xScaleSVG,
     yScaleDotPlot: yScaleDotPlot,

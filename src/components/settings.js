@@ -3,16 +3,6 @@ import { Generators } from "npm:@observablehq/stdlib";
 
 const relativeHeight = 0.6;
 
-// This doesn't work because the generator output is an async function
-export const w = Generators.width(document.querySelector("main"));
-
-const h = (() => {
-  const isLandscape = w > window.innerHeight;
-  return isLandscape
-    ? /* (w / 3) * 2 */ window.innerHeight * relativeHeight
-    : window.innerHeight * relativeHeight; // 16:9 for landscape, 60vh for portrait
-})();
-
 const margin = {
   top: 64,
   right: 16,
@@ -54,10 +44,7 @@ const fontSize = "12px";
 const icon =
   "M400-80v-280h-80v-240q0-33 23.5-56.5T400-680h160q33 0 56.5 23.5T640-600v240h-80v280H400Zm80-640q-33 0-56.5-23.5T400-800q0-33 23.5-56.5T480-880q33 0 56.5 23.5T560-800q0 33-23.5 56.5T480-720Z";
 
-const qwidth = h - margin.top - margin.bottom;
-const qdomain = [sleepMin, sleepMax];
 const qstep = 540 / 20 / 60;
-const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
 
 // Convert sleep time hours to JavaScript date objects
 const startTime = new Date();
@@ -75,8 +62,7 @@ const casesData = [
 ];
 
 export const settings = {
-  w,
-  h,
+  relativeHeight,
   ageMin,
   ageMax,
   nthresholdsAge,
@@ -88,9 +74,6 @@ export const settings = {
   canvasScaleFactor: 2,
   margin,
   qstep, // quantile step size in hours
-  qdomain, // quantile domain in hours
-  qwidth,
-  qradius,
   numQuantiles: 20, // number of quantiles
   smooth: false, // quantile dot plot smoothing
   canvasScaleFactor: 2,

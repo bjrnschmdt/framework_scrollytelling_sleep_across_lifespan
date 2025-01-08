@@ -101,16 +101,20 @@ import { setupIntersectionObserver } from "./components/intersectionObserver.js"
 ```
 
 ```js
-const { ageMin, ageMax, sleepMin, sleepMax, margin, canvasScaleFactor, icon } =
-  settings;
+const {
+  ageMin,
+  ageMax,
+  sleepMin,
+  sleepMax,
+  margin,
+  canvasScaleFactor,
+  icon,
+  relativeHeight,
+} = settings;
 ```
 
 ```js
 const w = width;
-```
-
-```js
-const relativeHeight = 0.6;
 ```
 
 ```js
@@ -365,7 +369,7 @@ function update(data) {
       updatePercentilePlot(data, xScaleSVG, yScaleSVG);
       break;
     case "dot":
-      updateDotPlot(data, container.node().value, xScaleSVG, yScaleDotPlot);
+      updateDotPlot(data, container.node().value, xScaleSVG, yScaleDotPlot, h);
       break;
     case "box":
       updateBoxPlot(data, xScaleSVG, yScaleBoxPlot);
