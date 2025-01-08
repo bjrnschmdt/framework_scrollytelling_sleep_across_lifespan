@@ -56,7 +56,7 @@ export function setupIntersectionObserver({
             age_value: steps[step].age,
             sleepTime_value: steps[step].sleepTime,
           },
-        });++++
+        });
 
         // Update the chart element’s value for the current step
         set(chartElement, steps[step]);
