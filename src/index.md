@@ -83,7 +83,6 @@ import {
 import { dataArray, dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
-import { element } from "./components/element.js";
 import {
   initializeCrosshair,
   updateCrosshairs,
@@ -289,7 +288,6 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 </section>
 
 ```js
-/* const container = d3.select(element("div")); */
 const container = d3.create("div");
 container.style("position", "relative");
 container.style("background-color", `var(--theme-background)`);
