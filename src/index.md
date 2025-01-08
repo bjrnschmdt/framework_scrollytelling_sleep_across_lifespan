@@ -89,7 +89,7 @@ import {
   updateCrosshairs,
 } from "./components/crosshair.js";
 import { PointerInteraction } from "./components/pointerInteraction.js";
-import { createXAxis, createYAxis } from "./components/axes.js";
+import { createAxes } from "./components/createAxes.js";
 import { Pointcloud } from "./components/pointcloud.js";
 import { drawGroupedPercentileLines } from "./components/percentileLines.js";
 import { drawRecommendedArea } from "./components/recommendedArea.js";
@@ -101,30 +101,8 @@ import { setupIntersectionObserver } from "./components/intersectionObserver.js"
 ```
 
 ```js
-const {
-  ageMin,
-  ageMax,
-  thresholdsAge,
-  sleepMin,
-  sleepMax,
-  nthresholdsSleep,
-  thresholdsSleep,
-  startTime,
-  endTime,
-  margin,
-  qstep,
-  qdomain,
-  qradius,
-  canvasScaleFactor,
-  percentileSelection,
-  mostProminent,
-  lessProminent,
-  fontFamily,
-  fontSize,
-  lineWidths,
-  icon,
-  colors,
-} = settings;
+const { ageMin, ageMax, sleepMin, sleepMax, margin, canvasScaleFactor, icon } =
+  settings;
 ```
 
 ```js
@@ -218,9 +196,6 @@ const entity = Inputs.bind(
   }),
   chartElement
 );
-```
-
-```js
 const entityValue = Generators.input(entity);
 ```
 
@@ -239,9 +214,6 @@ const prediction = Inputs.button("Auflösung anzeigen", {
   reduce: (value) => buttonClicked(value),
   disabled: isDisabled,
 });
-```
-
-```js
 const predictionValue = Generators.input(prediction);
 ```
 
@@ -252,9 +224,6 @@ const scrollTo = Inputs.button("Nochmal versuchen", {
     target.scrollIntoView({ behavior: "smooth" });
   },
 });
-```
-
-```js
 const scrollToValue = Generators.input(scrollTo);
 ```
 
@@ -369,8 +338,12 @@ const pointcloud = new Pointcloud(context, canvas, {
 });
 
 // Create Axes
-createXAxis(svg, xScaleSVG, h);
-createYAxis(svg, timeScale, w);
+createAxes(svg, {
+  xScaleSVG,
+  timeScale,
+  w,
+  h,
+});
 
 const crosshair = initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h, margin);
 
