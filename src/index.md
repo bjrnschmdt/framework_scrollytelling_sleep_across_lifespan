@@ -132,7 +132,6 @@ setupIntersectionObserver({
   targets,
   info,
   getSteps,
-  set,
   chartElement,
   setDisabled,
   ageInput,
@@ -402,17 +401,7 @@ container.node().update = update;
 
 ```js
 const chartElement = container.node();
-```
-
-```js
 const chartValue = Generators.input(chartElement);
-```
-
-```js
-function set(input, value) {
-  input.value = value;
-  input.dispatchEvent(new Event("input", { bubbles: true }));
-}
 ```
 
 ```js

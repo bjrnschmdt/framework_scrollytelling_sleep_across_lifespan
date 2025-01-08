@@ -1,4 +1,7 @@
 // intersectionObserver.js
+
+import { set } from "./helperFunctions.js";
+
 /**
  * Sets up an Intersection Observer to observe multiple “scroll-section”
  * elements and run custom logic when they enter/exit the viewport.
@@ -20,7 +23,6 @@ export function setupIntersectionObserver({
   targets,
   info,
   getSteps,
-  set,
   chartElement,
   setDisabled,
   ageInput,

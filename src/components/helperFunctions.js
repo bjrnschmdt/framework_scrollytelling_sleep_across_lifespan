@@ -1,6 +1,10 @@
 import * as d3 from "npm:d3";
 
 // Functions
+export function set(input, value) {
+  input.value = value;
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
 
 export function generateParticipantData(meanSleep, sdSleep, n, name, extent) {
   const data = [];
