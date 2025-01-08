@@ -6,7 +6,6 @@ theme: [midnight, alt]
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 .scroll-container {
-  /* position: relative; */
   margin: 1rem auto;
 }
 
@@ -15,19 +14,7 @@ theme: [midnight, alt]
   top: 0;
   margin: 0 auto;
   background-color: var(--theme-background-alt);
-  /* z-index: -1; */
-  /* pointer-events: none; */
-  /* transition: z-index 0.3s ease, pointer-events 0.3s ease; */
 }
-
-/* .scroll-info.interactive {
-  z-index: 3;
-  pointer-events: auto;
-} */
-
-/* .scroll-info > div {
-  position: relative;
-} */
 
 .scroll-info,
 .scroll-section {
@@ -95,6 +82,7 @@ import {
 } from "./components/helperFunctions.js";
 import { dataArray, dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
+import { createScales } from "./components/createScales.js";
 import { element } from "./components/element.js";
 import {
   initializeCrosshair,
@@ -155,6 +143,27 @@ const h = (() => {
     ? /* (w / 3) * 2 */ window.innerHeight * relativeHeight
     : window.innerHeight * relativeHeight; // 16:9 for landscape, 60vh for portrait
 })();
+```
+
+```js
+setupIntersectionObserver({
+  targets,
+  info,
+  getSteps,
+  set,
+  chartElement,
+  setDisabled,
+  ageInput,
+  sleepTimeInput,
+  estimate,
+  relativeHeight,
+  invalidation,
+});
+```
+
+```js
+const { xScaleSVG, yScaleSVG, timeScale, yScaleDotPlot, yScaleBoxPlot } =
+  createScales({ w, h });
 ```
 
 ```js
@@ -366,7 +375,6 @@ createYAxis(svg, timeScale, w);
 const crosshair = initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h, margin);
 
 // Setup the pointer interactions like pointerMoved and pointerClicked
-/* new PointerInteraction(svg, container); */
 new PointerInteraction(svg, container, {
   margin,
   w,
@@ -376,9 +384,6 @@ new PointerInteraction(svg, container, {
 });
 
 function update(data) {
-  /* console.log("data", data); */
-  /* console.log("node", container.node().value.variant); */
-
   // Update the pointcloud visibility
   pointcloud.setVisibility(container.node().value.showPointcloud);
 
@@ -437,123 +442,11 @@ function set(input, value) {
 const update = chartElement.update(dataSet.get(chartValue.age));
 ```
 
-<!-- --- ### Scales -->
-
-```js
-const xScaleSVG = d3
-  .scaleLinear()
-  .domain([ageMin, ageMax]) // Data space
-  .rangeRound([margin.left, w - margin.right]) // Pixel space
-  .clamp(true);
-```
-
-```js
-const yScaleSVG = d3
-  .scaleLinear()
-  .domain([sleepMin, sleepMax]) // Data space
-  .rangeRound([h - margin.bottom, margin.top]) // Pixel space, inverted because canvas y=0 is at the top
-  .clamp(true);
-```
-
-```js
-const timeScale = d3
-  .scaleTime()
-  .domain([startTime, endTime])
-  .range([h - margin.bottom, margin.top])
-  .clamp(true);
-```
-
-```js
-// find the maximum amount of stacked dots
-const qymax = Math.max(
-  ...data.map((obj) =>
-    Math.max(
-      ...d3
-        .rollup(
-          obj.dot,
-          (v) => v.length, // Count the entries
-          (d) => d.x // Group by the x value
-        )
-        .values()
-    )
-  )
-);
-```
-
-```js
-const xScaleDotPlot = d3
-  .scaleLinear()
-  .domain([0, qymax])
-  .range([0, qymax * qradius * 2]);
-```
-
-```js
-const yScaleDotPlot = d3
-  .scaleLinear()
-  .domain([sleepMin, sleepMax])
-  .range([h - margin.bottom, margin.top]);
-```
-
-```js
-const xScaleBoxPlot = d3
-  .scaleLinear()
-  .domain([ageMin, ageMax])
-  .rangeRound([margin.left, w - margin.right]);
-```
-
-```js
-const yScaleBoxPlot = d3
-  .scaleLinear()
-  .domain([sleepMin, sleepMax])
-  .range([h - margin.bottom, margin.top]);
-```
-
-```js
-const rangeSteps = d3.range(4, 13.5, 0.5); // Creates an array from 4 to 13 with steps of 0.5
-```
-
-```js
-const yScaleCrosshair = d3
-  .scaleThreshold()
-  .domain(rangeSteps) // Data space
-  .range(d3.range(h - margin.bottom, margin.top, -1)); // Assuming equal step in pixel space // Assuming equal step in pixel space
-```
-
-```js
-const yScaleCrosshair1 = d3
-  .scaleQuantize()
-  .domain([h - margin.bottom, margin.top])
-  .range(thresholdsSleep);
-```
-
-```js
-const yScaleQuantize = d3
-  .scaleQuantize()
-  .domain(d3.range(h - margin.bottom, margin.top, -1))
-  .range([4, 13]); // Assuming equal step in pixel space
-```
-
 <!-- --- ### Observer -->
 
 ```js
 const info = document.querySelector(".scroll-info");
 const targets = document.querySelectorAll(".scroll-section");
-```
-
-```js
-setupIntersectionObserver({
-  targets,
-  info,
-  getSteps,
-  set,
-  chartElement,
-  setDisabled,
-  ageInput,
-  sleepTimeInput,
-  estimate,
-  relativeHeight,
-  invalidation,
-});
 ```
 
 ```js
