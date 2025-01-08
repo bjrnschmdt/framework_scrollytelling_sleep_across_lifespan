@@ -1,6 +1,9 @@
 // intersectionObserver.js
 
 import { set } from "./helperFunctions.js";
+import { settings } from "./settings.js";
+
+const { relativeHeight } = settings;
 
 /**
  * Sets up an Intersection Observer to observe multiple “scroll-section”
@@ -15,7 +18,7 @@ import { set } from "./helperFunctions.js";
  * @param {Function} params.setDisabled - A function to disable/enable certain form inputs or buttons.
  * @param {HTMLInputElement} params.ageInput - The input holding the current age value.
  * @param {HTMLInputElement} params.sleepTimeInput - The input holding the current sleepTime value.
- * @param {HTMLInputElement} params.estimate - An input element that might be reset (e.g., to 0).
+ * @param {HTMLInputElement} params.estimateInput - An input element that might be reset (e.g., to 0).
  * @param {number} params.relativeHeight - A number used to calculate observer’s rootMargin offset.
  * @param {Promise} params.invalidation - A promise to clean up (disconnect) the observer when the notebook is invalidated.
  */
@@ -27,8 +30,7 @@ export function setupIntersectionObserver({
   setDisabled,
   ageInput,
   sleepTimeInput,
-  estimate,
-  relativeHeight,
+  estimateInput,
   invalidation,
 }) {
   // Define the callback
@@ -69,7 +71,7 @@ export function setupIntersectionObserver({
           target.style.display = "none";
         }
         setDisabled(false);
-        set(estimate, 0);
+        set(estimateInput, 0);
 
         // If it's the last section (step 8 in your example), do something special
         if (step === "8") {
@@ -105,4 +107,100 @@ export function setupIntersectionObserver({
   if (invalidation && typeof invalidation.then === "function") {
     invalidation.then(() => observer.disconnect());
   }
+}
+
+export function getSteps(age, sleepTime, variant) {
+  return {
+    0: {
+      age: undefined,
+      sleepTime: undefined,
+      showRecommended: false,
+      showPointcloud: false,
+      showPercentiles: [],
+      tooltipText: undefined,
+      isExplorable: false,
+      variant: "none",
+    },
+    1: {
+      age: undefined,
+      sleepTime: undefined,
+      showRecommended: false,
+      showPointcloud: false,
+      showPercentiles: [],
+      tooltipText: undefined,
+      isExplorable: false,
+      variant: "none",
+    },
+    2: {
+      age: undefined,
+      sleepTime: undefined,
+      showRecommended: false,
+      showPointcloud: true,
+      showPercentiles: [],
+
+      tooltipText: undefined,
+      isExplorable: false,
+      variant: "none",
+    },
+    3: {
+      age: undefined,
+      sleepTime: undefined,
+      showRecommended: false,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      tooltipText: undefined,
+      isExplorable: false,
+      variant: "none",
+    },
+    4: {
+      age: 31,
+      sleepTime: 7,
+      showRecommended: false,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      tooltipText: "Karin",
+      isExplorable: false,
+      variant: "none",
+    },
+    5: {
+      age: age,
+      sleepTime: sleepTime,
+      showRecommended: false,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      tooltipText: "Du",
+      isExplorable: false,
+      variant: "none",
+    },
+    6: {
+      age: age,
+      sleepTime: sleepTime,
+      showRecommended: false,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      tooltipText: undefined,
+      isExplorable: false,
+      variant: variant,
+    },
+    7: {
+      age: age,
+      sleepTime: sleepTime,
+      showRecommended: false,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      tooltipText: undefined,
+      isExplorable: false,
+      variant: variant,
+    },
+    8: {
+      age: age,
+      sleepTime: sleepTime,
+      showRecommended: false,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      tooltipText: undefined,
+      isExplorable: true,
+      variant: variant,
+    },
+  };
 }
