@@ -11,14 +11,14 @@ const { mostProminent, lessProminent, lineWidths, colors } = settings;
  * @param {d3.Selection} svg - D3 selection of your SVG.
  * @param {d3.Selection} container - D3 selection whose .node().value holds state (e.g., showPercentiles).
  * @param {object} config - Holds references to scales, data, and styling.
- * @param {array} config.dataArray - An array of plot data.
+ * @param {array} config.dataSet - An map of plot data.
  * @param {function} config.xScaleSVG - A D3 scale for x positions (age).
  * @param {function} config.yScaleSVG - A D3 scale for y positions (sleepTime).
  */
 export function drawGroupedPercentileLines(
   svg,
   container,
-  { dataArray, xScaleSVG, yScaleSVG }
+  { dataSet, xScaleSVG, yScaleSVG }
 ) {
   // Grab which percentiles to show from your container’s “state”
   const percentiles = container.node().value.showPercentiles || [];
@@ -28,6 +28,8 @@ export function drawGroupedPercentileLines(
   if (allPercentilesGroup.empty()) {
     allPercentilesGroup = svg.append("g").attr("class", "all-percentiles");
   }
+
+  const dataArray = Array.from(dataSet.values()); // Convert Map to Array
 
   const flattenedData = dataArray.flatMap((d) =>
     d.percentile.map((p) => ({

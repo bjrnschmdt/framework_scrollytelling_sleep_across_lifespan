@@ -4,7 +4,7 @@ theme: [midnight, alt]
 
 ```js
 import { getTrueValue, getURLParameter } from "./components/helperFunctions.js";
-import { dataArray, dataSet, simulatedData } from "./components/data.js";
+import { dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
 import {
@@ -289,7 +289,7 @@ function update(data) {
 
   // Draw percentiles
   drawGroupedPercentileLines(svg, container, {
-    dataArray,
+    dataSet,
     xScaleSVG,
     yScaleSVG,
   });
