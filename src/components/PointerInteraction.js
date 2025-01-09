@@ -2,7 +2,8 @@
 import * as d3 from "npm:d3";
 import _ from "npm:lodash";
 
-import { createDebouncedLogger, logInteraction } from "./helperFunctions.js";
+import { createDebouncedLogger } from "./helperFunctions.js";
+import { logInteraction } from "./logger.js";
 
 function roundToStep(value, step) {
   return Math.round(value / step) * step;

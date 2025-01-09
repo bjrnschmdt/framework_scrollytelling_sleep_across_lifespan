@@ -2,6 +2,8 @@
 
 import { set } from "./helperFunctions.js";
 import { settings } from "./settings.js";
+import { logSectionVisible, logEstimateSctnChange } from "./logger.js";
+import { getTrueValue } from "./helperFunctions.js";
 
 const { relativeHeight } = settings;
 
@@ -23,6 +25,7 @@ const { relativeHeight } = settings;
  * @param {Promise} params.invalidation - A promise to clean up (disconnect) the observer when the notebook is invalidated.
  */
 export function setupIntersectionObserver({
+  dataSet,
   targets,
   info,
   getSteps,
@@ -51,27 +54,14 @@ export function setupIntersectionObserver({
         const steps = getSteps(currentAgeValue, currentSleepTimeValue);
 
         // Optional analytics/tracking
-        window["optimizely"] = window["optimizely"] || [];
-        window["optimizely"].push({
-          type: "event",
-          eventName: "kielscn_schlafdauer_sctn_visible",
-          tags: {
-            section: parseInt(step, 10),
-            age_value: steps[step].age,
-            sleepTime_value: steps[step].sleepTime,
-          },
-        });
+        logSectionVisible(
+          parseInt(step, 10),
+          steps[step].age,
+          steps[step].sleepTime
+        );
 
         // Update the chart element’s value for the current step
         set(chartElement, steps[step]);
-
-        // Reset certain UI elements when a new section becomes visible
-        const target = document.getElementById("answer");
-        if (target) {
-          target.style.display = "none";
-        }
-        setDisabled(false);
-        set(estimateInput, 0);
 
         // If it's the last section (step 8 in your example), do something special
         if (step === "8") {
@@ -80,6 +70,23 @@ export function setupIntersectionObserver({
       } else {
         // Section is not visible
         visibleSection.classList.add("inactive");
+
+        // Only log the estimate if this is the special section at step 7
+        if (step === "7") {
+          const currentEstimateValue = estimateInput.value;
+          logEstimateSctnChange(
+            currentEstimateValue,
+            Math.round(getTrueValue(dataSet, chartElement.value) * 100)
+          );
+
+          // Reset estimate inputs when a new section becomes visible
+          const target = document.getElementById("answer");
+          if (target) {
+            target.style.display = "none";
+          }
+          setDisabled(false);
+          set(estimateInput, 0);
+        }
 
         // Remove interaction if the last section is no longer visible
         if (step === "8") {

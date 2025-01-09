@@ -3,10 +3,7 @@ theme: [midnight, alt]
 ---
 
 ```js
-import {
-  getNearestPValue,
-  getURLParameter,
-} from "./components/helperFunctions.js";
+import { getTrueValue, getURLParameter } from "./components/helperFunctions.js";
 import { dataArray, dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
@@ -27,6 +24,7 @@ import {
   setupIntersectionObserver,
   getSteps,
 } from "./components/intersectionObserver.js";
+import { initializeLogger, logEstimateClick } from "./components/logger.js";
 ```
 
 ```js
@@ -58,6 +56,7 @@ const h = (() => {
 
 ```js
 setupIntersectionObserver({
+  dataSet,
   targets,
   info,
   getSteps: (age, sleepTime) => getSteps(age, sleepTime, variant),
@@ -68,6 +67,10 @@ setupIntersectionObserver({
   estimateInput,
   relativeHeight,
 });
+```
+
+```js
+initializeLogger();
 ```
 
 ```js
@@ -140,15 +143,6 @@ const setDisabled = (x) => (isDisabled.value = x);
 ```
 
 ```js
-const prediction = Inputs.button("Auflösung anzeigen", {
-  value: null,
-  reduce: (value) => buttonClicked(value),
-  disabled: isDisabled,
-});
-const predictionValue = Generators.input(prediction);
-```
-
-```js
 const scrollTo = Inputs.button("Nochmal versuchen", {
   reduce: () => {
     const target = document.getElementById("user-input");
@@ -190,6 +184,16 @@ const estimateInput = Inputs.range([0, 100], {
   placeholder: "in %",
 });
 const estimateValue = Generators.input(estimateInput);
+```
+
+```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerInput = Inputs.button("Auflösung anzeigen", {
+  value: null,
+  reduce: (value) => buttonClicked(value),
+  disabled: isDisabled,
+});
+const answerValue = Generators.input(answerInput);
 ```
 
 ```js
@@ -323,18 +327,8 @@ const buttonClicked = (value) => {
   setDisabled(true);
   const target = document.getElementById("answer");
   target.style.display = "block";
-
-  window["optimizely"] = window["optimizely"] || [];
-  console.log("Loging button clicked", value);
-  window["optimizely"].push({
-    type: "event",
-    eventName: "kielscn_schlafdauer_sctn_7_input_changed",
-    tags: {
-      estimate_value: document.querySelector(
-        '.scroll-section.card[data-step="7"] input[type=number]'
-      ).value,
-    },
-  });
+  const trueValue = Math.round(getTrueValue(dataSet, chartValue) * 100);
+  logEstimateClick(estimateValue, trueValue);
   return value + 1;
 };
 ```
@@ -354,8 +348,8 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.
   ${ageInput}${sleepTimeInput}</div>
   <div class="scroll-section card" data-step="6">Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</div> 
-    <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimateInput}${prediction}
-      <div id="answer">Die richtige Antwort ist ${Math.round(getNearestPValue(dataSet, chartValue.age, chartValue.sleepTime) * 100)}% Versuche es gerne nochmal mit einem anderen Alter/Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
+    <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}
+      <div id="answer">Die richtige Antwort ist ${Math.round(getTrueValue(dataSet, chartValue) * 100)}% Versuche es gerne nochmal mit einem anderen Alter/Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
       </div>
     </div>  
    <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>

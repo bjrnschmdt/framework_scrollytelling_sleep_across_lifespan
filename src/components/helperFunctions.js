@@ -116,6 +116,18 @@ export function getNearestPValue(dataSet, age, sleeptime) {
   return bestMatch ? bestMatch.nearestPValue : null;
 }
 
+export function getTrueValue(dataSet, chartValue) {
+  const age = chartValue.age;
+  const sleepTime = chartValue.sleepTime;
+
+  // Use optional chaining and fallback values
+  const trueValue =
+    dataSet.get(age)?.estimatesPlotData?.find((d) => d.sleeptime === sleepTime)
+      ?.nearestPValue ?? null;
+
+  return trueValue;
+}
+
 // probability density function
 
 export function epanechnikov(bandwidth) {
@@ -157,7 +169,7 @@ export function createDebouncedLogger(callback, delay) {
   };
 }
 
-export function logInteraction({ age, sleepTime }) {
+/* export function logInteraction({ age, sleepTime }) {
   window["optimizely"] = window["optimizely"] || [];
   window["optimizely"].push({
     type: "event",
@@ -167,4 +179,4 @@ export function logInteraction({ age, sleepTime }) {
       sleepTime_value: sleepTime,
     },
   });
-}
+} */
