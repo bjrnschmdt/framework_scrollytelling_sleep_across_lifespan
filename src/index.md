@@ -333,6 +333,36 @@ const buttonClicked = (value) => {
 };
 ```
 
+```js
+// Get the div where the visualization description will be displayed
+const visualizationDescriptionDiv = document.querySelector(
+  '.scroll-section[data-step="6"]'
+);
+
+// Object to store descriptions for each visualization type
+const visualizationDescriptions = {
+  dot: "Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.",
+  box: "Die hier gezeigte Boxplot-Darstellung zeigt, wie die Daten verteilt sind. Dabei sind die Hälfte der Daten im mittleren Bereich, also in der Box, abgebildet. Die Balken oben und unten zeigen die längsten und kürzesten Schlafdauern und bilden die andere Hälfte der Daten ab. Der Boxplot bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
+  percentile:
+    "Hier haben wir die Perzentillinien noch zusätzlich beschriftet, damit du dich besser zurechtfinden kannst. Die Beschriftung bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
+  hops: "diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
+  traced_hops:
+    "diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
+  none: "No specific visualization selected.",
+};
+
+// Function to update the description based on the visualization type
+function updateVisualizationDescription(visualizationType) {
+  const description =
+    visualizationDescriptions[visualizationType] ||
+    visualizationDescriptions.none;
+  visualizationDescriptionDiv.textContent = description;
+}
+
+// Example usage: Update the description based on the current visualization type
+updateVisualizationDescription(variant);
+```
+
 # Schlafdauer über die Lebensspanne
 
 Hallo!
