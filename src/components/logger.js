@@ -39,9 +39,9 @@ export function logEstimateSctnChange(estimateValue, trueValue) {
 }
 
 // Used in pointerInteraction.js
-export function logInteraction(age, sleepTime) {
+export function logInteraction(event) {
   logEvent("kielscn_schlafdauer_exploration_changed", {
-    age_value: age,
-    sleepTime_value: sleepTime,
+    age_value: event.age,
+    sleepTime_value: event.sleepTime,
   });
 }
