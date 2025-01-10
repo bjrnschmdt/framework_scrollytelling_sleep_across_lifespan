@@ -4,7 +4,7 @@ import { settings } from "./settings.js";
 
 const { sleepMin, sleepMax, margin, qstep } = settings;
 
-function precalculateHeights(data, qradius) {
+export function precalculateHeights(data, qradius) {
   const totalHeightMap = new Map();
   data.forEach((dot) => {
     const x = dot.x;
@@ -20,7 +20,7 @@ function getStackOffset(x, radius, stackMap) {
   return currentHeight;
 }
 
-function calculateCX(d, stackMap, totalHeightMap, qradius) {
+export function calculateCX(d, stackMap, totalHeightMap, qradius) {
   const offset = getStackOffset(d.x, qradius, stackMap);
   const totalHeight = totalHeightMap.get(d.x);
   return totalHeight / 2 - offset - qradius;
@@ -34,8 +34,11 @@ function enterDot(enter, context) {
     .append("use")
     .attr("href", "#man-icon")
     .attr("class", "dot-plot-element")
-    .attr("x", (d) => calculateCX(d, stackMap, totalHeightMap, qradius) - 12)
-    .attr("y", (d) => yScaleDotPlot(d.x) - 12)
+    .attr(
+      "x",
+      (d) => calculateCX(d, stackMap, totalHeightMap, qradius) - qradius
+    )
+    .attr("y", (d) => yScaleDotPlot(d.x) - qradius)
     .attr("width", 2 * qradius)
     .attr("height", 2 * qradius)
     .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
@@ -57,12 +60,7 @@ function updateDot(update, context) {
     .attr("y", (d) => yScaleDotPlot(d.x) - 12);
 }
 
-export function updateDotPlot(data, values, xScaleSVG, yScaleDotPlot, h) {
-  // Calculate qradius
-  const qdomain = [sleepMin, sleepMax];
-  const qwidth = h - margin.top - margin.bottom;
-  const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
-
+export function updateDotPlot(data, values, xScaleSVG, yScaleDotPlot, qradius) {
   const preprocessDotPlot = (plotData) => {
     return {
       stackMap: new Map(),

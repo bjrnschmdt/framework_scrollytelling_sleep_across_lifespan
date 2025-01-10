@@ -3,7 +3,11 @@ theme: [midnight, alt]
 ---
 
 ```js
-import { getTrueValue, getURLParameter } from "./components/helperFunctions.js";
+import {
+  getTrueValue,
+  getURLParameter,
+  calculateMargins,
+} from "./components/helperFunctions.js";
 import { dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
@@ -37,6 +41,7 @@ const {
   canvasScaleFactor,
   icon,
   relativeHeight,
+  qstep,
 } = settings;
 ```
 
@@ -52,6 +57,13 @@ const h = (() => {
     ? /* (w / 3) * 2 */ window.innerHeight * relativeHeight
     : window.innerHeight * relativeHeight; // 16:9 for landscape, 60vh for portrait
 })();
+```
+
+```js
+const qdomain = [sleepMin, sleepMax];
+const qwidth = h - margin.top - margin.bottom;
+const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
+const sideMargins = calculateMargins(dataSet, qradius);
 ```
 
 ```js
@@ -75,7 +87,7 @@ initializeLogger();
 
 ```js
 const { xScaleSVG, yScaleSVG, timeScale, yScaleDotPlot, yScaleBoxPlot } =
-  createScales({ w, h });
+  createScales({ w, h, sideMargins });
 ```
 
 ```js
@@ -253,9 +265,17 @@ createAxes(svg, {
   timeScale,
   w,
   h,
+  sideMargins,
 });
 
-const crosshair = initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h, margin);
+const crosshair = initializeCrosshair(
+  svg,
+  xScaleSVG,
+  yScaleSVG,
+  w,
+  h,
+  sideMargins
+);
 
 // Setup the pointer interactions like pointerMoved and pointerClicked
 new PointerInteraction(svg, container, {
@@ -275,7 +295,13 @@ function update(data) {
       updatePercentilePlot(data, xScaleSVG, yScaleSVG);
       break;
     case "dot":
-      updateDotPlot(data, container.node().value, xScaleSVG, yScaleDotPlot, h);
+      updateDotPlot(
+        data,
+        container.node().value,
+        xScaleSVG,
+        yScaleDotPlot,
+        qradius
+      );
       break;
     case "box":
       updateBoxPlot(data, xScaleSVG, yScaleBoxPlot);
@@ -300,7 +326,14 @@ function update(data) {
     yScaleSVG,
   });
 
-  updateCrosshairs(container.node().value, crosshair, xScaleSVG, yScaleSVG, w);
+  updateCrosshairs(
+    container.node().value,
+    crosshair,
+    xScaleSVG,
+    yScaleSVG,
+    w,
+    sideMargins
+  );
 }
 
 container.node().update = update;

@@ -5,7 +5,7 @@ import { settings } from "./settings.js";
 
 const { ageMin, ageMax, margin, fontSize, fontFamily } = settings;
 
-export function createAxes(svg, { xScaleSVG, timeScale, w, h }) {
+export function createAxes(svg, { xScaleSVG, timeScale, w, h, sideMargins }) {
   // Append the x-axis group to the SVG and set its position based on height and margin
   svg
     .append("g")
@@ -31,11 +31,11 @@ export function createAxes(svg, { xScaleSVG, timeScale, w, h }) {
   const yAxis = svg
     .append("g")
     .attr("class", "y-axis")
-    .attr("transform", `translate(${margin.left},0)`)
+    .attr("transform", `translate(${sideMargins.left},0)`)
     .call(
       d3
         .axisRight(timeScale)
-        .tickSize(w - margin.left - margin.right)
+        .tickSize(w - sideMargins.left - sideMargins.right)
         .tickFormat(d3.timeFormat("%H:%M"))
     )
     .call((g) => {
