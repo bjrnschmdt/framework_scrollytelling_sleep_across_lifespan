@@ -83,14 +83,33 @@ const ageBinnedData = ageBins(simulatedData)
   .filter((bin) => bin.x0 !== bin.x1) // the extra filter step ensures that there is no empty bin
   .map((bin) => bin.sort((a, b) => d3.ascending(a.sleepTime, b.sleepTime))); // sorted to apply d3.quantileSorted() later for efficiency
 
+const ageBinnedDataUnsorted = ageBins(simulatedData).filter(
+  (bin) => bin.x0 !== bin.x1
+); // the extra filter step ensures that there is no empty bin
+
 // data
 
-const dataPercentilePlot = ageBinnedData.map((age) => {
-  const percentileResults = calculatePercentiles(age);
+const dataHOP = ageBinnedDataUnsorted.map((ageBin) => {
+  // Create the new bin
+  const newBin = ageBin.map((d, index) => ({
+    id: `hop-${ageBin.x0}-${index}`,
+    age: ageBin.x0,
+    sleepTime: d.sleepTime,
+  }));
+
+  // Transfer attributes
+  newBin.x0 = ageBin.x0;
+  newBin.x1 = ageBin.x1;
+
+  return newBin;
+});
+
+const dataPercentilePlot = ageBinnedData.map((ageBin) => {
+  const percentileResults = calculatePercentiles(ageBin);
 
   // Add x0 and x1 to the quantile array as properties
-  percentileResults.x0 = age.x0; // Retain x0 from the CDF
-  percentileResults.x1 = age.x1; // Retain x1 from the CDF
+  percentileResults.x0 = ageBin.x0; // Retain x0 from the CDF
+  percentileResults.x1 = ageBin.x1; // Retain x1 from the CDF
 
   // Add a stable "id" to each percentile entry
   percentileResults.forEach((d) => {
@@ -236,6 +255,7 @@ export const dataSet = (() => {
     let percentilePlot = dataPercentilePlot.find(
       (item) => item.x0 === x0 && item.x1 === x1
     );
+    let hopPlot = dataHOP.find((item) => item.x0 === x0);
     const estimates = dataEstimates.find(
       (item) => item.x0 === x0 && item.x1 === x1
     );
@@ -250,6 +270,7 @@ export const dataSet = (() => {
           q: dp.q,
           id: dp.id,
         })),
+        hop: hopPlot,
         estimatesPlotData: estimates.estimatesPlotData,
       });
     } else {

@@ -24,6 +24,7 @@ import { updatePlot, exitPlot } from "./components/plot.js";
 import { updateDotPlot } from "./components/plotDot.js";
 import { updatePercentilePlot } from "./components/plotPercentile.js";
 import { updateBoxPlot } from "./components/plotBox.js";
+import { updateHOPPlot, animateHOP } from "./components/plotHOP.js";
 import {
   setupIntersectionObserver,
   getSteps,
@@ -44,6 +45,10 @@ const {
   qstep,
 } = settings;
 ```
+
+<!-- ```js
+console.log("dataSet", dataSet);
+``` -->
 
 ```js
 const w = width;
@@ -86,8 +91,7 @@ initializeLogger();
 ```
 
 ```js
-const { xScaleSVG, yScaleSVG, timeScale, yScaleDotPlot, yScaleBoxPlot } =
-  createScales({ w, h, sideMargins });
+const { xScaleSVG, yScaleSVG, timeScale } = createScales({ w, h, sideMargins });
 ```
 
 ```js
@@ -286,10 +290,10 @@ new PointerInteraction(svg, container, {
   yScaleSVG,
 });
 
-function update(data) {
+function update(data, index) {
   // Update the pointcloud visibility
   pointcloud.setVisibility(container.node().value.showPointcloud);
-
+  /* console.log("data", data); */
   switch (container.node().value.variant) {
     case "percentile":
       updatePercentilePlot(data, xScaleSVG, yScaleSVG);
@@ -299,12 +303,27 @@ function update(data) {
         data,
         container.node().value,
         xScaleSVG,
-        yScaleDotPlot,
+        yScaleSVG,
         qradius
       );
       break;
     case "box":
-      updateBoxPlot(data, xScaleSVG, yScaleBoxPlot);
+      updateBoxPlot(data, xScaleSVG, yScaleSVG);
+      break;
+    case "hop":
+      /* animateHOP(
+        data, // Pass the full dataset
+        xScaleSVG,
+        yScaleSVG,
+        qradius
+      ); */
+      updateHOPPlot(data, {
+        xScaleSVG,
+        yScaleSVG,
+        qradius,
+        hopCount,
+        index,
+      });
       break;
     case "none":
       exitPlot();
@@ -345,7 +364,26 @@ const chartValue = Generators.input(chartElement);
 ```
 
 ```js
-const update = chartElement.update(dataSet.get(chartValue.age));
+const update = chartElement.update(dataSet.get(chartValue.age), j);
+```
+
+```js
+chartValue;
+const j = (async function* () {
+  for (let j = 0; variant === "hop"; ++j) {
+    yield j;
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+})();
+```
+
+```js
+const hopCount = 1;
+```
+
+```js
+/* console.log("j", j); */
+console.log("chartValue", chartValue);
 ```
 
 <!-- --- ### Observer -->
@@ -378,7 +416,7 @@ const visualizationDescriptions = {
   box: "Die hier gezeigte Boxplot-Darstellung zeigt, wie die Daten verteilt sind. Dabei sind die Hälfte der Daten im mittleren Bereich, also in der Box, abgebildet. Die Balken oben und unten zeigen die längsten und kürzesten Schlafdauern und bilden die andere Hälfte der Daten ab. Der Boxplot bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
   percentile:
     "Hier haben wir die Perzentillinien noch zusätzlich beschriftet, damit du dich besser zurechtfinden kannst. Die Beschriftung bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
-  hops: "diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
+  hop: "diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
   traced_hops:
     "diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
   none: "No specific visualization selected.",

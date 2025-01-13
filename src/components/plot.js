@@ -6,9 +6,11 @@ export function updatePlot({
   plotDataKey,
   enterFn,
   updateFn,
+  exitFn = (exit) => exit.remove(),
   filterFn = (arr) => arr,
   preprocessFn = () => ({}),
   xScaleSVG,
+  yScaleSVG,
   yScaleDotPlot,
   yScaleBoxPlot,
   yScalePercentile,
@@ -27,10 +29,18 @@ export function updatePlot({
   const context = {
     data: filteredData,
     originalData: data,
-    scales: { xScaleSVG, yScaleDotPlot, yScaleBoxPlot, yScalePercentile },
+    scales: {
+      xScaleSVG,
+      yScaleSVG,
+      yScaleDotPlot,
+      yScaleBoxPlot,
+      yScalePercentile,
+    },
     ...preprocessed,
   };
 
+  /*   console.log("filteredData", filteredData);
+   */
   const plot = svg
     .selectAll(`g.${plotClass}`)
     // Passing a dummy array of length 1 so that .join() sees “one container”
@@ -54,12 +64,12 @@ export function updatePlot({
     .join(
       (enter) => enterFn(enter, context).classed(`${plotClass}-element`, true),
       (update) => updateFn(update, context),
-      (exit) => exit.remove()
+      (exit) => exitFn(exit, context)
     );
 }
 
 export function exitPlot() {
   const svg = d3.select(".svg");
-  const plotClasses = ["dot-plot", "box-plot", "percentile-plot"];
+  const plotClasses = ["dot-plot", "box-plot", "percentile-plot", "hop-plot"];
   svg.selectAll(plotClasses.map((cls) => `.${cls}`).join(", ")).remove();
 }

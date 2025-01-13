@@ -33,21 +33,9 @@ export function createScales({ w, h, sideMargins }) {
     .range([h - margin.bottom, margin.top])
     .clamp(true);
 
-  const yScaleDotPlot = d3
-    .scaleLinear()
-    .domain([sleepMin, sleepMax])
-    .range([h - margin.bottom, margin.top]);
-
-  const yScaleBoxPlot = d3
-    .scaleLinear()
-    .domain([sleepMin, sleepMax])
-    .range([h - margin.bottom, margin.top]);
-
   return {
     xScaleSVG,
     yScaleSVG,
     timeScale,
-    yScaleDotPlot,
-    yScaleBoxPlot,
   };
 }
