@@ -28,7 +28,7 @@ export function calculateCX(d, stackMap, totalHeightMap, qradius) {
 
 function enterDot(enter, context) {
   const { scales, stackMap, totalHeightMap, values, qradius } = context;
-  const { yScaleDotPlot } = scales;
+  const { yScaleSVG } = scales;
 
   return enter
     .append("use")
@@ -38,17 +38,17 @@ function enterDot(enter, context) {
       "x",
       (d) => calculateCX(d, stackMap, totalHeightMap, qradius) - qradius
     )
-    .attr("y", (d) => yScaleDotPlot(d.x) - qradius)
+    .attr("y", (d) => yScaleSVG(d.x) - qradius)
     .attr("width", 2 * qradius)
     .attr("height", 2 * qradius)
     .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
     .style("stroke", "white")
-    .style("stroke-width", 32);
+    .style("stroke-width", 3 * qradius);
 }
 
 function updateDot(update, context) {
   const { scales, stackMap, totalHeightMap, values, qradius } = context;
-  const { yScaleDotPlot } = scales;
+  const { yScaleSVG } = scales;
 
   return update
     .transition()
@@ -57,10 +57,10 @@ function updateDot(update, context) {
     .ease(d3.easeCubic)
     .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
     .attr("x", (d) => calculateCX(d, stackMap, totalHeightMap, qradius) - 12)
-    .attr("y", (d) => yScaleDotPlot(d.x) - 12);
+    .attr("y", (d) => yScaleSVG(d.x) - 12);
 }
 
-export function updateDotPlot(data, values, xScaleSVG, yScaleDotPlot, qradius) {
+export function updateDotPlot(data, values, xScaleSVG, yScaleSVG, qradius) {
   const preprocessDotPlot = (plotData) => {
     return {
       stackMap: new Map(),
@@ -77,6 +77,6 @@ export function updateDotPlot(data, values, xScaleSVG, yScaleDotPlot, qradius) {
     updateFn: (update, context) => updateDot(update, { ...context, qradius }),
     preprocessFn: preprocessDotPlot,
     xScaleSVG: xScaleSVG,
-    yScaleDotPlot: yScaleDotPlot,
+    yScaleSVG: yScaleSVG,
   });
 }

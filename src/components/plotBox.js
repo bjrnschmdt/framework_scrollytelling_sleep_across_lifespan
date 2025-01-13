@@ -5,7 +5,7 @@ import { settings } from "./settings.js";
 const { lineWidths } = settings;
 
 function enterBox(enter, context) {
-  const { yScaleBoxPlot } = context.scales;
+  const { yScaleSVG } = context.scales;
 
   const boxEnter = enter.append("g");
 
@@ -15,10 +15,7 @@ function enterBox(enter, context) {
     .attr("class", "range")
     .attr("stroke", "white")
     .attr("stroke-width", lineWidths.regular)
-    .attr(
-      "d",
-      (d) => `M0,${yScaleBoxPlot(d.range[1])}V${yScaleBoxPlot(d.range[0])}`
-    );
+    .attr("d", (d) => `M0,${yScaleSVG(d.range[1])}V${yScaleSVG(d.range[0])}`);
 
   // quartiles path
   boxEnter
@@ -29,8 +26,8 @@ function enterBox(enter, context) {
     .attr(
       "d",
       (d) =>
-        `M-10,${yScaleBoxPlot(d.quartiles[2])}
-       H10V${yScaleBoxPlot(d.quartiles[0])}
+        `M-10,${yScaleSVG(d.quartiles[2])}
+       H10V${yScaleSVG(d.quartiles[0])}
        H-10Z`
     );
 
@@ -40,23 +37,20 @@ function enterBox(enter, context) {
     .attr("class", "median")
     .attr("stroke", "white")
     .attr("stroke-width", lineWidths.regular)
-    .attr("d", (d) => `M-10,${yScaleBoxPlot(d.quartiles[1])}H10`);
+    .attr("d", (d) => `M-10,${yScaleSVG(d.quartiles[1])}H10`);
 
   return boxEnter;
 }
 
 function updateBox(update, context) {
-  const { yScaleBoxPlot } = context.scales;
+  const { yScaleSVG } = context.scales;
 
   // range path
   update
     .select(".range")
     .transition()
     .duration(400)
-    .attr(
-      "d",
-      (d) => `M0,${yScaleBoxPlot(d.range[1])}V${yScaleBoxPlot(d.range[0])}`
-    );
+    .attr("d", (d) => `M0,${yScaleSVG(d.range[1])}V${yScaleSVG(d.range[0])}`);
 
   // quartiles path
   update
@@ -66,8 +60,8 @@ function updateBox(update, context) {
     .attr(
       "d",
       (d) =>
-        `M-10,${yScaleBoxPlot(d.quartiles[2])}
-       H10V${yScaleBoxPlot(d.quartiles[0])}
+        `M-10,${yScaleSVG(d.quartiles[2])}
+       H10V${yScaleSVG(d.quartiles[0])}
        H-10Z`
     );
 
@@ -76,12 +70,12 @@ function updateBox(update, context) {
     .select(".median")
     .transition()
     .duration(400)
-    .attr("d", (d) => `M-10,${yScaleBoxPlot(d.quartiles[1])}H10`);
+    .attr("d", (d) => `M-10,${yScaleSVG(d.quartiles[1])}H10`);
 
   return update;
 }
 
-export function updateBoxPlot(data, xScaleSVG, yScaleBoxPlot) {
+export function updateBoxPlot(data, xScaleSVG, yScaleSVG) {
   updatePlot({
     data,
     plotClass: "box-plot",
@@ -89,7 +83,7 @@ export function updateBoxPlot(data, xScaleSVG, yScaleBoxPlot) {
     enterFn: enterBox,
     updateFn: updateBox,
     xScaleSVG,
-    yScaleBoxPlot,
+    yScaleSVG,
     // no filterFn or preprocessFn needed if none required
   });
 }
