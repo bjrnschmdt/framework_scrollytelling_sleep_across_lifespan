@@ -18,13 +18,15 @@ function enterHOP(enter, context) {
     );
 }
 
-function updateHOP(update) {
+function updateHOP(update, context) {
+  const { hopCount } = context;
+
   return update.call((update) =>
     update
       .transition("hopUpdate")
       .duration(1000)
       .ease(d3.easeLinear)
-      .style("opacity", (d, i) => (1 / 4) * i)
+      .style("opacity", (d, i) => (1 / hopCount) * i)
   );
 }
 
@@ -36,7 +38,8 @@ export function updateHOPPlot(data, context) {
     plotClass: "hop-plot",
     plotDataKey: "hop",
     enterFn: (enter, context) => enterHOP(enter, { ...context, qradius }),
-    updateFn: (update, context) => updateHOP(update, { ...context, qradius }),
+    updateFn: (update, context) =>
+      updateHOP(update, { ...context, qradius, hopCount }),
     filterFn: (arr) => arr.slice(index, index + hopCount),
     xScaleSVG,
     yScaleSVG,
