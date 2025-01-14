@@ -8,6 +8,7 @@ export function initializeLogger() {
 // Log a generic event
 export function logEvent(eventName, tags = {}) {
   console.log("Log event", eventName, tags);
+  /*   console.log("Optimizely", window["optimizely"]); */
   window["optimizely"].push({
     type: "event",
     eventName,
@@ -24,8 +25,17 @@ export function logSectionVisible(step, age, sleepTime) {
   });
 }
 
-export function logEstimateClick(estimateValue, trueValue) {
+export function logEstimateClick({
+  estimateValue,
+  trueValue,
+  section,
+  age,
+  sleepTime,
+}) {
   logEvent("kielscn_schlafdauer_estimate_on_click", {
+    section,
+    age_value: age,
+    sleepTime_value: sleepTime,
     estimate_value: estimateValue,
     true_value: trueValue,
   });
