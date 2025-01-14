@@ -70,6 +70,12 @@ export function updatePlot({
 
 export function exitPlot() {
   const svg = d3.select(".svg");
-  const plotClasses = ["dot-plot", "box-plot", "percentile-plot", "hop-plot"];
+  const plotClasses = [
+    "dot-plot",
+    "box-plot",
+    "percentile-plot",
+    "hop-plot",
+    "hop-traced-plot",
+  ];
   svg.selectAll(plotClasses.map((cls) => `.${cls}`).join(", ")).remove();
 }

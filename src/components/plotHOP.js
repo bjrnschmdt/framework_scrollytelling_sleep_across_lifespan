@@ -2,7 +2,7 @@ import * as d3 from "npm:d3";
 import { updatePlot } from "./plot.js";
 
 function enterHOP(enter, context) {
-  const { qradius } = context;
+  const { qradius, hopCount } = context;
   const { yScaleSVG } = context.scales;
 
   return enter
@@ -14,7 +14,10 @@ function enterHOP(enter, context) {
     .attr("height", 2 * qradius)
     .style("opacity", 0)
     .call((enter) =>
-      enter.transition("hopEnter").delay(150).style("opacity", 1)
+      enter
+        .transition("hopEnter")
+        .delay(150)
+        .style("opacity", (d, i) => (1 / hopCount) * (i + 1))
     );
 }
 
@@ -26,7 +29,7 @@ function updateHOP(update, context) {
       .transition("hopUpdate")
       .duration(1000)
       .ease(d3.easeLinear)
-      .style("opacity", (d, i) => (1 / hopCount) * i)
+      .style("opacity", (d, i) => (1 / hopCount) * (i + 1))
   );
 }
 
@@ -37,9 +40,9 @@ export function updateHOPPlot(data, context) {
     data,
     plotClass: "hop-plot",
     plotDataKey: "hop",
-    enterFn: (enter, context) => enterHOP(enter, { ...context, qradius }),
-    updateFn: (update, context) =>
-      updateHOP(update, { ...context, qradius, hopCount }),
+    enterFn: (enter, context) =>
+      enterHOP(enter, { ...context, qradius, hopCount }),
+    updateFn: (update, context) => updateHOP(update, { ...context, hopCount }),
     filterFn: (arr) => arr.slice(index, index + hopCount),
     xScaleSVG,
     yScaleSVG,
