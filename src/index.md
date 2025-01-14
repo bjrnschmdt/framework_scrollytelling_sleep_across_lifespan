@@ -213,6 +213,44 @@ const answerValue = Generators.input(answerInput);
 ```
 
 ```js
+const feedbackAestheticInput = Inputs.radio(
+  new Map([
+    ["1", 1],
+    ["2", 2],
+    ["3", 3],
+    ["4", 4],
+    ["5 stimme voll zu", 5],
+  ]),
+  {
+    /* label: "Die Gestaltung der Grafik war ansprechend."  */
+    label: "stimme gar nicht zu",
+  }
+);
+const feedbackAestheticValue = Generators.input(feedbackAestheticInput);
+```
+
+```js
+const feedbackInterestInput = Inputs.radio(
+  new Map([
+    ["1", 1],
+    ["2", 2],
+    ["3", 3],
+    ["4", 4],
+    ["5 stimme voll zu", 5],
+  ]),
+  {
+    /* label: "Die Gestaltung der Grafik war ansprechend."  */
+    label: "stimme gar nicht zu",
+  }
+);
+const feedbackInterestValue = Generators.input(feedbackInterestInput);
+```
+
+```js
+console.log("feebackValue", feedbackAestheticValue);
+```
+
+```js
 const container = d3.create("div");
 container.style("position", "relative");
 container.style("background-color", `var(--theme-background)`);
@@ -311,17 +349,20 @@ function update(data, index) {
       updateBoxPlot(data, xScaleSVG, yScaleSVG);
       break;
     case "hop":
-      /* animateHOP(
-        data, // Pass the full dataset
-        xScaleSVG,
-        yScaleSVG,
-        qradius
-      ); */
       updateHOPPlot(data, {
         xScaleSVG,
         yScaleSVG,
         qradius,
-        hopCount,
+        hopCount: 1,
+        index,
+      });
+      break;
+    case "hop_traced":
+      updateHOPPlot(data, {
+        xScaleSVG,
+        yScaleSVG,
+        qradius,
+        hopCount: 4,
         index,
       });
       break;
@@ -370,15 +411,11 @@ const update = chartElement.update(dataSet.get(chartValue.age), j);
 ```js
 chartValue;
 const j = (async function* () {
-  for (let j = 0; variant === "hop"; ++j) {
+  for (let j = 0; variant === "hop" || variant === "hop_traced"; ++j) {
     yield j;
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 })();
-```
-
-```js
-const hopCount = 1;
 ```
 
 ```js
@@ -399,7 +436,13 @@ const buttonClicked = (value) => {
   const target = document.getElementById("answer");
   target.style.display = "block";
   const trueValue = Math.round(getTrueValue(dataSet, chartValue) * 100);
-  logEstimateClick(estimateValue, trueValue);
+  logEstimateClick({
+    estimateValue,
+    trueValue,
+    section: 7,
+    age: chartValue.age,
+    sleepTime: chartValue.sleepTime,
+  });
   return value + 1;
 };
 ```
@@ -416,9 +459,9 @@ const visualizationDescriptions = {
   box: "Die hier gezeigte Boxplot-Darstellung zeigt, wie die Daten verteilt sind. Dabei sind die Hälfte der Daten im mittleren Bereich, also in der Box, abgebildet. Die Balken oben und unten zeigen die längsten und kürzesten Schlafdauern und bilden die andere Hälfte der Daten ab. Der Boxplot bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
   percentile:
     "Hier haben wir die Perzentillinien noch zusätzlich beschriftet, damit du dich besser zurechtfinden kannst. Die Beschriftung bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
-  hop: "diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
-  traced_hops:
-    "diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
+  hop: "Diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
+  hop_traced:
+    "Diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
   none: "No specific visualization selected.",
 };
 
@@ -449,14 +492,29 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.
   ${ageInput}${sleepTimeInput}</div>
   <div class="scroll-section card" data-step="6">Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</div> 
-    <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}
-      <div id="answer">Die richtige Antwort ist ${Math.round(getTrueValue(dataSet, chartValue) * 100)}% Versuche es gerne nochmal mit einem anderen Alter/Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
-      </div>
-    </div>  
-   <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
-      <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
-
+  <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}
+    <div id="answer">Die richtige Antwort ist ${Math.round(getTrueValue(dataSet, chartValue) * 100)}% Versuche es gerne nochmal mit einem anderen Alter/Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
+    </div>
+  </div>  
+  <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
 </section>
+<div class="card">
+    <h2>Altersgruppe bis 10 Jahre</h2>
+    <p> Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
+    <h2>11–17 Jahre</h2>
+    <p>Während der Pubertät fällt die Schlafdauer dramatisch ab; gleichzeitig nimmt die Streuung zu. Da sich in dieser Phase die innere Uhr meist auf spätere Bettzeiten einstellt, die Schule aber in der Regel früh beginnt, bekommen Jugendliche oft weniger Schlaf, als es Fachleute empfehlen.</p>
+    <h2>18–65 Jahre</h2>
+    <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7 Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
+    <h2>Über 66 Jahre</h2>
+    <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
+</div>
+<div class="card">
+  <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
+  <h2>Die Gestaltung der Grafik war ansprechend.</h2>
+  ${feedbackAestheticInput}
+  <h2>Das Thema hat mich interessiert.</h2>
+  ${feedbackInterestInput}
+</div>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
@@ -478,9 +536,12 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 }
 .scroll-section {
   position:relative;
-  max-width: 32rem;
   margin: 0 auto 60vh;
   z-index: 2;
+}
+
+.card {
+  max-width: 32rem;
 }
 
 .scroll-section.inactive {
