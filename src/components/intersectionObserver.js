@@ -42,16 +42,16 @@ export function setupIntersectionObserver({
       const visibleSection = entry.target;
       const step = visibleSection.dataset.step;
 
+      // Fetch the latest values (age, sleepTime) without making the cell reactive
+      const currentAgeValue = ageInput.value;
+      const currentSleepTimeValue = sleepTimeInput.value;
+
+      // Build or fetch the steps object
+      const steps = getSteps(currentAgeValue, currentSleepTimeValue);
+
       if (entry.isIntersecting) {
         // Section is visible
         visibleSection.classList.remove("inactive");
-
-        // Fetch the latest values (age, sleepTime) without making the cell reactive
-        const currentAgeValue = ageInput.value;
-        const currentSleepTimeValue = sleepTimeInput.value;
-
-        // Build or fetch the steps object
-        const steps = getSteps(currentAgeValue, currentSleepTimeValue);
 
         // Optional analytics/tracking
         logSectionVisible(
@@ -74,10 +74,15 @@ export function setupIntersectionObserver({
         // Only log the estimate if this is the special section at step 7
         if (step === "7") {
           const currentEstimateValue = estimateInput.value;
-          logEstimateSctnChange(
-            currentEstimateValue,
-            Math.round(getTrueValue(dataSet, chartElement.value) * 100)
-          );
+          logEstimateSctnChange({
+            section: 7,
+            age_value: steps[step].age,
+            sleepTime_value: steps[step].sleepTime,
+            estimate_value: currentEstimateValue,
+            true_value: Math.round(
+              getTrueValue(dataSet, chartElement.value) * 100
+            ),
+          });
 
           // Reset estimate inputs when a new section becomes visible
           const target = document.getElementById("answer");

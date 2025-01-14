@@ -8,7 +8,7 @@ export function initializeLogger() {
 // Log a generic event
 export function logEvent(eventName, tags = {}) {
   console.log("Log event", eventName, tags);
-  /*   console.log("Optimizely", window["optimizely"]); */
+  /* console.log("Optimizely", window["optimizely"]); */
   window["optimizely"].push({
     type: "event",
     eventName,
@@ -41,10 +41,19 @@ export function logEstimateClick({
   });
 }
 
-export function logEstimateSctnChange(estimateValue, trueValue) {
+export function logEstimateSctnChange({
+  estimate_value,
+  true_value,
+  section,
+  age_value,
+  sleepTime_value,
+}) {
   logEvent("kielscn_schlafdauer_estimate_on_sctn_change", {
-    estimate_value: estimateValue,
-    true_value: trueValue,
+    section,
+    age_value,
+    sleepTime_value,
+    estimate_value,
+    true_value,
   });
 }
 
