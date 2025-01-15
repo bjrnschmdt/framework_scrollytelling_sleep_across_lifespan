@@ -7,13 +7,17 @@ export function initializeLogger() {
 
 // Log a generic event
 export function logEvent(eventName, tags = {}) {
-  console.log("Log event", eventName, tags);
-  /* console.log("Optimizely", window["optimizely"]); */
-  window["optimizely"].push({
-    type: "event",
-    eventName,
-    tags,
-  });
+  try {
+    console.log("Log event", eventName, tags);
+    window["optimizely"] = window["optimizely"] || [];
+    window["optimizely"].push({
+      type: "event",
+      eventName,
+      tags,
+    });
+  } catch (error) {
+    console.error("Logging failed", error);
+  }
 }
 
 // Specific loggers for known events
@@ -62,5 +66,17 @@ export function logInteraction(event) {
   logEvent("kielscn_schlafdauer_exploration_changed", {
     age_value: event.age,
     sleepTime_value: event.sleepTime,
+  });
+}
+
+export function logAestheticItem({ feedbackAestheticValue = 0 }) {
+  logEvent("kielscn_schlafdauer_feedback_aesthetics", {
+    aesthetic_value: feedbackAestheticValue,
+  });
+}
+
+export function logInterestItem({ feedbackInterestValue = 0 }) {
+  logEvent("kielscn_schlafdauer_feedback_interest", {
+    interest_value: feedbackInterestValue,
   });
 }

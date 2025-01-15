@@ -29,7 +29,12 @@ import {
   setupIntersectionObserver,
   getSteps,
 } from "./components/intersectionObserver.js";
-import { initializeLogger, logEstimateClick } from "./components/logger.js";
+import {
+  initializeLogger,
+  logEstimateClick,
+  logAestheticItem,
+  logInterestItem,
+} from "./components/logger.js";
 ```
 
 ```js
@@ -224,11 +229,18 @@ const feedbackAestheticInput = Inputs.radio(
     ["5 stimme voll zu", 5],
   ]),
   {
-    /* label: "Die Gestaltung der Grafik war ansprechend."  */
     label: "stimme gar nicht zu",
   }
 );
 const feedbackAestheticValue = Generators.input(feedbackAestheticInput);
+```
+
+```js
+logAestheticItem({ feedbackAestheticValue });
+```
+
+```js
+console.log("feebackValue", feedbackAestheticValue);
 ```
 
 ```js
@@ -241,7 +253,6 @@ const feedbackInterestInput = Inputs.radio(
     ["5 stimme voll zu", 5],
   ]),
   {
-    /* label: "Die Gestaltung der Grafik war ansprechend."  */
     label: "stimme gar nicht zu",
   }
 );
@@ -249,7 +260,7 @@ const feedbackInterestValue = Generators.input(feedbackInterestInput);
 ```
 
 ```js
-console.log("feebackValue", feedbackAestheticValue);
+logInterestItem({ feedbackInterestValue });
 ```
 
 ```js
