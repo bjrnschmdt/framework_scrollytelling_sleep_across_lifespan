@@ -153,7 +153,6 @@ export function updateCrosshairs(
   // If tooltip is visible, show the text from data.tooltipText
   if (tooltipIsVisible) {
     tooltipText.text(data.tooltipText);
-    console.log("tooltipText", data.tooltipText);
   }
 
   // if cursor outside margins the crosshair get reset
