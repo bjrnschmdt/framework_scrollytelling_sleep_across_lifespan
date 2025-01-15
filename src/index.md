@@ -53,10 +53,6 @@ const {
 } = settings;
 ```
 
-<!-- ```js
-console.log("dataSet", dataSet);
-``` -->
-
 ```js
 const w = width;
 ```
@@ -240,10 +236,6 @@ logAestheticItem({ feedbackAestheticValue });
 ```
 
 ```js
-console.log("feebackValue", feedbackAestheticValue);
-```
-
-```js
 const feedbackInterestInput = Inputs.radio(
   new Map([
     ["1", 1],
@@ -344,7 +336,7 @@ new PointerInteraction(svg, container, {
 function update(data, index) {
   // Update the pointcloud visibility
   pointcloud.setVisibility(container.node().value.showPointcloud);
-  /* console.log("data", data); */
+
   switch (container.node().value.variant) {
     case "percentile":
       updatePercentilePlot(data, xScaleSVG, yScaleSVG);
@@ -430,11 +422,6 @@ const j = (async function* () {
 })();
 ```
 
-```js
-/* console.log("j", j); */
-console.log("chartValue", chartValue);
-```
-
 <!-- --- ### Observer -->
 
 ```js
@@ -510,7 +497,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   </div>  
   <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
 </section>
-<div class="card">
+<div class="outro card">
     <h2>Altersgruppe bis 10 Jahre</h2>
     <p> Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
     <h2>11–17 Jahre</h2>
@@ -520,7 +507,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
     <h2>Über 66 Jahre</h2>
     <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
 </div>
-<div class="card">
+<div class="outro card">
   <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
   <h2>Die Gestaltung der Grafik war ansprechend.</h2>
   ${feedbackAestheticInput}
@@ -533,6 +520,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 
 .scroll-container {
   margin: 1rem auto;
+  padding-bottom: 1vh; /* hack to ensure last section scrolls past svg to */
 }
 
 .scroll-info {
@@ -562,8 +550,13 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 }
 
 .scroll-section:last-of-type {
-  margin-bottom: 30vh;
+  margin-bottom: 60vh;
 }
+
+.outro {
+  margin: 0 auto 2rem;
+}
+
 
 /* Style the buttons that are used to open and close the accordion panel */
 /* .accordion {
