@@ -1,5 +1,8 @@
 import * as d3 from "npm:d3";
 import { updatePlot } from "./plot.js";
+import { settings } from "./settings.js";
+
+const { hopDuration } = settings;
 
 function enterHOP(enter, context) {
   const { qradius, hopCount } = context;
@@ -12,13 +15,7 @@ function enterHOP(enter, context) {
     .attr("y", (d) => yScaleSVG(d.sleepTime))
     .attr("width", 2 * qradius)
     .attr("height", 2 * qradius)
-    .style("opacity", 0)
-    .call((enter) =>
-      enter
-        .transition("hopEnter")
-        .delay(150)
-        .style("opacity", (d, i) => (1 / hopCount) * (i + 1))
-    );
+    .style("opacity", (d, i) => (1 / hopCount) * (i + 1));
 }
 
 function updateHOP(update, context) {
@@ -27,14 +24,14 @@ function updateHOP(update, context) {
   return update.call((update) =>
     update
       .transition("hopUpdate")
-      .duration(1000)
+      .duration(hopDuration)
       .ease(d3.easeLinear)
       .style("opacity", (d, i) => (1 / hopCount) * (i + 1))
   );
 }
 
 export function updateHOPPlot(data, context) {
-  const { xScaleSVG, yScaleSVG, qradius, hopCount, index } = context;
+  const { xScaleSVG, yScaleSVG, qradius, hopCount = 1, index } = context;
 
   updatePlot({
     data,

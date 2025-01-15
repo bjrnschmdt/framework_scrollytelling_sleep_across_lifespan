@@ -43,6 +43,8 @@ const {
   icon,
   relativeHeight,
   qstep,
+  hopCount,
+  hopDuration,
 } = settings;
 ```
 
@@ -353,7 +355,6 @@ function update(data, index) {
         xScaleSVG,
         yScaleSVG,
         qradius,
-        hopCount: 1,
         index,
       });
       break;
@@ -362,7 +363,7 @@ function update(data, index) {
         xScaleSVG,
         yScaleSVG,
         qradius,
-        hopCount: 4,
+        hopCount,
         index,
       });
       break;
@@ -413,7 +414,7 @@ chartValue;
 const j = (async function* () {
   for (let j = 0; variant === "hop" || variant === "hop_traced"; ++j) {
     yield j;
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, hopDuration));
   }
 })();
 ```

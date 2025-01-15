@@ -90,4 +90,6 @@ export const settings = {
   startTime,
   endTime,
   casesData,
+  hopCount: 5,
+  hopDuration: 400,
 };
