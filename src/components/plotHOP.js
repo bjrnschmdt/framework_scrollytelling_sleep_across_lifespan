@@ -29,7 +29,10 @@ function updateHOP(update, context) {
       .transition("hopUpdate")
       .duration(hopDuration)
       .ease(d3.easeLinear)
-      .style("opacity", (d, i) => (1 / hopCount) * (i + 1))
+      .style("opacity", (d, i, nodes) => {
+        const arrayLength = nodes.length; // Get the current array length
+        return (i + 1) / arrayLength; // Dynamically calculate opacity
+      })
   );
 }
 
