@@ -14,9 +14,6 @@ export function updatePlot({
   preprocessFn = () => ({}),
   xScaleSVG,
   yScaleSVG,
-  yScaleDotPlot,
-  yScaleBoxPlot,
-  yScalePercentile,
 }) {
   const svg = d3.select(".svg");
 
@@ -44,9 +41,6 @@ export function updatePlot({
     scales: {
       xScaleSVG,
       yScaleSVG,
-      yScaleDotPlot,
-      yScaleBoxPlot,
-      yScalePercentile,
     },
     plotArea,
     ...preprocessed,
