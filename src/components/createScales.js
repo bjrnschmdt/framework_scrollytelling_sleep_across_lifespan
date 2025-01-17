@@ -14,11 +14,11 @@ const {
   // plus any additional settings you might need
 } = settings;
 
-export function createScales({ w, h, sideMargins }) {
+export function createScales({ w, h }) {
   const xScaleSVG = d3
     .scaleLinear()
     .domain([ageMin, ageMax])
-    .rangeRound([sideMargins.left, w - sideMargins.right])
+    .rangeRound([margin.left, w - margin.right])
     .clamp(true);
 
   const yScaleSVG = d3

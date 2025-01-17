@@ -60,7 +60,11 @@ function updateDot(update, context) {
     .attr("y", (d) => yScaleSVG(d.x) - 12);
 }
 
-export function updateDotPlot(data, values, xScaleSVG, yScaleSVG, qradius) {
+export function updateDotPlot(data, values, xScaleSVG, yScaleSVG, h) {
+  const qdomain = [sleepMin, sleepMax];
+  const qwidth = h - margin.top - margin.bottom;
+  const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
+
   const preprocessDotPlot = (plotData) => {
     return {
       stackMap: new Map(),

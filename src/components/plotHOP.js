@@ -2,7 +2,7 @@ import * as d3 from "npm:d3";
 import { updatePlot } from "./plot.js";
 import { settings } from "./settings.js";
 
-const { hopDuration } = settings;
+const { sleepMin, sleepMax, qstep, margin, hopDuration } = settings;
 
 function enterHOP(enter, context) {
   const { qradius, hopCount } = context;
@@ -52,7 +52,10 @@ function filterFn(arr, context) {
 }
 
 export function updateHOPPlot(data, context) {
-  const { xScaleSVG, yScaleSVG, qradius, hopCount = 1, index } = context;
+  const { xScaleSVG, yScaleSVG, hopCount = 1, index, h } = context;
+  const qdomain = [sleepMin, sleepMax];
+  const qwidth = h - margin.top - margin.bottom;
+  const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
 
   updatePlot({
     data,

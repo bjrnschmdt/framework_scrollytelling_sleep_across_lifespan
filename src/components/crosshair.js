@@ -16,14 +16,7 @@ import { ageFormat, convertDecimalToTimeFormat } from "./helperFunctions.js";
 
 const { ageMin, sleepMax, margin, fontFamily, fontSize, lineWidths } = settings;
 
-export function initializeCrosshair(
-  svg,
-  xScaleSVG,
-  yScaleSVG,
-  w,
-  h,
-  sideMargins
-) {
+export function initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h) {
   const x = Number(xScaleSVG(ageMin));
   const y = Number(yScaleSVG(sleepMax));
 
@@ -83,7 +76,7 @@ export function initializeCrosshair(
   const crosshairYLabel = crosshair
     .append("text")
     .attr("class", "crosshairLabel")
-    .attr("x", sideMargins.left)
+    .attr("x", margin.left)
     .attr("y", y)
     .attr("dy", -4)
     .style("fill", "white")
@@ -98,8 +91,8 @@ export function initializeCrosshair(
   const crosshairYLine = crosshair
     .append("line")
     .attr("class", "crosshairLine")
-    .attr("x1", sideMargins.left)
-    .attr("x2", w - sideMargins.right)
+    .attr("x1", margin.left)
+    .attr("x2", w - margin.right)
     .attr("y1", y)
     .attr("y2", y)
     .style("stroke", "white")
@@ -130,8 +123,7 @@ export function updateCrosshairs(
   },
   xScaleSVG,
   yScaleSVG,
-  w,
-  sideMargins
+  w
 ) {
   let x = Number(xScaleSVG(data.age));
   let y = Number(yScaleSVG(data.sleepTime));
@@ -207,7 +199,7 @@ export function updateCrosshairs(
   crosshairYLabel
     .transition("dxTransitionLabel")
     .duration(200)
-    .attr("x", intersect ? w - sideMargins.right : sideMargins.left);
+    .attr("x", intersect ? w - margin.right : margin.left);
 
   crosshairYLabel
     .transition("textanchorTransitionLabel")

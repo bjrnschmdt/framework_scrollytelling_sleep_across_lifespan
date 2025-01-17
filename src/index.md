@@ -3,11 +3,7 @@ theme: [midnight, alt]
 ---
 
 ```js
-import {
-  getTrueValue,
-  getURLParameter,
-  calculateMargins,
-} from "./components/helperFunctions.js";
+import { getTrueValue, getURLParameter } from "./components/helperFunctions.js";
 import { dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
@@ -67,13 +63,6 @@ const h = (() => {
 ```
 
 ```js
-const qdomain = [sleepMin, sleepMax];
-const qwidth = h - margin.top - margin.bottom;
-const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
-const sideMargins = calculateMargins(dataSet, qradius);
-```
-
-```js
 setupIntersectionObserver({
   dataSet,
   targets,
@@ -93,7 +82,7 @@ initializeLogger();
 ```
 
 ```js
-const { xScaleSVG, yScaleSVG, timeScale } = createScales({ w, h, sideMargins });
+const { xScaleSVG, yScaleSVG, timeScale } = createScales({ w, h });
 ```
 
 ```js
@@ -301,17 +290,9 @@ createAxes(svg, {
   timeScale,
   w,
   h,
-  sideMargins,
 });
 
-const crosshair = initializeCrosshair(
-  svg,
-  xScaleSVG,
-  yScaleSVG,
-  w,
-  h,
-  sideMargins
-);
+const crosshair = initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h);
 
 // Setup the pointer interactions like pointerMoved and pointerClicked
 new PointerInteraction(svg, container, {
@@ -331,13 +312,7 @@ function update(data, index) {
       updatePercentilePlot(data, xScaleSVG, yScaleSVG);
       break;
     case "dot":
-      updateDotPlot(
-        data,
-        container.node().value,
-        xScaleSVG,
-        yScaleSVG,
-        qradius
-      );
+      updateDotPlot(data, container.node().value, xScaleSVG, yScaleSVG, h);
       break;
     case "box":
       updateBoxPlot(data, xScaleSVG, yScaleSVG);
@@ -346,17 +321,17 @@ function update(data, index) {
       updateHOPPlot(data, {
         xScaleSVG,
         yScaleSVG,
-        qradius,
         index,
+        h,
       });
       break;
     case "hop_traced":
       updateHOPPlot(data, {
         xScaleSVG,
         yScaleSVG,
-        qradius,
         hopCount,
         index,
+        h,
       });
       break;
     case "none":
@@ -379,14 +354,7 @@ function update(data, index) {
     yScaleSVG,
   });
 
-  updateCrosshairs(
-    container.node().value,
-    crosshair,
-    xScaleSVG,
-    yScaleSVG,
-    w,
-    sideMargins
-  );
+  updateCrosshairs(container.node().value, crosshair, xScaleSVG, yScaleSVG, w);
 }
 
 container.node().update = update;

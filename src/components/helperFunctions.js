@@ -20,46 +20,6 @@ export function generateParticipantData(meanSleep, sdSleep, n, name, extent) {
   return data;
 }
 
-export function calculateMargins(dataSet, qradius) {
-  // Extract first and last items from the dataSet
-  const entries = Array.from(dataSet.values());
-  const firstItem = entries[0].dot;
-  const lastItem = entries[entries.length - 1].dot;
-
-  // Initialize maps and context
-  const totalHeightMapFirst = precalculateHeights(firstItem, qradius);
-  const totalHeightMapLast = precalculateHeights(lastItem, qradius);
-
-  const stackMapFirst = new Map();
-  const stackMapLast = new Map();
-
-  // Helper to calculate the maximum offset for a given item and maps
-  const findMaxOffset = (item, stackMap, totalHeightMap) => {
-    return item.reduce((maxOffset, dot) => {
-      const offset = calculateCX(dot, stackMap, totalHeightMap, qradius);
-      return Math.max(maxOffset, Math.abs(offset)); // Track the highest offset
-    }, 0);
-  };
-
-  // Calculate the maximum offsets for the first and last items
-  const maxOffsetFirst = findMaxOffset(
-    firstItem,
-    stackMapFirst,
-    totalHeightMapFirst
-  );
-  const maxOffsetLast = findMaxOffset(
-    lastItem,
-    stackMapLast,
-    totalHeightMapLast
-  );
-
-  // Return the margins
-  return {
-    left: maxOffsetFirst + qradius, // Add the radius to the offset
-    right: maxOffsetLast + qradius, // Add the radius to the offset
-  };
-}
-
 export function calculateQuantiles(data, n) {
   const filteredData = data
     .map((d) => d.sleepTime)
