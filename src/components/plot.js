@@ -1,5 +1,8 @@
 import * as d3 from "npm:d3";
 
+import { settings } from "./settings.js";
+const { iconPath } = settings;
+
 export function updatePlot({
   data,
   plotClass,
@@ -26,6 +29,15 @@ export function updatePlot({
   const filteredData = filterFn(array);
   const preprocessed = preprocessFn(filteredData);
 
+  const plotArea = {
+    xMin: xScaleSVG.range()[0],
+    xMax: xScaleSVG.range()[1],
+    yMin: yScaleSVG.range()[1],
+    yMax: yScaleSVG.range()[0],
+    width: xScaleSVG.range()[1] - xScaleSVG.range()[0],
+    height: yScaleSVG.range()[0] - yScaleSVG.range()[1],
+  };
+
   const context = {
     data: filteredData,
     originalData: data,
@@ -36,15 +48,56 @@ export function updatePlot({
       yScaleBoxPlot,
       yScalePercentile,
     },
+    plotArea,
     ...preprocessed,
   };
 
-  /*   console.log("filteredData", filteredData);
-   */
-  const plot = svg
+  // Ensure the defs and clipPath exist (defined only once)
+  let defs = svg.select("defs");
+  if (defs.empty()) {
+    defs = svg.append("defs");
+  }
+
+  // Add or update the clipPath
+  let clipPath = defs.select("#plot-clip");
+  if (clipPath.empty()) {
+    clipPath = defs.append("clipPath").attr("id", "plot-clip").append("rect");
+  }
+
+  clipPath
+    .select("rect")
+    .attr("x", plotArea.xMin)
+    .attr("y", plotArea.yMin)
+    .attr("width", plotArea.width)
+    .attr("height", plotArea.height);
+
+  // Add the man-icon symbol if it doesn't exist
+  let manIcon = defs.select("#man-icon");
+  if (manIcon.empty()) {
+    manIcon = defs
+      .append("symbol")
+      .attr("id", "man-icon")
+      .attr("viewBox", "0 -960 960 960")
+      .append("path")
+      .attr("d", iconPath) // Use the icon path provided
+      .attr("fill", "white");
+  }
+
+  // Create or update the static plot-container group
+  const plotContainer = svg
+    .selectAll("g.plot-container")
+    .data([null]) // Single static container
+    .join((enter) =>
+      enter
+        .append("g")
+        .attr("class", "plot-container")
+        .attr("clip-path", "url(#plot-clip)")
+    );
+
+  // Create or update the dynamic plot group inside the container
+  const plot = plotContainer
     .selectAll(`g.${plotClass}`)
-    // Passing a dummy array of length 1 so that .join() sees “one container”
-    .data([null])
+    .data([null]) // Passing a dummy array of length 1 so .join() sees one container
     .join(
       (enter) =>
         enter
@@ -58,6 +111,8 @@ export function updatePlot({
           .ease(d3.easeCubic)
           .attr("transform", `translate(${xScaleSVG(data.ageRange.start)}, 0)`)
     );
+
+  // Update the elements inside the plot group
   plot
     .selectAll(`.${plotClass}-element`)
     .data(filteredData, (d) => d.id)

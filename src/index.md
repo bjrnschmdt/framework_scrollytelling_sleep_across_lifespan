@@ -45,7 +45,6 @@ const {
   sleepMax,
   margin,
   canvasScaleFactor,
-  icon,
   relativeHeight,
   qstep,
   hopCount,
@@ -289,16 +288,6 @@ const svg = container
   .style("position", "absolute")
   .style("top", "0px")
   .style("left", "0px");
-
-const defs = svg.append("defs");
-
-defs
-  .append("symbol")
-  .attr("id", "man-icon")
-  .attr("viewBox", "0 -960 960 960")
-  .append("path")
-  .attr("d", icon)
-  .attr("fill", "white");
 
 const pointcloud = new Pointcloud(context, canvas, {
   simulatedData,

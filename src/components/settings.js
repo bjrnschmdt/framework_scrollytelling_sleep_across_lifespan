@@ -41,7 +41,7 @@ const nthresholdsAge = 90;
 const thresholdsAge = d3.ticks(ageMin, ageMax, nthresholdsAge);
 const fontFamily = "Roboto";
 const fontSize = "12px";
-const icon =
+const iconPath =
   "M400-80v-280h-80v-240q0-33 23.5-56.5T400-680h160q33 0 56.5 23.5T640-600v240h-80v280H400Zm80-640q-33 0-56.5-23.5T400-800q0-33 23.5-56.5T480-880q33 0 56.5 23.5T560-800q0 33-23.5 56.5T480-720Z";
 
 const qstep = 540 / 20 / 60;
@@ -85,7 +85,7 @@ export const settings = {
   fontFamily,
   fontSize,
   lineWidths,
-  icon,
+  iconPath,
   colors,
   startTime,
   endTime,
