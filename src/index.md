@@ -69,6 +69,7 @@ setupIntersectionObserver({
   info,
   getSteps: (age, sleepTime) => getSteps(age, sleepTime, variant),
   chartElement,
+  /* entity, */
   setDisabled,
   ageInput,
   sleepTimeInput,
@@ -102,7 +103,8 @@ const def = {
   showRecommended: false,
   showPointcloud: true,
   showPercentiles: ["B", "C"],
-  isExplorable: true,
+  tooltipText: "Sie",
+  isExplorable: false,
   variant: "none",
 };
 ```
@@ -110,6 +112,7 @@ const def = {
 ```js
 // !!! this may be not needed anymore since input binding is done with separate input declarations
 // Still need this for... (don't recall right now)
+// possibly because the age and sleepTime inputs need to be bound to the entity because it cannot directly be bound to the chartElement
 const entity = Inputs.bind(
   Inputs.form({
     age: Inputs.range([ageMin, ageMax], {
@@ -138,6 +141,14 @@ const entity = Inputs.bind(
   chartElement
 );
 const entityValue = Generators.input(entity);
+```
+
+```js
+console.log("entityValue", entityValue);
+/* console.log("entity", entity);
+console.log("entityChildren[0]", entity.children[0]);
+console.log("chartElement", chartElement);
+console.log("chartElementChildren", chartElement.value); */
 ```
 
 ```js
@@ -251,6 +262,7 @@ container.style("background-color", `var(--theme-background)`);
 const canvas = container.append("canvas").node();
 const context = canvas.getContext("2d");
 
+console.log("cell rerun");
 // Initialize the value of the container
 container.node().value = {
   age: undefined,
@@ -258,10 +270,11 @@ container.node().value = {
   showRecommended: false,
   showPointcloud: true,
   showPercentiles: ["B", "C"],
-  tooltipText: undefined,
+  tooltipText: "Er",
   isExplorable: false,
   variant: "none",
 };
+/* container.node().value = def; */
 
 canvas.width = w * canvasScaleFactor;
 canvas.height = h * canvasScaleFactor;
@@ -277,6 +290,16 @@ const svg = container
   .style("position", "absolute")
   .style("top", "0px")
   .style("left", "0px");
+
+const defs = svg.append("defs");
+defs
+  .append("clipPath")
+  .attr("id", "plot-clip")
+  .append("rect")
+  .attr("x", 0)
+  .attr("y", 0)
+  .attr("width", w)
+  .attr("height", h);
 
 const pointcloud = new Pointcloud(context, canvas, {
   simulatedData,
@@ -354,6 +377,7 @@ function update(data, index) {
     yScaleSVG,
   });
 
+  console.log("update", container.node().value);
   updateCrosshairs(container.node().value, crosshair, xScaleSVG, yScaleSVG, w);
 }
 

@@ -52,19 +52,6 @@ export function updatePlot({
     defs = svg.append("defs");
   }
 
-  // Add or update the clipPath
-  let clipPath = defs.select("#plot-clip");
-  if (clipPath.empty()) {
-    clipPath = defs.append("clipPath").attr("id", "plot-clip").append("rect");
-  }
-
-  clipPath
-    .select("rect")
-    .attr("x", plotArea.xMin)
-    .attr("y", plotArea.yMin)
-    .attr("width", plotArea.width)
-    .attr("height", plotArea.height);
-
   // Add the man-icon symbol if it doesn't exist
   let manIcon = defs.select("#man-icon");
   if (manIcon.empty()) {
