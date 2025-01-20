@@ -2,7 +2,7 @@
 import * as d3 from "npm:d3";
 import _ from "npm:lodash";
 
-import { createDebouncedLogger } from "./helperFunctions.js";
+import { createDebouncedLogger, set } from "./helperFunctions.js";
 import { logInteraction } from "./logger.js";
 
 function roundToStep(value, step) {
@@ -94,8 +94,7 @@ export class PointerInteraction {
 
     // Trigger an update only if the value changes
     if (!_.isEqual(this.node.value, newValue)) {
-      this.node.value = newValue;
-      this.node.dispatchEvent(new CustomEvent("input", { bubbles: true }));
+      set(this.node, newValue);
 
       // Log the interaction with a debounce
       this.debouncedLogger(newValue);
