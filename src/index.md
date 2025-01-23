@@ -208,7 +208,8 @@ function getSteps(age, sleepTime, chartValue, variant) {
 ```
 
 ```js
-const personalizationValue = true;
+const personalizationValue =
+  ageValue === def.age && sleepTimeValue === def.sleepTime;
 ```
 
 ```js
@@ -528,7 +529,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.
   ${ageInput}${sleepTimeInput}</div>
   <div class="scroll-section card" data-step="6">Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</div> 
-  <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}
+  <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}
     <div id="answer">Die richtige Antwort ist ${Math.round(getTrueValue(dataSet, stepProps) * 100)}% Versuche es gerne nochmal mit einem anderen Alter/Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
     </div>
   </div>  
