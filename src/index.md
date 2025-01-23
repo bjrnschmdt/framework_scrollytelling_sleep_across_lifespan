@@ -3,7 +3,11 @@ theme: [midnight, alt]
 ---
 
 ```js
-import { getTrueValue, getURLParameter } from "./components/helperFunctions.js";
+import {
+  getTrueValue,
+  getURLParameter,
+  createDebouncedLogger,
+} from "./components/helperFunctions.js";
 import { dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
@@ -20,16 +24,14 @@ import { updatePlot, exitPlot } from "./components/plot.js";
 import { updateDotPlot } from "./components/plotDot.js";
 import { updatePercentilePlot } from "./components/plotPercentile.js";
 import { updateBoxPlot } from "./components/plotBox.js";
-import { updateHOPPlot, animateHOP } from "./components/plotHOP.js";
-import {
-  setupIntersectionObserver,
-  getSteps,
-} from "./components/intersectionObserver.js";
+import { updateHOPPlot } from "./components/plotHOP.js";
+import { setupIntersectionObserver } from "./components/intersectionObserver.js";
 import {
   initializeLogger,
-  logEstimateClick,
-  logAestheticItem,
-  logInterestItem,
+  logEvent,
+  logSectionVisible,
+  logInput,
+  logBtnEstimate,
 } from "./components/logger.js";
 ```
 
@@ -42,11 +44,12 @@ const {
   margin,
   canvasScaleFactor,
   relativeHeight,
-  qstep,
   hopCount,
   hopDuration,
 } = settings;
 ```
+
+<!-- Setup -->
 
 ```js
 const w = width;
@@ -63,33 +66,7 @@ const h = (() => {
 ```
 
 ```js
-setupIntersectionObserver({
-  dataSet,
-  targets,
-  info,
-  getSteps: (age, sleepTime) => getSteps(age, sleepTime, variant),
-  chartElement,
-  /* entity, */
-  setDisabled,
-  ageInput,
-  sleepTimeInput,
-  estimateInput,
-  relativeHeight,
-});
-```
-
-```js
-initializeLogger();
-```
-
-```js
 const { xScaleSVG, yScaleSVG, timeScale } = createScales({ w, h });
-```
-
-```js
-const recommended = Mutable(false);
-const setTrue = () => (recommended.value = true);
-const setFalse = () => (recommended.value = false);
 ```
 
 ```js
@@ -109,46 +86,125 @@ const def = {
 };
 ```
 
+<!-- Analytics -->
+
 ```js
-// !!! this may be not needed anymore since input binding is done with separate input declarations
-// Still need this for... (don't recall right now)
-// possibly because the age and sleepTime inputs need to be bound to the entity because it cannot directly be bound to the chartElement
-const entity = Inputs.bind(
-  Inputs.form({
-    age: Inputs.range([ageMin, ageMax], {
-      step: 1,
-      label: "age",
-      value: def.age,
-    }),
-    sleepTime: Inputs.range([sleepMin, sleepMax], {
-      step: 0.25,
-      label: "sleep duration",
-      value: def.sleepTime,
-    }),
-    showRecommended: Inputs.toggle({ label: "Recommended", value: false }),
-    showPointcloud: Inputs.toggle({ label: "Pointcloud", value: true }),
-    showPercentiles: Inputs.checkbox(["A", "B", "C"], {
-      label: "Percentiles",
-      value: ["C"],
-    }),
-    tooltipText: Inputs.text({ label: "Tooltip text", value: undefined }),
-    isExplorable: Inputs.toggle({ label: "Explorable?", value: true }),
-    variant: Inputs.radio(["box", "dot", "percentile", "none"], {
-      label: "Select one",
-      value: "none",
-    }),
-  }),
-  chartElement
-);
-const entityValue = Generators.input(entity);
+initializeLogger();
 ```
 
 ```js
-console.log("entityValue", entityValue);
-/* console.log("entity", entity);
-console.log("entityChildren[0]", entity.children[0]);
-console.log("chartElement", chartElement);
-console.log("chartElementChildren", chartElement.value); */
+logSectionVisible(scrollyStep);
+```
+
+```js
+const debouncedLoggers = {
+  age: createDebouncedLogger((value) => logInput("age", value), 500),
+  sleepTime: createDebouncedLogger(
+    (value) => logInput("sleepTime", value),
+    500
+  ),
+  estimate: createDebouncedLogger((value) => logInput("estimate", value), 500),
+};
+```
+
+```js
+debouncedLoggers.age(ageValue);
+```
+
+```js
+debouncedLoggers.sleepTime(sleepTimeValue);
+```
+
+```js
+debouncedLoggers.estimate(estimateValue);
+```
+
+```js
+logInput("aesthetics", aestheticsValue);
+```
+
+```js
+logInput("interest", interestValue);
+```
+
+<!-- Scrollytelling -->
+
+```js
+const scrollyStep = Mutable(0);
+const setScrollyStep = (x) => (scrollyStep.value = x);
+```
+
+```js
+const scrollyProps = getSteps(ageValue, sleepTimeValue, chartValue, variant);
+```
+
+```js
+const stepProps = scrollyProps[scrollyStep];
+```
+
+```js
+const baseStep = {
+  age: undefined,
+  sleepTime: undefined,
+  showRecommended: false,
+  showPointcloud: false,
+  showPercentiles: [],
+  tooltipText: undefined,
+  isExplorable: false,
+  variant: "none",
+};
+```
+
+```js
+function getSteps(age, sleepTime, chartValue, variant) {
+  return {
+    0: { ...baseStep },
+    1: { ...baseStep },
+    2: { ...baseStep, showPointcloud: true },
+    3: { ...baseStep, showPointcloud: true, showPercentiles: ["C"] },
+    4: {
+      ...baseStep,
+      age: 31,
+      sleepTime: 7,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      tooltipText: "Karin",
+    },
+    5: {
+      ...baseStep,
+      age,
+      sleepTime,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      tooltipText: "Du",
+    },
+    6: {
+      ...baseStep,
+      age,
+      sleepTime,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      variant,
+    },
+    7: {
+      ...baseStep,
+      age,
+      sleepTime,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      variant,
+    },
+    8: {
+      ...baseStep,
+      age: chartValue.age,
+      sleepTime: chartValue.sleepTime,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      isExplorable: true,
+      variant,
+    },
+  };
+}
 ```
 
 ```js
@@ -161,36 +217,20 @@ const setDisabled = (x) => (isDisabled.value = x);
 ```
 
 ```js
-const scrollTo = Inputs.button("Nochmal versuchen", {
-  reduce: () => {
-    const target = document.getElementById("user-input");
-    target.scrollIntoView({ behavior: "smooth" });
-  },
+const ageInput = Inputs.range([ageMin, ageMax], {
+  step: 1,
+  label: "Alter",
+  value: def.age,
 });
-const scrollToValue = Generators.input(scrollTo);
-```
-
-```js
-const ageInput = Inputs.bind(
-  Inputs.range([ageMin, ageMax], {
-    step: 1,
-    label: "Alter",
-    value: def.age,
-  }),
-  entity.children[0]
-);
 const ageValue = Generators.input(ageInput);
 ```
 
 ```js
-const sleepTimeInput = Inputs.bind(
-  Inputs.range([sleepMin, sleepMax], {
-    step: 0.25,
-    label: "Schlafdauer",
-    value: def.sleepTime,
-  }),
-  entity.children[1]
-);
+const sleepTimeInput = Inputs.range([sleepMin, sleepMax], {
+  step: 0.25,
+  label: "Schlafdauer",
+  value: def.sleepTime,
+});
 const sleepTimeValue = Generators.input(sleepTimeInput);
 ```
 
@@ -208,14 +248,25 @@ const estimateValue = Generators.input(estimateInput);
 // This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
 const answerInput = Inputs.button("Auflösung anzeigen", {
   value: null,
-  reduce: (value) => buttonClicked(value),
+  reduce: (value) => btnEstimate(value),
   disabled: isDisabled,
 });
 const answerValue = Generators.input(answerInput);
 ```
 
 ```js
-const feedbackAestheticInput = Inputs.radio(
+const scrollTo = Inputs.button("Nochmal versuchen", {
+  reduce: () => {
+    logEvent("kielscn_schlafdauer_btn_retry");
+    const target = document.getElementById("user-input");
+    target.scrollIntoView({ behavior: "smooth" });
+  },
+});
+const scrollToValue = Generators.input(scrollTo);
+```
+
+```js
+const aestheticsInput = Inputs.radio(
   new Map([
     ["1", 1],
     ["2", 2],
@@ -227,15 +278,11 @@ const feedbackAestheticInput = Inputs.radio(
     label: "stimme gar nicht zu",
   }
 );
-const feedbackAestheticValue = Generators.input(feedbackAestheticInput);
+const aestheticsValue = Generators.input(aestheticsInput);
 ```
 
 ```js
-logAestheticItem({ feedbackAestheticValue });
-```
-
-```js
-const feedbackInterestInput = Inputs.radio(
+const interestInput = Inputs.radio(
   new Map([
     ["1", 1],
     ["2", 2],
@@ -247,12 +294,10 @@ const feedbackInterestInput = Inputs.radio(
     label: "stimme gar nicht zu",
   }
 );
-const feedbackInterestValue = Generators.input(feedbackInterestInput);
+const interestValue = Generators.input(interestInput);
 ```
 
-```js
-logInterestItem({ feedbackInterestValue });
-```
+<!-- Main Visualization code -->
 
 ```js
 const container = d3.create("div");
@@ -262,19 +307,11 @@ container.style("background-color", `var(--theme-background)`);
 const canvas = container.append("canvas").node();
 const context = canvas.getContext("2d");
 
-console.log("cell rerun");
 // Initialize the value of the container
 container.node().value = {
   age: undefined,
   sleepTime: undefined,
-  showRecommended: false,
-  showPointcloud: true,
-  showPercentiles: ["B", "C"],
-  tooltipText: "Er",
-  isExplorable: false,
-  variant: "none",
 };
-/* container.node().value = def; */
 
 canvas.width = w * canvasScaleFactor;
 canvas.height = h * canvasScaleFactor;
@@ -318,24 +355,26 @@ createAxes(svg, {
 const crosshair = initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h);
 
 // Setup the pointer interactions like pointerMoved and pointerClicked
-new PointerInteraction(svg, container, {
+const pointerInteraction = new PointerInteraction(svg, {
   margin,
   w,
   h,
   xScaleSVG,
   yScaleSVG,
+  container,
 });
 
-function update(data, index) {
+function update({ data, stepProps, hopIndex }) {
   // Update the pointcloud visibility
-  pointcloud.setVisibility(container.node().value.showPointcloud);
+  pointcloud.setVisibility(stepProps.showPointcloud);
+  pointerInteraction.isExplorable = () => stepProps?.isExplorable || false;
 
-  switch (container.node().value.variant) {
+  switch (stepProps.variant) {
     case "percentile":
       updatePercentilePlot(data, xScaleSVG, yScaleSVG);
       break;
     case "dot":
-      updateDotPlot(data, container.node().value, xScaleSVG, yScaleSVG, h);
+      updateDotPlot(data, stepProps, xScaleSVG, yScaleSVG, h);
       break;
     case "box":
       updateBoxPlot(data, xScaleSVG, yScaleSVG);
@@ -344,7 +383,7 @@ function update(data, index) {
       updateHOPPlot(data, {
         xScaleSVG,
         yScaleSVG,
-        index,
+        hopIndex,
         h,
       });
       break;
@@ -353,7 +392,7 @@ function update(data, index) {
         xScaleSVG,
         yScaleSVG,
         hopCount,
-        index,
+        hopIndex,
         h,
       });
       break;
@@ -365,8 +404,9 @@ function update(data, index) {
   }
 
   // Draw percentiles
-  drawGroupedPercentileLines(svg, container, {
+  drawGroupedPercentileLines(svg, {
     dataSet,
+    showPercentiles: stepProps.showPercentiles,
     xScaleSVG,
     yScaleSVG,
   });
@@ -377,8 +417,7 @@ function update(data, index) {
     yScaleSVG,
   });
 
-  console.log("update", container.node().value);
-  updateCrosshairs(container.node().value, crosshair, xScaleSVG, yScaleSVG, w);
+  updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w);
 }
 
 container.node().update = update;
@@ -390,7 +429,11 @@ const chartValue = Generators.input(chartElement);
 ```
 
 ```js
-const update = chartElement.update(dataSet.get(chartValue.age), j);
+const update = chartElement.update({
+  data: dataSet.get(stepProps.age),
+  stepProps,
+  hopIndex: j,
+});
 ```
 
 ```js
@@ -403,29 +446,42 @@ const j = (async function* () {
 })();
 ```
 
-<!-- --- ### Observer -->
+<!-- --- Observer -->
 
 ```js
-const info = document.querySelector(".scroll-info");
 const targets = document.querySelectorAll(".scroll-section");
 ```
 
 ```js
-const buttonClicked = (value) => {
+setupIntersectionObserver({
+  targets,
+  setDisabled,
+  estimateInput,
+  invalidation,
+  setScrollyStep,
+});
+```
+
+<!-- Helper functions -->
+
+```js
+const btnEstimate = (value) => {
   setDisabled(true);
   const target = document.getElementById("answer");
   target.style.display = "block";
-  const trueValue = Math.round(getTrueValue(dataSet, chartValue) * 100);
-  logEstimateClick({
+  const trueValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
+  console.log("trueValue", trueValue);
+  logBtnEstimate({
     estimateValue,
     trueValue,
-    section: 7,
-    age: chartValue.age,
-    sleepTime: chartValue.sleepTime,
+    age: stepProps.age,
+    sleepTime: stepProps.sleepTime,
   });
   return value + 1;
 };
 ```
+
+<!-- HTML -->
 
 ```js
 // Get the div where the visualization description will be displayed
@@ -473,7 +529,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   ${ageInput}${sleepTimeInput}</div>
   <div class="scroll-section card" data-step="6">Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</div> 
   <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "deiner" : "dieser"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}
-    <div id="answer">Die richtige Antwort ist ${Math.round(getTrueValue(dataSet, chartValue) * 100)}% Versuche es gerne nochmal mit einem anderen Alter/Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
+    <div id="answer">Die richtige Antwort ist ${Math.round(getTrueValue(dataSet, stepProps) * 100)}% Versuche es gerne nochmal mit einem anderen Alter/Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
     </div>
   </div>  
   <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
@@ -491,10 +547,12 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 <div class="outro card">
   <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
   <h2>Die Gestaltung der Grafik war ansprechend.</h2>
-  ${feedbackAestheticInput}
+  ${aestheticsInput}
   <h2>Das Thema hat mich interessiert.</h2>
-  ${feedbackInterestInput}
+  ${interestInput}
 </div>
+
+<!-- CSS -->
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
@@ -536,33 +594,6 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 
 .outro {
   margin: 0 auto 2rem;
-}
-
-
-/* Style the buttons that are used to open and close the accordion panel */
-/* .accordion {
-  background-color: #eee;
-  color: #444;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  text-align: left;
-  border: none;
-  outline: none;
-  transition: 0.4s;
-} */
-
-/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-/* .active, .accordion:hover {
-  background-color: #ccc;
-} */
-
-/* Style the accordion panel. Note: hidden by default */
-.panel {
-  /* padding: 0 18px; */
-  /* background-color: white; */
-  display: none;
-  overflow: hidden;
 }
 
 #answer {

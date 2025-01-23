@@ -117,9 +117,9 @@ export function getNearestPValue(dataSet, age, sleeptime) {
   return bestMatch ? bestMatch.nearestPValue : null;
 }
 
-export function getTrueValue(dataSet, chartValue) {
-  const age = chartValue.age;
-  const sleepTime = chartValue.sleepTime;
+export function getTrueValue(dataSet, stepProps) {
+  const age = stepProps.age;
+  const sleepTime = stepProps.sleepTime;
 
   // Use optional chaining and fallback values
   const trueValue =
@@ -169,15 +169,3 @@ export function createDebouncedLogger(callback, delay) {
     }, delay);
   };
 }
-
-/* export function logInteraction({ age, sleepTime }) {
-  window["optimizely"] = window["optimizely"] || [];
-  window["optimizely"].push({
-    type: "event",
-    eventName: "kielscn_schlafdauer_sctn_8_input_changed",
-    tags: {
-      age_value: age,
-      sleepTime_value: sleepTime,
-    },
-  });
-} */

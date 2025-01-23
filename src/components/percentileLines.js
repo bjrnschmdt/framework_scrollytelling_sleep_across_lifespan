@@ -9,20 +9,16 @@ const { mostProminent, lessProminent, lineWidths, colors } = settings;
  * selected in container.node().value.showPercentiles.
  *
  * @param {d3.Selection} svg - D3 selection of your SVG.
- * @param {d3.Selection} container - D3 selection whose .node().value holds state (e.g., showPercentiles).
  * @param {object} config - Holds references to scales, data, and styling.
  * @param {array} config.dataSet - An map of plot data.
  * @param {function} config.xScaleSVG - A D3 scale for x positions (age).
  * @param {function} config.yScaleSVG - A D3 scale for y positions (sleepTime).
+ * @param {array} config.showPercentiles - An array of selected percentiles.
  */
 export function drawGroupedPercentileLines(
   svg,
-  container,
-  { dataSet, xScaleSVG, yScaleSVG }
+  { dataSet, showPercentiles, xScaleSVG, yScaleSVG }
 ) {
-  // Grab which percentiles to show from your container’s “state”
-  const percentiles = container.node().value.showPercentiles || [];
-
   // Create or select a group for all percentile lines
   let allPercentilesGroup = svg.select(".all-percentiles");
   if (allPercentilesGroup.empty()) {
@@ -45,11 +41,12 @@ export function drawGroupedPercentileLines(
     const percentileKey = value[0]; // The percentile key (5, 6, 7, etc.)
     return (
       // Only show if it matches your logic for “A”, “B”, or “C”
-      (mostProminent.includes(percentileKey) && percentiles.includes("A")) ||
+      (mostProminent.includes(percentileKey) &&
+        showPercentiles.includes("A")) ||
       (lessProminent.includes(percentileKey) &&
         percentileKey % 5 === 0 &&
-        percentiles.includes("B")) ||
-      percentiles.includes("C")
+        showPercentiles.includes("B")) ||
+      showPercentiles.includes("C")
     );
   });
 
@@ -77,7 +74,7 @@ export function drawGroupedPercentileLines(
 
         if (
           mostProminent.includes(percentileKey) &&
-          percentiles.includes("A")
+          showPercentiles.includes("A")
         ) {
           // e.g. thick lines or standard lines
           strokeOpacity = 0.4;
@@ -85,12 +82,12 @@ export function drawGroupedPercentileLines(
         } else if (
           lessProminent.includes(percentileKey) &&
           percentileKey % 5 === 0 &&
-          percentiles.includes("B")
+          showPercentiles.includes("B")
         ) {
           // e.g. thinner lines
           strokeOpacity = 0.4;
           strokeWidth = lineWidths.thin;
-        } else if (percentiles.includes("C")) {
+        } else if (showPercentiles.includes("C")) {
           // e.g. some default
           strokeOpacity = 0.2;
           strokeWidth = lineWidths.regular;

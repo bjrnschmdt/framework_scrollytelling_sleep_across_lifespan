@@ -21,23 +21,20 @@ export function logEvent(eventName, tags = {}) {
 }
 
 // Specific loggers for known events
-export function logSectionVisible(step, age, sleepTime) {
+export function logSectionVisible(step) {
   logEvent("kielscn_schlafdauer_sctn_visible", {
     section: parseInt(step, 10),
-    age_value: age,
-    sleepTime_value: sleepTime,
   });
 }
 
-export function logEstimateClick({
-  estimateValue,
-  trueValue,
-  section,
-  age,
-  sleepTime,
-}) {
-  logEvent("kielscn_schlafdauer_estimate_on_click", {
-    section,
+export function logInput(parameterName, value) {
+  logEvent(`kielscn_schlafdauer_input_${parameterName}`, {
+    [parameterName]: value,
+  });
+}
+
+export function logBtnEstimate({ estimateValue, trueValue, age, sleepTime }) {
+  logEvent("kielscn_schlafdauer_btn_estimate", {
     age_value: age,
     sleepTime_value: sleepTime,
     estimate_value: estimateValue,
@@ -45,38 +42,10 @@ export function logEstimateClick({
   });
 }
 
-export function logEstimateSctnChange({
-  estimate_value,
-  true_value,
-  section,
-  age_value,
-  sleepTime_value,
-}) {
-  logEvent("kielscn_schlafdauer_estimate_on_sctn_change", {
-    section,
-    age_value,
-    sleepTime_value,
-    estimate_value,
-    true_value,
-  });
-}
-
 // Used in pointerInteraction.js
 export function logInteraction(event) {
-  logEvent("kielscn_schlafdauer_exploration_changed", {
+  logEvent("kielscn_schlafdauer_input_custom", {
     age_value: event.age,
     sleepTime_value: event.sleepTime,
-  });
-}
-
-export function logAestheticItem({ feedbackAestheticValue = 0 }) {
-  logEvent("kielscn_schlafdauer_feedback_aesthetics", {
-    aesthetic_value: feedbackAestheticValue,
-  });
-}
-
-export function logInterestItem({ feedbackInterestValue = 0 }) {
-  logEvent("kielscn_schlafdauer_feedback_interest", {
-    interest_value: feedbackInterestValue,
   });
 }
