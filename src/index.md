@@ -7,6 +7,7 @@ import {
   getTrueValue,
   getURLParameter,
   createDebouncedLogger,
+  formatTime,
 } from "./components/helperFunctions.js";
 import { dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
@@ -144,6 +145,8 @@ const stepProps = scrollyProps[scrollyStep];
 
 ```js
 const baseStep = {
+  xDomain: [5, 95],
+  yDomain: [4, 13],
   age: undefined,
   sleepTime: undefined,
   showRecommended: false,
@@ -156,12 +159,25 @@ const baseStep = {
 ```
 
 ```js
+function setHour(value) {
+  return new Date(0, 0, 0, value, 0, 0);
+}
+```
+
+```js
 function getSteps(age, sleepTime, chartValue, variant) {
   return {
     0: { ...baseStep },
-    1: { ...baseStep },
-    2: { ...baseStep, showPointcloud: true },
-    3: { ...baseStep, showPointcloud: true, showPercentiles: ["C"] },
+    1: { ...baseStep, xDomain: [10, 90], yDomain: [5, 12] },
+    2: {
+      ...baseStep,
+      showPointcloud: true,
+    },
+    3: {
+      ...baseStep,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+    },
     4: {
       ...baseStep,
       age: 31,
@@ -169,6 +185,8 @@ function getSteps(age, sleepTime, chartValue, variant) {
       showPointcloud: true,
       showPercentiles: ["C"],
       tooltipText: "Karin",
+      xDomain: [21, 41],
+      yDomain: [5, 9],
     },
     5: {
       ...baseStep,
@@ -177,6 +195,8 @@ function getSteps(age, sleepTime, chartValue, variant) {
       showPointcloud: true,
       showPercentiles: ["C"],
       tooltipText: "Du",
+      /*       xDomain: [45, 50],
+      yDomain: [7, 10], */
     },
     6: {
       ...baseStep,
@@ -185,6 +205,8 @@ function getSteps(age, sleepTime, chartValue, variant) {
       showPointcloud: true,
       showPercentiles: ["C"],
       variant,
+      /*       xDomain: [10, 50],
+      yDomain: [7, 13], */
     },
     7: {
       ...baseStep,
@@ -193,6 +215,8 @@ function getSteps(age, sleepTime, chartValue, variant) {
       showPointcloud: true,
       showPercentiles: ["C"],
       variant,
+      xDomain: [60, 96],
+      yDomain: [7, 13],
     },
     8: {
       ...baseStep,
@@ -231,6 +255,7 @@ const sleepTimeInput = Inputs.range([sleepMin, sleepMax], {
   step: 0.25,
   label: "Schlafdauer",
   value: def.sleepTime,
+  format: (x) => formatTime(x),
 });
 const sleepTimeValue = Generators.input(sleepTimeInput);
 ```
@@ -301,6 +326,16 @@ const interestValue = Generators.input(interestInput);
 <!-- Main Visualization code -->
 
 ```js
+/* const xAxis = d3.axisBottom(xScaleSVG).tickFormat(d3.format("02")); */
+```
+
+```js
+/* const yAxis = d3
+  .axisRight(yScaleSVG)
+  .tickFormat(formatTime); */
+```
+
+```js
 const container = d3.create("div");
 container.style("position", "relative");
 container.style("background-color", `var(--theme-background)`);
@@ -330,6 +365,7 @@ const svg = container
   .style("left", "0px");
 
 const defs = svg.append("defs");
+
 defs
   .append("clipPath")
   .attr("id", "plot-clip")
@@ -346,12 +382,24 @@ const pointcloud = new Pointcloud(context, canvas, {
 });
 
 // Create Axes
-createAxes(svg, {
+const { gx, gy, xAxis, yAxis, updateAxes } = createAxes(svg, {
   xScaleSVG,
-  timeScale,
+  yScaleSVG,
   w,
   h,
 });
+
+/* const gx = svg
+  .append("g")
+  .attr("class", "x-axis")
+  .attr("transform", `translate(0,${h - margin.bottom})`)
+  .call(xAxis);
+
+const gy = svg
+  .append("g")
+  .attr("class", "y-axis")
+  .attr("transform", `translate(${margin.left},0)`)
+  .call(yAxis); */
 
 const crosshair = initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h);
 
@@ -369,6 +417,9 @@ function update({ data, stepProps, hopIndex }) {
   // Update the pointcloud visibility
   pointcloud.setVisibility(stepProps.showPointcloud);
   pointerInteraction.isExplorable = () => stepProps?.isExplorable || false;
+  xScaleSVG.domain(stepProps.xDomain);
+  yScaleSVG.domain(stepProps.yDomain);
+  /* console.log("yScaleSVG.domain()", yScaleSVG.domain()); */
 
   switch (stepProps.variant) {
     case "percentile":
@@ -404,6 +455,9 @@ function update({ data, stepProps, hopIndex }) {
       console.error("Unknown plot type selected");
   }
 
+  // Update the axes with transitions
+  updateAxes();
+
   // Draw percentiles
   drawGroupedPercentileLines(svg, {
     dataSet,
@@ -413,10 +467,10 @@ function update({ data, stepProps, hopIndex }) {
   });
 
   // Draw recommended Area
-  drawRecommendedArea(svg, container, {
+  /* drawRecommendedArea(svg, container, {
     xScaleSVG,
     yScaleSVG,
-  });
+  }); */
 
   updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w);
 }

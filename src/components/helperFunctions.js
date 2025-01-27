@@ -148,16 +148,12 @@ export function getURLParameter(name) {
 
 export const ageFormat = d3.format("02");
 
-export const timeFormat = d3.timeFormat("%H:%M");
-
-export function convertDecimalToTimeFormat(decimalHour) {
-  const hours = Math.floor(decimalHour); // Get the whole number part for hours
-  const minutes = Math.round((decimalHour - hours) * 60); // Convert the decimal part to minutes
-
-  const date = new Date();
-  date.setHours(hours, minutes, 0, 0);
-
-  return timeFormat(date); // Format the date to HH:MM
+export function formatTime(value) {
+  const hours = Math.floor(value);
+  const minutes = Math.round((value - hours) * 60);
+  return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}`;
 }
 
 export function createDebouncedLogger(callback, delay) {

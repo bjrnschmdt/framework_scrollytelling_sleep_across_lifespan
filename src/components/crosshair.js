@@ -12,13 +12,22 @@
 
 import * as d3 from "npm:d3";
 import { settings } from "./settings.js";
-import { ageFormat, convertDecimalToTimeFormat } from "./helperFunctions.js";
+import { ageFormat, formatTime } from "./helperFunctions.js";
 
-const { ageMin, sleepMax, margin, fontFamily, fontSize, lineWidths } = settings;
+const { margin, fontFamily, fontSize, lineWidths } = settings;
 
 export function initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h) {
-  const x = Number(xScaleSVG(ageMin));
-  const y = Number(yScaleSVG(sleepMax));
+  const domainX = xScaleSVG.domain()[0];
+  const domainY = yScaleSVG.domain()[1];
+
+  console.log("domainX", domainX);
+  console.log("domainY", domainY);
+
+  const x = Number(xScaleSVG(domainX));
+  const y = Number(yScaleSVG(domainY));
+
+  console.log("x", x);
+  console.log("y", y);
 
   const crosshair = svg.append("g").attr("class", "crosshair");
 
@@ -61,7 +70,7 @@ export function initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h) {
     .style("font", `${fontSize} ${fontFamily}`)
     .style("text-anchor", "start")
     .style("alignment-baseline", "hanging")
-    .text(`${ageFormat(ageMin)} Jahre (Alter)`);
+    .text(`${ageFormat(domainX)} Jahre (Alter)`);
 
   const crosshairXLine = crosshair
     .append("line")
@@ -86,7 +95,7 @@ export function initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h) {
     .style("font", `${fontSize} ${fontFamily}`)
     .style("text-anchor", "start")
     .style("alignment-baseline", "baseline")
-    .text(`${convertDecimalToTimeFormat(sleepMax)} Stunden (Schlafdauer)`);
+    .text(`${formatTime(domainY)} Stunden (Schlafdauer)`);
 
   const crosshairYLine = crosshair
     .append("line")
@@ -135,6 +144,9 @@ export function updateCrosshairs(
   let intersect = data.age < 23;
   let labelXOffset = -6;
 
+  const domainX = xScaleSVG.domain()[0];
+  const domainY = yScaleSVG.domain()[1];
+
   // -------------------------
   // Tooltip visibility logic
   // -------------------------
@@ -149,14 +161,14 @@ export function updateCrosshairs(
 
   // if cursor outside margins the crosshair get reset
   if (isNaN(x) || isNaN(y)) {
-    x = Number(xScaleSVG(ageMin));
-    y = Number(yScaleSVG(sleepMax));
-    textAge = ageMin;
-    textSleep = sleepMax;
+    x = Number(xScaleSVG(domainX));
+    y = Number(yScaleSVG(domainY));
+    textAge = domainX;
+    textSleep = domainY;
     duration = 400;
     tickOpacity = 1;
     pointOpacity = 0;
-    labelXOffset = 0;
+    /* labelXOffset = 0; */
   }
 
   // Transition the tooltip container
@@ -167,7 +179,7 @@ export function updateCrosshairs(
     .attr("transform", `translate(${x}, ${y})`);
 
   // Fade out the axis ticks if the crosshair is active
-  d3.selectAll(".x-axis .tick")
+  /*   d3.selectAll(".x-axis .tick")
     .transition()
     .duration(200)
     .attr("opacity", tickOpacity);
@@ -175,7 +187,7 @@ export function updateCrosshairs(
   d3.selectAll(".y-axis .tick text")
     .transition()
     .duration(200)
-    .attr("opacity", tickOpacity);
+    .attr("opacity", tickOpacity); */
 
   // Move the crosshair dot
   crosshairPoint
@@ -211,7 +223,7 @@ export function updateCrosshairs(
     .transition("xyTextTransitionLabel")
     .duration(duration)
     .attr("y", y)
-    .text(`${convertDecimalToTimeFormat(textSleep)} Stunden (Schlafdauer)`);
+    .text(`${formatTime(textSleep)} Stunden (Schlafdauer)`);
 
   crosshairYLine.transition().duration(duration).attr("y1", y).attr("y2", y);
 }
