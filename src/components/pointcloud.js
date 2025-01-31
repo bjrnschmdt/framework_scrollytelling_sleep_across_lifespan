@@ -62,7 +62,10 @@ export class Pointcloud {
 
     // Filter data based on age range
     this.simulatedData
-      .filter((d) => d.age >= this.ageMin && d.age <= this.ageMax)
+      .filter(
+        (d) =>
+          d.age >= this.xScale.domain()[0] && d.age <= this.xScale.domain()[1]
+      )
       .forEach((point) => {
         this.context.beginPath();
         this.context.arc(
@@ -126,6 +129,60 @@ export class Pointcloud {
   }
 
   /**
+   * Smoothly transition the scales and redraw the points.
+   * @param {function} newXScale - The updated x-axis scale.
+   * @param {function} newYScale - The updated y-axis scale.
+   * @param {number} duration - Duration of the transition in milliseconds.
+   */
+  transitionScales(
+    newXScale,
+    newYScale,
+    duration = 1000,
+    easingFunction = d3.easeCubicInOut
+  ) {
+    const oldXScale = this.xScale.copy();
+    const oldYScale = this.yScale.copy();
+
+    const xInterpolator = d3.interpolate(
+      oldXScale.domain(),
+      newXScale.domain()
+    );
+    const yInterpolator = d3.interpolate(
+      oldYScale.domain(),
+      newYScale.domain()
+    );
+
+    const startTime = performance.now();
+
+    const animate = () => {
+      const elapsed = performance.now() - startTime;
+      const t = Math.min(elapsed / duration, 1); // Normalize time between 0 and 1
+
+      const easedT = easingFunction(t); // Apply easing function
+
+      // Update the scales using the interpolated domains
+      this.xScale.domain(xInterpolator(easedT));
+      this.yScale.domain(yInterpolator(easedT));
+
+      // Redraw with updated scales
+      this.draw(this.alpha);
+
+      // Continue the animation until it's complete
+      if (t < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+
+    // After transition, set scales to new scales
+    setTimeout(() => {
+      this.xScale = newXScale;
+      this.yScale = newYScale;
+    }, duration);
+  }
+
+  /**
    * Sets visibility and triggers the appropriate fade in or fade out.
    */
   setVisibility(visible) {
@@ -134,5 +191,12 @@ export class Pointcloud {
     } else if (!visible && this.visible) {
       this.fadeOut();
     }
+  }
+
+  updateScales(xScale, yScale) {
+    console.log("Updating scales");
+    this.xScale = xScale;
+    this.yScale = yScale;
+    this.draw(this.alpha); // Redraw points with the current alpha
   }
 }

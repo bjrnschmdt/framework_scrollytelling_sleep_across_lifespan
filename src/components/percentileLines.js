@@ -22,7 +22,10 @@ export function drawGroupedPercentileLines(
   // Create or select a group for all percentile lines
   let allPercentilesGroup = svg.select(".all-percentiles");
   if (allPercentilesGroup.empty()) {
-    allPercentilesGroup = svg.append("g").attr("class", "all-percentiles");
+    allPercentilesGroup = svg
+      .append("g")
+      .attr("class", "all-percentiles")
+      .attr("clip-path", "url(#plot-clip)");
   }
 
   const dataArray = Array.from(dataSet.values()); // Convert Map to Array
@@ -155,4 +158,22 @@ function drawPercentileLines(
     .attr("stroke-width", strokeWidth)
     .attr("stroke-opacity", opacity)
     .attr("d", lineGenerator);
+}
+
+export function updatePercentileLineScales(svg, { xScaleSVG, yScaleSVG }) {
+  // Update the paths with the new scales
+  svg
+    .selectAll(".percentile-group path")
+    .transition() // Optional: Add a smooth transition
+    .duration(1000)
+    .ease(d3.easeCubicInOut)
+    .attr("d", function (d) {
+      // Recreate the line generator with updated scales
+      const lineGenerator = d3
+        .line()
+        .curve(d3.curveNatural)
+        .x((d) => xScaleSVG(d.age))
+        .y((d) => yScaleSVG(d.tst));
+      return lineGenerator(d);
+    });
 }

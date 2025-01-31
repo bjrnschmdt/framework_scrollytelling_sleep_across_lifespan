@@ -19,13 +19,13 @@ export function createScales({ w, h }) {
     .scaleLinear()
     .domain([ageMin, ageMax])
     .rangeRound([margin.left, w - margin.right])
-    .clamp(true);
+    .clamp(false);
 
   const yScaleSVG = d3
     .scaleLinear()
     .domain([sleepMin, sleepMax])
     .rangeRound([h - margin.bottom, margin.top])
-    .clamp(true);
+    .clamp(false);
 
   const timeScale = d3
     .scaleTime()

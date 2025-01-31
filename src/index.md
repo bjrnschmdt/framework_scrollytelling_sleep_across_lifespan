@@ -19,7 +19,11 @@ import {
 import { PointerInteraction } from "./components/pointerInteraction.js";
 import { createAxes } from "./components/createAxes.js";
 import { Pointcloud } from "./components/pointcloud.js";
-import { drawGroupedPercentileLines } from "./components/percentileLines.js";
+/* import PercentileLines from "./components/PercentileLines.js"; */
+import {
+  drawGroupedPercentileLines,
+  updatePercentileLineScales,
+} from "./components/percentileLines.js";
 import { drawRecommendedArea } from "./components/recommendedArea.js";
 import { updatePlot, exitPlot } from "./components/plot.js";
 import { updateDotPlot } from "./components/plotDot.js";
@@ -145,8 +149,6 @@ const stepProps = scrollyProps[scrollyStep];
 
 ```js
 const baseStep = {
-  xDomain: [5, 95],
-  yDomain: [4, 13],
   age: undefined,
   sleepTime: undefined,
   showRecommended: false,
@@ -168,7 +170,7 @@ function setHour(value) {
 function getSteps(age, sleepTime, chartValue, variant) {
   return {
     0: { ...baseStep },
-    1: { ...baseStep, xDomain: [10, 90], yDomain: [5, 12] },
+    1: { ...baseStep },
     2: {
       ...baseStep,
       showPointcloud: true,
@@ -185,8 +187,6 @@ function getSteps(age, sleepTime, chartValue, variant) {
       showPointcloud: true,
       showPercentiles: ["C"],
       tooltipText: "Karin",
-      xDomain: [21, 41],
-      yDomain: [5, 9],
     },
     5: {
       ...baseStep,
@@ -195,8 +195,6 @@ function getSteps(age, sleepTime, chartValue, variant) {
       showPointcloud: true,
       showPercentiles: ["C"],
       tooltipText: "Du",
-      /*       xDomain: [45, 50],
-      yDomain: [7, 10], */
     },
     6: {
       ...baseStep,
@@ -205,8 +203,6 @@ function getSteps(age, sleepTime, chartValue, variant) {
       showPointcloud: true,
       showPercentiles: ["C"],
       variant,
-      /*       xDomain: [10, 50],
-      yDomain: [7, 13], */
     },
     7: {
       ...baseStep,
@@ -215,8 +211,6 @@ function getSteps(age, sleepTime, chartValue, variant) {
       showPointcloud: true,
       showPercentiles: ["C"],
       variant,
-      xDomain: [60, 96],
-      yDomain: [7, 13],
     },
     8: {
       ...baseStep,
@@ -227,8 +221,78 @@ function getSteps(age, sleepTime, chartValue, variant) {
       isExplorable: true,
       variant,
     },
+    9: {
+      ...baseStep,
+      age: chartValue.age,
+      sleepTime: chartValue.sleepTime,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      isExplorable: true,
+      variant,
+    },
+    10: {
+      ...baseStep,
+      age: chartValue.age,
+      sleepTime: chartValue.sleepTime,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      isExplorable: true,
+      variant,
+    },
+    11: {
+      ...baseStep,
+      age: chartValue.age,
+      sleepTime: chartValue.sleepTime,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      isExplorable: true,
+      variant,
+    },
+    12: {
+      ...baseStep,
+      age: chartValue.age,
+      sleepTime: chartValue.sleepTime,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      isExplorable: true,
+      variant,
+    },
+    13: {
+      ...baseStep,
+      age: chartValue.age,
+      sleepTime: chartValue.sleepTime,
+      showPointcloud: true,
+      showPercentiles: ["C"],
+      isExplorable: true,
+      variant,
+    },
   };
 }
+```
+
+```js
+const domainBase = {
+  xDomain: [5, 94],
+  yDomain: [4, 13],
+};
+```
+
+```js
+const domainSettings = {
+  1: { ...domainBase },
+  2: { ...domainBase },
+  3: { ...domainBase },
+  4: { ...domainBase },
+  5: { ...domainBase },
+  6: { ...domainBase },
+  7: { ...domainBase },
+  8: { ...domainBase },
+  9: { ...domainBase },
+  10: { ...domainBase, xDomain: [5, 10] },
+  11: { ...domainBase, xDomain: [11, 17] },
+  12: { ...domainBase, xDomain: [18, 65] },
+  13: { ...domainBase, xDomain: [66, 94] },
+};
 ```
 
 ```js
@@ -255,7 +319,7 @@ const sleepTimeInput = Inputs.range([sleepMin, sleepMax], {
   step: 0.25,
   label: "Schlafdauer",
   value: def.sleepTime,
-  format: (x) => formatTime(x),
+  /* format: (x) => formatTime(x), */
 });
 const sleepTimeValue = Generators.input(sleepTimeInput);
 ```
@@ -336,6 +400,14 @@ const interestValue = Generators.input(interestInput);
 ```
 
 ```js
+
+```
+
+```js
+
+```
+
+```js
 const container = d3.create("div");
 container.style("position", "relative");
 container.style("background-color", `var(--theme-background)`);
@@ -370,16 +442,18 @@ defs
   .append("clipPath")
   .attr("id", "plot-clip")
   .append("rect")
-  .attr("x", 0)
-  .attr("y", 0)
-  .attr("width", w)
-  .attr("height", h);
+  .attr("x", margin.left)
+  .attr("y", margin.top)
+  .attr("width", w - margin.left - margin.right)
+  .attr("height", h - margin.top - margin.bottom);
 
 const pointcloud = new Pointcloud(context, canvas, {
   simulatedData,
   xScale: xScaleSVG,
   yScale: yScaleSVG,
 });
+
+/* const percentileLines = new PercentileLines(svg, { xScaleSVG, yScaleSVG }); */
 
 // Create Axes
 const { gx, gy, xAxis, yAxis, updateAxes } = createAxes(svg, {
@@ -388,18 +462,6 @@ const { gx, gy, xAxis, yAxis, updateAxes } = createAxes(svg, {
   w,
   h,
 });
-
-/* const gx = svg
-  .append("g")
-  .attr("class", "x-axis")
-  .attr("transform", `translate(0,${h - margin.bottom})`)
-  .call(xAxis);
-
-const gy = svg
-  .append("g")
-  .attr("class", "y-axis")
-  .attr("transform", `translate(${margin.left},0)`)
-  .call(yAxis); */
 
 const crosshair = initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h);
 
@@ -413,13 +475,24 @@ const pointerInteraction = new PointerInteraction(svg, {
   container,
 });
 
-function update({ data, stepProps, hopIndex }) {
+const zoom = d3.zoom().scaleExtent([0.5, 8]).on("zoom", zoomed);
+
+function zoomed({ transform }) {
+  /* console.log("zoomed", transform); */
+  const zx = transform.rescaleX(xScaleSVG).interpolate(d3.interpolateRound);
+  const zy = transform.rescaleY(yScaleSVG).interpolate(d3.interpolateRound);
+  /* console.log("zx.domain()", zx.domain());
+  console.log("zy.domain()", zy.domain()); */
+  gx.call(xAxis, zx);
+  gy.call(yAxis, zy);
+}
+
+svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
+
+function updateChart({ data, stepProps, hopIndex }) {
   // Update the pointcloud visibility
   pointcloud.setVisibility(stepProps.showPointcloud);
   pointerInteraction.isExplorable = () => stepProps?.isExplorable || false;
-  xScaleSVG.domain(stepProps.xDomain);
-  yScaleSVG.domain(stepProps.yDomain);
-  /* console.log("yScaleSVG.domain()", yScaleSVG.domain()); */
 
   switch (stepProps.variant) {
     case "percentile":
@@ -455,10 +528,6 @@ function update({ data, stepProps, hopIndex }) {
       console.error("Unknown plot type selected");
   }
 
-  // Update the axes with transitions
-  updateAxes();
-
-  // Draw percentiles
   drawGroupedPercentileLines(svg, {
     dataSet,
     showPercentiles: stepProps.showPercentiles,
@@ -466,16 +535,44 @@ function update({ data, stepProps, hopIndex }) {
     yScaleSVG,
   });
 
-  // Draw recommended Area
-  /* drawRecommendedArea(svg, container, {
+  updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w);
+}
+
+function updateDomain({ domain }) {
+  // Update scales
+  xScaleSVG.domain(domain.xDomain);
+  yScaleSVG.domain(domain.yDomain);
+
+  updatePointcloudScales(pointcloud, {
+    xScaleSVG,
+    yScaleSVG,
+  });
+
+  // Update axes
+  updateAxes(xScaleSVG, yScaleSVG);
+
+  // Draw percentile lines
+  /* drawGroupedPercentileLines(svg, {
+    dataSet,
+    showPercentiles: stepProps.showPercentiles,
     xScaleSVG,
     yScaleSVG,
   }); */
 
-  updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w);
+  updatePercentileLineScales(svg, { xScaleSVG, yScaleSVG });
+
+  // Update crosshairs
+  /* updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w); */
 }
 
-container.node().update = update;
+container.node().updateChart = updateChart;
+container.node().updateDomain = updateDomain;
+```
+
+```js
+function updatePointcloudScales(pointcloud, { xScaleSVG, yScaleSVG }) {
+  pointcloud.transitionScales(xScaleSVG.copy(), yScaleSVG.copy(), 1000); // Animate over 1 second
+}
 ```
 
 ```js
@@ -484,11 +581,28 @@ const chartValue = Generators.input(chartElement);
 ```
 
 ```js
-const update = chartElement.update({
+const updateChart = chartElement.updateChart({
   data: dataSet.get(stepProps.age),
   stepProps,
   hopIndex: j,
 });
+```
+
+```js
+// Update chart domain only when necessary
+const updateDomain = chartElement.updateDomain({ domain });
+```
+
+```js
+// Reactive domain state
+const domain = Mutable(domainBase);
+const setDomain = (x) => (domain.value = x);
+```
+
+```js
+// Update domain only if it has changed
+JSON.stringify(domain) !== JSON.stringify(domainSettings[scrollyStep]) &&
+  setDomain(domainSettings[scrollyStep]);
 ```
 
 ```js
@@ -570,7 +684,6 @@ updateVisualizationDescription(variant);
 
 # Schlafdauer über die Lebensspanne
 
-Hallo!
 Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so lange schlafen wie du? Und wie sieht es mit der Schlafdauer in der Gesamtbevölkerung so aus? Finde es mit unserer interaktiven Grafik heraus! Scrolle einfach nach unten - die Inhalte entfalten sich Schritt für Schritt, während du weiter scrollst.
 
 <section class="scroll-container">
@@ -584,12 +697,31 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   ${ageInput}${sleepTimeInput}</div>
   <div class="scroll-section card" data-step="6">Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</div> 
   <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}
-    <div id="answer">Die richtige Antwort ist ${Math.round(getTrueValue(dataSet, stepProps) * 100)}% Versuche es gerne nochmal mit einem anderen Alter/Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
+    <div id="answer">Super, die richtige Lösung ist ${Math.round(getTrueValue(dataSet, stepProps) * 100)}% Wenn du magst, versuche es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
     </div>
   </div>  
-  <div class="scroll-section card" data-step="8">Jetzt kannst du die Grafik frei erkunden, indem du den Cursor in die Grafik bewegst.</div>
+  <div class="scroll-section card" data-step="8">Bewege den Cursor in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder.</div>
+  <div class="scroll-section card" data-step="9">
+  <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
+  <h2>Die Gestaltung der Grafik war ansprechend.</h2>
+  ${aestheticsInput}
+  <h2>Das Thema hat mich interessiert.</h2>
+  ${interestInput}
+</div>
+    <div class="scroll-section card" data-step="10"><h2>Altersgruppe bis 10 Jahre</h2>
+    <p> Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
+    </div>
+    <div class="scroll-section card" data-step="11"><h2>11–17 Jahre</h2>
+    <p>Während der Pubertät fällt die Schlafdauer dramatisch ab; gleichzeitig nimmt die Streuung zu. Da sich in dieser Phase die innere Uhr meist auf spätere Bettzeiten einstellt, die Schule aber in der Regel früh beginnt, bekommen Jugendliche oft weniger Schlaf, als es Fachleute empfehlen.</p>
+    </div>
+      <div class="scroll-section card" data-step="12"><h2>18–65 Jahre</h2>
+    <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7 Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
+   </div>
+  <div class="scroll-section card" data-step="13"><h2>Über 66 Jahre</h2>
+    <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
+</div>
 </section>
-<div class="outro card">
+<!-- <div class="outro card">
     <h2>Altersgruppe bis 10 Jahre</h2>
     <p> Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
     <h2>11–17 Jahre</h2>
@@ -598,7 +730,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
     <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7 Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
     <h2>Über 66 Jahre</h2>
     <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
-</div>
+</div> -->
 <div class="outro card">
   <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
   <h2>Die Gestaltung der Grafik war ansprechend.</h2>

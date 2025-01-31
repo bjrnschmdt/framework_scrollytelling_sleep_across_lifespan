@@ -37,16 +37,16 @@ function styleXAxis(g) {
 }
 
 export function createAxes(svg, { xScaleSVG, yScaleSVG, w, h }) {
-  const xAxis = (g) => {
-    g.call(d3.axisBottom(xScaleSVG).tickFormat(d3.format("02")));
+  const xAxis = (g, x) => {
+    g.call(d3.axisBottom(x).tickFormat(d3.format("02")));
     styleXAxis(g);
   };
 
-  const yAxis = (g) => {
+  const yAxis = (g, y) => {
     g.call(
       d3
-        .axisRight(yScaleSVG)
-        .tickValues(yScaleSVG.ticks().slice(1)) // Exclude first tick
+        .axisRight(y)
+        .tickValues(y.ticks().slice(1)) // Exclude first tick
         .tickSize(w - margin.left - margin.right)
         .tickFormat(formatTime)
     );
@@ -57,13 +57,13 @@ export function createAxes(svg, { xScaleSVG, yScaleSVG, w, h }) {
     .append("g")
     .attr("class", "x-axis")
     .attr("transform", `translate(0,${h - margin.bottom})`)
-    .call(xAxis);
+    .call(xAxis, xScaleSVG);
 
   const gy = svg
     .append("g")
     .attr("class", "y-axis")
     .attr("transform", `translate(${margin.left},0)`)
-    .call(yAxis);
+    .call(yAxis, yScaleSVG);
 
   // Return update functions for dynamic transitions
   return {
@@ -71,12 +71,16 @@ export function createAxes(svg, { xScaleSVG, yScaleSVG, w, h }) {
     gy,
     xAxis,
     yAxis,
-    updateAxes: () => {
-      gx.transition().duration(1000).call(xAxis).selection().call(styleXAxis); // Reapply styles for the x-axis
+    updateAxes: (x, y) => {
+      gx.transition()
+        .duration(1000)
+        .call(xAxis, x)
+        .selection()
+        .call(styleXAxis); // Reapply styles for the x-axis
 
       gy.transition()
         .duration(1000)
-        .call(yAxis)
+        .call(yAxis, y)
         .selection()
         .call((g) => styleYAxis(g, { w })); // Reapply styles for the y-axis
     },
