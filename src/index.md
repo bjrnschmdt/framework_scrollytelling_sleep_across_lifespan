@@ -21,6 +21,7 @@ import { createAxes } from "./components/createAxes.js";
 import { Pointcloud } from "./components/pointcloud.js";
 /* import PercentileLines from "./components/PercentileLines.js"; */
 import {
+  PercentileLines,
   drawGroupedPercentileLines,
   updatePercentileLineScales,
 } from "./components/percentileLines.js";
@@ -279,6 +280,7 @@ const domainBase = {
 
 ```js
 const domainSettings = {
+  0: { ...domainBase },
   1: { ...domainBase },
   2: { ...domainBase },
   3: { ...domainBase },
@@ -287,11 +289,35 @@ const domainSettings = {
   6: { ...domainBase },
   7: { ...domainBase },
   8: { ...domainBase },
-  9: { ...domainBase },
-  10: { ...domainBase, xDomain: [5, 10] },
-  11: { ...domainBase, xDomain: [11, 17] },
-  12: { ...domainBase, xDomain: [18, 65] },
-  13: { ...domainBase, xDomain: [66, 94] },
+  9: { ...domainBase, xDomain: [5, 10] },
+  10: { ...domainBase, xDomain: [11, 17] },
+  11: { ...domainBase, xDomain: [18, 65] },
+  12: { ...domainBase, xDomain: [66, 94] },
+};
+```
+
+```js
+const visibilityBase = {
+  showPointcloud: true,
+  showPercentiles: ["C"],
+};
+```
+
+```js
+const visibilitySettings = {
+  0: { ...visibilityBase, showPointcloud: false, showPercentiles: [] },
+  1: { ...visibilityBase, showPointcloud: false, showPercentiles: [] },
+  2: { ...visibilityBase, showPercentiles: [] },
+  3: { ...visibilityBase },
+  4: { ...visibilityBase },
+  5: { ...visibilityBase },
+  6: { ...visibilityBase },
+  7: { ...visibilityBase },
+  8: { ...visibilityBase },
+  9: { ...visibilityBase },
+  10: { ...visibilityBase },
+  11: { ...visibilityBase },
+  12: { ...visibilityBase },
 };
 ```
 
@@ -390,24 +416,6 @@ const interestValue = Generators.input(interestInput);
 <!-- Main Visualization code -->
 
 ```js
-/* const xAxis = d3.axisBottom(xScaleSVG).tickFormat(d3.format("02")); */
-```
-
-```js
-/* const yAxis = d3
-  .axisRight(yScaleSVG)
-  .tickFormat(formatTime); */
-```
-
-```js
-
-```
-
-```js
-
-```
-
-```js
 const container = d3.create("div");
 container.style("position", "relative");
 container.style("background-color", `var(--theme-background)`);
@@ -447,11 +455,17 @@ defs
   .attr("width", w - margin.left - margin.right)
   .attr("height", h - margin.top - margin.bottom);
 
-const pointcloud = new Pointcloud(context, canvas, {
+/* const pointcloud = new Pointcloud(context, canvas, {
   simulatedData,
   xScale: xScaleSVG,
   yScale: yScaleSVG,
-});
+}); */
+
+/* const percentileLines = new PercentileLines(svg, {
+  dataSet,
+  xScaleSVG,
+  yScaleSVG,
+}); */
 
 /* const percentileLines = new PercentileLines(svg, { xScaleSVG, yScaleSVG }); */
 
@@ -478,11 +492,8 @@ const pointerInteraction = new PointerInteraction(svg, {
 const zoom = d3.zoom().scaleExtent([0.5, 8]).on("zoom", zoomed);
 
 function zoomed({ transform }) {
-  /* console.log("zoomed", transform); */
   const zx = transform.rescaleX(xScaleSVG).interpolate(d3.interpolateRound);
   const zy = transform.rescaleY(yScaleSVG).interpolate(d3.interpolateRound);
-  /* console.log("zx.domain()", zx.domain());
-  console.log("zy.domain()", zy.domain()); */
   gx.call(xAxis, zx);
   gy.call(yAxis, zy);
 }
@@ -491,7 +502,11 @@ svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
 
 function updateChart({ data, stepProps, hopIndex }) {
   // Update the pointcloud visibility
-  pointcloud.setVisibility(stepProps.showPointcloud);
+  console.log("updateChart");
+
+  /* pointcloud.setVisibility(stepProps.showPointcloud); */
+  /* percentileLines.setVisibility(stepProps.showPercentiles.length > 0); */ // Toggle visibility
+
   pointerInteraction.isExplorable = () => stepProps?.isExplorable || false;
 
   switch (stepProps.variant) {
@@ -528,25 +543,31 @@ function updateChart({ data, stepProps, hopIndex }) {
       console.error("Unknown plot type selected");
   }
 
-  drawGroupedPercentileLines(svg, {
+  /* drawGroupedPercentileLines(svg, {
     dataSet,
     showPercentiles: stepProps.showPercentiles,
     xScaleSVG,
     yScaleSVG,
-  });
+  }); */
+
+  // Draw percentile lines (only if visible)
+  /*   if (percentileLines.show) {
+    percentileLines.draw(dataSet, stepProps.showPercentiles);
+  } */
 
   updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w);
 }
 
 function updateDomain({ domain }) {
+  console.log("updateDomain");
   // Update scales
   xScaleSVG.domain(domain.xDomain);
   yScaleSVG.domain(domain.yDomain);
 
-  updatePointcloudScales(pointcloud, {
+  /* updatePointcloudScales(pointcloud, {
     xScaleSVG,
     yScaleSVG,
-  });
+  }); */
 
   // Update axes
   updateAxes(xScaleSVG, yScaleSVG);
@@ -559,14 +580,26 @@ function updateDomain({ domain }) {
     yScaleSVG,
   }); */
 
-  updatePercentileLineScales(svg, { xScaleSVG, yScaleSVG });
+  // Update the percentile lines scales and re-render them using the stored showPercentiles value.
+  /* percentileLines.updateScales(xScaleSVG, yScaleSVG); */
+  /*   percentileLines.render(); */
+
+  /* percentileLines.draw(dataSet);
+  percentileLines.updateScales(xScaleSVG, yScaleSVG); */
+  /* updatePercentileLineScales(svg, { xScaleSVG, yScaleSVG }); */
 
   // Update crosshairs
   /* updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w); */
 }
 
+function updateVisibility({ visibility }) {
+  /* pointcloud.setVisibility(visibility.showPointcloud); */
+  /* percentileLines.setShowPercentiles(visibility.showPercentiles.length > 0); */
+}
+
 container.node().updateChart = updateChart;
 container.node().updateDomain = updateDomain;
+container.node().updateVisibility = updateVisibility;
 ```
 
 ```js
@@ -594,7 +627,13 @@ const updateDomain = chartElement.updateDomain({ domain });
 ```
 
 ```js
+// Update chart visibility only when necessary
+const updateVisibility = chartElement.updateVisibility({ visibility });
+```
+
+```js
 // Reactive domain state
+
 const domain = Mutable(domainBase);
 const setDomain = (x) => (domain.value = x);
 ```
@@ -603,6 +642,20 @@ const setDomain = (x) => (domain.value = x);
 // Update domain only if it has changed
 JSON.stringify(domain) !== JSON.stringify(domainSettings[scrollyStep]) &&
   setDomain(domainSettings[scrollyStep]);
+```
+
+```js
+// Reactive domain state
+const visibility = Mutable(visibilityBase);
+console.log("visibility", visibility.value);
+const setVisibility = (x) => (visibility.value = x);
+```
+
+```js
+// Update domain only if it has changed
+JSON.stringify(visibility) !==
+  JSON.stringify(visibilitySettings[scrollyStep]) &&
+  setVisibility(visibilitySettings[scrollyStep]);
 ```
 
 ```js
@@ -688,36 +741,36 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 
 <section class="scroll-container">
   <div class="scroll-info">${chartElement}</div>
-  <div class="scroll-section card" data-step="1">Auf der Y-Achse links ist die Schlafdauer eingetragen, unten auf der X-Achse das Alter.</div>
-  <div class="scroll-section card" data-step="2">Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000 Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert. Die Daten der Erwachsenen beruhen auf Selbsteinschätzungen, die der Kinder auf Angaben der Eltern. Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen: Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig.</div>
-  <div class="scroll-section card" data-step="3">Die Linien geben Perzentile an und zeigen, wie sich die Datenpunkte in der Stichprobe verteilen. Was das konkret heißt, siehst du im folgenden Bild:</div>
-  <div class="scroll-section card" data-step="4">Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</div>
-   <div class="scroll-section card" data-step="5" id="user-input">
+  <div class="scroll-section card" data-step="0">Auf der Y-Achse links ist die Schlafdauer eingetragen, unten auf der X-Achse das Alter.</div>
+  <div class="scroll-section card" data-step="1">Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000 Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert. Die Daten der Erwachsenen beruhen auf Selbsteinschätzungen, die der Kinder auf Angaben der Eltern. Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen: Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig.</div>
+  <div class="scroll-section card" data-step="2">Die Linien geben Perzentile an und zeigen, wie sich die Datenpunkte in der Stichprobe verteilen. Was das konkret heißt, siehst du im folgenden Bild:</div>
+  <div class="scroll-section card" data-step="3">Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</div>
+   <div class="scroll-section card" data-step="4" id="user-input">
   Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.
   ${ageInput}${sleepTimeInput}</div>
-  <div class="scroll-section card" data-step="6">Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</div> 
-  <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}
+  <div class="scroll-section card" data-step="5">Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</div> 
+  <div class="scroll-section card" data-step="6">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}
     <div id="answer">Super, die richtige Lösung ist ${Math.round(getTrueValue(dataSet, stepProps) * 100)}% Wenn du magst, versuche es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
     </div>
   </div>  
-  <div class="scroll-section card" data-step="8">Bewege den Cursor in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder.</div>
-  <div class="scroll-section card" data-step="9">
+  <div class="scroll-section card" data-step="7">Bewege den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder.</div>
+  <div class="scroll-section card" data-step="8">
   <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
   <h2>Die Gestaltung der Grafik war ansprechend.</h2>
   ${aestheticsInput}
   <h2>Das Thema hat mich interessiert.</h2>
   ${interestInput}
 </div>
-    <div class="scroll-section card" data-step="10"><h2>Altersgruppe bis 10 Jahre</h2>
+    <div class="scroll-section card" data-step="9"><h2>Altersgruppe bis 10 Jahre</h2>
     <p> Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
     </div>
-    <div class="scroll-section card" data-step="11"><h2>11–17 Jahre</h2>
+    <div class="scroll-section card" data-step="10"><h2>11–17 Jahre</h2>
     <p>Während der Pubertät fällt die Schlafdauer dramatisch ab; gleichzeitig nimmt die Streuung zu. Da sich in dieser Phase die innere Uhr meist auf spätere Bettzeiten einstellt, die Schule aber in der Regel früh beginnt, bekommen Jugendliche oft weniger Schlaf, als es Fachleute empfehlen.</p>
     </div>
-      <div class="scroll-section card" data-step="12"><h2>18–65 Jahre</h2>
+      <div class="scroll-section card" data-step="11"><h2>18–65 Jahre</h2>
     <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7 Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
    </div>
-  <div class="scroll-section card" data-step="13"><h2>Über 66 Jahre</h2>
+  <div class="scroll-section card" data-step="12"><h2>Über 66 Jahre</h2>
     <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
 </div>
 </section>
