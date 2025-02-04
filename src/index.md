@@ -135,12 +135,55 @@ logInput("interest", interestValue);
 <!-- Scrollytelling -->
 
 ```js
-const scrollyStep = Mutable(0);
-const setScrollyStep = (x) => (scrollyStep.value = x);
+// A helper that does a shallow diff (or deep diff if needed)
+function diffStepProps(newProps, oldProps) {
+  const diff = {};
+
+  function arraysEqual(a, b) {
+    return (
+      Array.isArray(a) &&
+      Array.isArray(b) &&
+      a.length === b.length &&
+      a.every((val, index) => val === b[index])
+    );
+  }
+
+  for (const key in newProps) {
+    if (Array.isArray(newProps[key]) && Array.isArray(oldProps[key])) {
+      if (!arraysEqual(newProps[key], oldProps[key])) {
+        diff[key] = { old: oldProps[key], new: newProps[key] };
+      }
+    } else if (newProps[key] !== oldProps[key]) {
+      diff[key] = { old: oldProps[key], new: newProps[key] };
+    }
+  }
+
+  return diff;
+}
 ```
 
 ```js
-const scrollyProps = getSteps(ageValue, sleepTimeValue, chartValue, variant);
+// Initial computation of stepProps from your getSteps function:
+/* const initialStepProps = scrollyProps[scrollyStep]; */
+```
+
+```js
+// Create a mutable that holds the full object (as your “source of truth”)
+const stableStepProps = Mutable(baseStep);
+const setStableStepProps = (x) => (stableStepProps.value = x);
+```
+
+```js
+const changes = diffStepProps(stepProps, stableStepProps);
+```
+
+```js
+/* console.log("Changes:", changes); */
+```
+
+```js
+const scrollyStep = Mutable(0);
+const setScrollyStep = (x) => (scrollyStep.value = x);
 ```
 
 ```js
@@ -157,141 +200,114 @@ const baseStep = {
   tooltipText: undefined,
   isExplorable: false,
   variant: "none",
-};
-```
-
-```js
-function setHour(value) {
-  return new Date(0, 0, 0, value, 0, 0);
-}
-```
-
-```js
-function getSteps(age, sleepTime, chartValue, variant) {
-  return {
-    0: { ...baseStep },
-    1: { ...baseStep },
-    2: {
-      ...baseStep,
-      showPointcloud: true,
-    },
-    3: {
-      ...baseStep,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-    },
-    4: {
-      ...baseStep,
-      age: 31,
-      sleepTime: 7,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-      tooltipText: "Karin",
-    },
-    5: {
-      ...baseStep,
-      age,
-      sleepTime,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-      tooltipText: "Du",
-    },
-    6: {
-      ...baseStep,
-      age,
-      sleepTime,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-      variant,
-    },
-    7: {
-      ...baseStep,
-      age,
-      sleepTime,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-      variant,
-    },
-    8: {
-      ...baseStep,
-      age: chartValue.age,
-      sleepTime: chartValue.sleepTime,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-      isExplorable: true,
-      variant,
-    },
-    9: {
-      ...baseStep,
-      age: chartValue.age,
-      sleepTime: chartValue.sleepTime,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-      isExplorable: true,
-      variant,
-    },
-    10: {
-      ...baseStep,
-      age: chartValue.age,
-      sleepTime: chartValue.sleepTime,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-      isExplorable: true,
-      variant,
-    },
-    11: {
-      ...baseStep,
-      age: chartValue.age,
-      sleepTime: chartValue.sleepTime,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-      isExplorable: true,
-      variant,
-    },
-    12: {
-      ...baseStep,
-      age: chartValue.age,
-      sleepTime: chartValue.sleepTime,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-      isExplorable: true,
-      variant,
-    },
-    13: {
-      ...baseStep,
-      age: chartValue.age,
-      sleepTime: chartValue.sleepTime,
-      showPointcloud: true,
-      showPercentiles: ["C"],
-      isExplorable: true,
-      variant,
-    },
-  };
-}
-```
-
-```js
-const domainBase = {
   xDomain: [5, 94],
   yDomain: [4, 13],
 };
 ```
 
 ```js
-const domainSettings = {
-  1: { ...domainBase },
-  2: { ...domainBase },
-  3: { ...domainBase },
-  4: { ...domainBase },
-  5: { ...domainBase },
-  6: { ...domainBase },
-  7: { ...domainBase },
-  8: { ...domainBase },
-  9: { ...domainBase },
-  10: { ...domainBase, xDomain: [5, 10] },
-  11: { ...domainBase, xDomain: [11, 17] },
-  12: { ...domainBase, xDomain: [18, 65] },
-  13: { ...domainBase, xDomain: [66, 94] },
+const scrollyProps = {
+  0: { ...baseStep },
+  1: { ...baseStep },
+  2: {
+    ...baseStep,
+    showPointcloud: true,
+  },
+  3: {
+    ...baseStep,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+  },
+  4: {
+    ...baseStep,
+    age: 31,
+    sleepTime: 7,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    tooltipText: "Karin",
+  },
+  5: {
+    ...baseStep,
+    age: ageValue,
+    sleepTime: sleepTimeValue,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    tooltipText: "Du",
+  },
+  6: {
+    ...baseStep,
+    age: ageValue,
+    sleepTime: sleepTimeValue,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    variant,
+  },
+  7: {
+    ...baseStep,
+    age: ageValue,
+    sleepTime: sleepTimeValue,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    variant,
+  },
+  8: {
+    ...baseStep,
+    age: chartValue.age,
+    sleepTime: chartValue.sleepTime,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    isExplorable: true,
+    variant,
+  },
+  9: {
+    ...baseStep,
+    age: chartValue.age,
+    sleepTime: chartValue.sleepTime,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    isExplorable: true,
+    variant,
+  },
+  10: {
+    ...baseStep,
+    age: chartValue.age,
+    sleepTime: chartValue.sleepTime,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    isExplorable: true,
+    variant,
+    xDomain: [5, 10],
+  },
+  11: {
+    ...baseStep,
+    age: chartValue.age,
+    sleepTime: chartValue.sleepTime,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    isExplorable: true,
+    variant,
+    xDomain: [11, 17],
+  },
+  12: {
+    ...baseStep,
+    age: chartValue.age,
+    sleepTime: chartValue.sleepTime,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    isExplorable: true,
+    variant,
+    xDomain: [18, 65],
+  },
+  13: {
+    ...baseStep,
+    age: chartValue.age,
+    sleepTime: chartValue.sleepTime,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    isExplorable: true,
+    variant,
+    xDomain: [66, 94],
+  },
 };
 ```
 
@@ -390,24 +406,6 @@ const interestValue = Generators.input(interestInput);
 <!-- Main Visualization code -->
 
 ```js
-/* const xAxis = d3.axisBottom(xScaleSVG).tickFormat(d3.format("02")); */
-```
-
-```js
-/* const yAxis = d3
-  .axisRight(yScaleSVG)
-  .tickFormat(formatTime); */
-```
-
-```js
-
-```
-
-```js
-
-```
-
-```js
 const container = d3.create("div");
 container.style("position", "relative");
 container.style("background-color", `var(--theme-background)`);
@@ -475,98 +473,109 @@ const pointerInteraction = new PointerInteraction(svg, {
   container,
 });
 
-const zoom = d3.zoom().scaleExtent([0.5, 8]).on("zoom", zoomed);
+/* const zoom = d3.zoom().scaleExtent([0.5, 8]).on("zoom", zoomed);
 
 function zoomed({ transform }) {
-  /* console.log("zoomed", transform); */
   const zx = transform.rescaleX(xScaleSVG).interpolate(d3.interpolateRound);
   const zy = transform.rescaleY(yScaleSVG).interpolate(d3.interpolateRound);
-  /* console.log("zx.domain()", zx.domain());
-  console.log("zy.domain()", zy.domain()); */
   gx.call(xAxis, zx);
   gy.call(yAxis, zy);
 }
 
-svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
+svg.call(zoom).call(zoom.transform, d3.zoomIdentity); */
 
-function updateChart({ data, stepProps, hopIndex }) {
-  // Update the pointcloud visibility
-  pointcloud.setVisibility(stepProps.showPointcloud);
-  pointerInteraction.isExplorable = () => stepProps?.isExplorable || false;
+function updateChart({ data, stepProps, changes, hopIndex }) {
+  // Update only if there are changes
+  if (Object.keys(changes).length > 0) {
+    /* console.log("changes", changes); */
 
-  switch (stepProps.variant) {
-    case "percentile":
-      updatePercentilePlot(data, xScaleSVG, yScaleSVG);
-      break;
-    case "dot":
-      updateDotPlot(data, stepProps, xScaleSVG, yScaleSVG, h);
-      break;
-    case "box":
-      updateBoxPlot(data, xScaleSVG, yScaleSVG);
-      break;
-    case "hop":
-      updateHOPPlot(data, {
+    // Update if the domain has changed
+    if (changes.xDomain || changes.yDomain) {
+      // Update scales
+      xScaleSVG.domain(stepProps.xDomain);
+      yScaleSVG.domain(stepProps.yDomain);
+
+      updatePercentileLineScales(svg, { xScaleSVG, yScaleSVG });
+
+      updatePointcloudScales(pointcloud, {
         xScaleSVG,
         yScaleSVG,
-        hopIndex,
-        h,
       });
-      break;
-    case "hop_traced":
-      updateHOPPlot(data, {
+
+      // Update axes
+      updateAxes(xScaleSVG, yScaleSVG);
+
+      // Update crosshairs
+      updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w);
+    }
+
+    // Update pointcloud visibility
+    if (changes.showPointcloud) {
+      pointcloud.setVisibility(stepProps.showPointcloud);
+    }
+
+    // Update percentiles visibility
+    if (changes.showPercentiles) {
+      drawGroupedPercentileLines(svg, {
+        dataSet,
+        showPercentiles: stepProps.showPercentiles,
         xScaleSVG,
         yScaleSVG,
-        hopCount,
-        hopIndex,
-        h,
       });
-      break;
-    case "none":
-      exitPlot();
-      break;
-    default:
-      console.error("Unknown plot type selected");
+    }
+
+    // Update exploration mode
+    if (changes.isExplorable) {
+      pointerInteraction.isExplorable = () => stepProps?.isExplorable || false;
+    }
+
+    // Update type specific plot
+    if (changes.variant || changes.age || changes.sleepTime) {
+      switch (stepProps.variant) {
+        case "percentile":
+          updatePercentilePlot(data, xScaleSVG, yScaleSVG);
+          break;
+        case "dot":
+          updateDotPlot(data, stepProps, xScaleSVG, yScaleSVG, h);
+          break;
+        case "box":
+          updateBoxPlot(data, xScaleSVG, yScaleSVG);
+          break;
+        case "hop":
+          updateHOPPlot(data, {
+            xScaleSVG,
+            yScaleSVG,
+            hopIndex,
+            h,
+          });
+          break;
+        case "hop_traced":
+          updateHOPPlot(data, {
+            xScaleSVG,
+            yScaleSVG,
+            hopCount,
+            hopIndex,
+            h,
+          });
+          break;
+        case "none":
+          exitPlot();
+          break;
+        default:
+          console.error("Unknown plot type selected");
+      }
+    }
+
+    // Update crosshairs
+    if (changes.age || changes.sleepTime || changes.tooltipText) {
+      updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w);
+    }
+
+    setStableStepProps(stepProps);
   }
-
-  drawGroupedPercentileLines(svg, {
-    dataSet,
-    showPercentiles: stepProps.showPercentiles,
-    xScaleSVG,
-    yScaleSVG,
-  });
-
-  updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w);
-}
-
-function updateDomain({ domain }) {
-  // Update scales
-  xScaleSVG.domain(domain.xDomain);
-  yScaleSVG.domain(domain.yDomain);
-
-  updatePointcloudScales(pointcloud, {
-    xScaleSVG,
-    yScaleSVG,
-  });
-
-  // Update axes
-  updateAxes(xScaleSVG, yScaleSVG);
-
-  // Draw percentile lines
-  /* drawGroupedPercentileLines(svg, {
-    dataSet,
-    showPercentiles: stepProps.showPercentiles,
-    xScaleSVG,
-    yScaleSVG,
-  }); */
-
-  updatePercentileLineScales(svg, { xScaleSVG, yScaleSVG });
-
-  // Update crosshairs
-  /* updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w); */
 }
 
 container.node().updateChart = updateChart;
-container.node().updateDomain = updateDomain;
 ```
 
 ```js
@@ -584,25 +593,9 @@ const chartValue = Generators.input(chartElement);
 const updateChart = chartElement.updateChart({
   data: dataSet.get(stepProps.age),
   stepProps,
+  changes,
   hopIndex: j,
 });
-```
-
-```js
-// Update chart domain only when necessary
-const updateDomain = chartElement.updateDomain({ domain });
-```
-
-```js
-// Reactive domain state
-const domain = Mutable(domainBase);
-const setDomain = (x) => (domain.value = x);
-```
-
-```js
-// Update domain only if it has changed
-JSON.stringify(domain) !== JSON.stringify(domainSettings[scrollyStep]) &&
-  setDomain(domainSettings[scrollyStep]);
 ```
 
 ```js
@@ -731,13 +724,13 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
     <h2>Über 66 Jahre</h2>
     <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
 </div> -->
-<div class="outro card">
+<!-- <div class="outro card">
   <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
   <h2>Die Gestaltung der Grafik war ansprechend.</h2>
   ${aestheticsInput}
   <h2>Das Thema hat mich interessiert.</h2>
   ${interestInput}
-</div>
+</div> -->
 
 <!-- CSS -->
 

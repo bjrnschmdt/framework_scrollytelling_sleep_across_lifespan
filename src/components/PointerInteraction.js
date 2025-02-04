@@ -100,11 +100,7 @@ export class PointerInteraction {
    */
   pointerMoved(event) {
     // Ignore invalid events or if interaction is not allowed
-    if (
-      !this.isValidEvent(event) ||
-      this.isPlotLocked ||
-      !this.isExplorable()
-    ) {
+    if (!this.isValidEvent(event) || this.isPlotLocked || !this.isExplorable) {
       return;
     }
 
