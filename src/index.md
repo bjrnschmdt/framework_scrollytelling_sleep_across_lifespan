@@ -693,7 +693,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
     <div id="answer">Super, die richtige Lösung ist ${Math.round(getTrueValue(dataSet, stepProps) * 100)}% Wenn du magst, versuche es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
     </div>
   </div>  
-  <div class="scroll-section card" data-step="8">Bewege den Cursor in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder.</div>
+  <div class="scroll-section card" data-step="8">Bewege den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder.</div>
   <div class="scroll-section card" data-step="9">
   <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
   <h2>Die Gestaltung der Grafik war ansprechend.</h2>
