@@ -47,6 +47,9 @@ export function setupIntersectionObserver({
           }
           setDisabled(false);
           set(estimateInput, 0);
+          for (const input of estimateInput.querySelectorAll("input")) {
+            input.disabled = false;
+          }
         }
       }
     });

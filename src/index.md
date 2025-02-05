@@ -629,13 +629,13 @@ setupIntersectionObserver({
 ```js
 const btnEstimate = (value) => {
   setDisabled(true);
-  const target = document.getElementById("answer");
-  target.style.display = "block";
-  const trueValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
-  console.log("trueValue", trueValue);
+  feedbackInput.style.display = "block";
+  for (const input of estimateInput.querySelectorAll("input")) {
+    input.disabled = true;
+  }
   logBtnEstimate({
     estimateValue,
-    trueValue,
+    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
     age: stepProps.age,
     sleepTime: stepProps.sleepTime,
   });
@@ -644,6 +644,27 @@ const btnEstimate = (value) => {
 ```
 
 <!-- HTML -->
+
+```js
+const feedbackInput = html`<div id="answer" style="display: none;"></div>`;
+const feedbackValue = Generators.input(feedbackInput);
+```
+
+```js
+feedbackInput.innerHTML = ""; // Clear existing content
+
+const trueValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
+const estimated = estimateValue;
+
+const message = document.createElement("p");
+message.textContent =
+  Math.abs(estimated - trueValue) <= 5
+    ? `Super, die richtige Lösung ist ${trueValue}%. Wenn du magst, versuche es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer.`
+    : `Die richtige Antwort ist ${trueValue}%. Wenn du magst, versuche es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer.`;
+
+feedbackInput.appendChild(message);
+feedbackInput.appendChild(scrollTo); // Append the button as an element
+```
 
 ```js
 // Get the div where the visualization description will be displayed
@@ -675,6 +696,10 @@ function updateVisualizationDescription(visualizationType) {
 updateVisualizationDescription(variant);
 ```
 
+```js
+
+```
+
 # Schlafdauer über die Lebensspanne
 
 Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so lange schlafen wie du? Und wie sieht es mit der Schlafdauer in der Gesamtbevölkerung so aus? Finde es mit unserer interaktiven Grafik heraus! Scrolle einfach nach unten - die Inhalte entfalten sich Schritt für Schritt, während du weiter scrollst.
@@ -689,10 +714,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.
   ${ageInput}${sleepTimeInput}</div>
   <div class="scroll-section card" data-step="6">Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</div> 
-  <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}
-    <div id="answer">Super, die richtige Lösung ist ${Math.round(getTrueValue(dataSet, stepProps) * 100)}% Wenn du magst, versuche es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer. Wenn du auf den Button klickst, scrollt die Seite wieder nach oben zur richtigen Stelle. Wenn du lieber fortfahren willst, scrolle wie gehabt weiter nach unten.${scrollTo}
-    </div>
-  </div>  
+  <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}${feedbackInput}</div>  
   <div class="scroll-section card" data-step="8">Bewege den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder.</div>
   <div class="scroll-section card" data-step="9">
   <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
