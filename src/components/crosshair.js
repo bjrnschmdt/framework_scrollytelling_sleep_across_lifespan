@@ -20,14 +20,14 @@ export function initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h) {
   const domainX = xScaleSVG.domain()[0];
   const domainY = yScaleSVG.domain()[1];
 
-  console.log("domainX", domainX);
-  console.log("domainY", domainY);
+  /* console.log("domainX", domainX);
+  console.log("domainY", domainY); */
 
   const x = Number(xScaleSVG(domainX));
   const y = Number(yScaleSVG(domainY));
 
-  console.log("x", x);
-  console.log("y", y);
+  /* console.log("x", x);
+  console.log("y", y); */
 
   const crosshair = svg.append("g").attr("class", "crosshair");
 

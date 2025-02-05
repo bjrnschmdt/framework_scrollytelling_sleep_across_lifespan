@@ -32,7 +32,7 @@ export default {
     "<div>🚧 This project is a work in progress. Please do not share the URL. 🚧</div>", // what to show in the header (HTML)
   footer: `<p>© <script>document.write(new Date().getFullYear());</script> <a href="https://www.kielscn.de">Kiel Science Communication Network</a>. Alle Rechte vorbehalten.</p>`, // what to show in the footer (HTML)
   sidebar: false, // whether to show the sidebar
-  // toc: true, // whether to show the table of contents
+  toc: false, // whether to show the table of contents
   pager: false, // whether to show previous & next links in the footer
   // output: "dist", // path to the output root for build
   search: true, // activate search

@@ -43,7 +43,7 @@ function enterDot(enter, context) {
     .attr("height", 2 * qradius)
     .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
     .style("stroke", "white")
-    .style("stroke-width", 3 * qradius);
+    .style("stroke-width", 1 * qradius);
 }
 
 function updateDot(update, context) {

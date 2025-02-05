@@ -1,5 +1,6 @@
 ---
-theme: [midnight, alt]
+theme: [midnight, alt, wide]
+toc: false
 ---
 
 ```js
@@ -60,14 +61,39 @@ const {
 const w = width;
 ```
 
-```js
+<!-- ```js
 // Reactive height based on orientation
 const h = (() => {
   const isLandscape = w > window.innerHeight;
   return isLandscape
-    ? /* (w / 3) * 2 */ window.innerHeight * relativeHeight
+    ? window.innerHeight * relativeHeight
     : window.innerHeight * relativeHeight; // 16:9 for landscape, 60vh for portrait
 })();
+``` -->
+
+<!-- ```js
+// Reactive height based on orientation
+const h = window.innerHeight;
+``` -->
+
+```js
+const h = Generators.observe((change) => {
+  // Define a function to notify the new height.
+  const notify = () => change(window.innerHeight);
+
+  // Set up the resize event listener.
+  window.addEventListener("resize", notify);
+
+  // Immediately notify the current height.
+  notify();
+
+  // Return a cleanup function that removes the event listener.
+  return () => window.removeEventListener("resize", notify);
+});
+```
+
+```js
+console.log("height", h);
 ```
 
 ```js
@@ -222,7 +248,7 @@ const scrollyProps = {
     ...baseStep,
     age: 31,
     sleepTime: 7,
-    showPointcloud: true,
+    showPointcloud: false,
     showPercentiles: ["C"],
     tooltipText: "Karin",
   },
@@ -365,7 +391,7 @@ const scrollTo = Inputs.button("Nochmal versuchen", {
   reduce: () => {
     logEvent("kielscn_schlafdauer_btn_retry");
     const target = document.getElementById("user-input");
-    target.scrollIntoView({ behavior: "smooth" });
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
   },
 });
 const scrollToValue = Generators.input(scrollTo);
@@ -408,7 +434,6 @@ const interestValue = Generators.input(interestInput);
 ```js
 const container = d3.create("div");
 container.style("position", "relative");
-container.style("background-color", `var(--theme-background)`);
 
 const canvas = container.append("canvas").node();
 const context = canvas.getContext("2d");
@@ -473,13 +498,20 @@ const pointerInteraction = new PointerInteraction(svg, {
   container,
 });
 
-/* const zoom = d3.zoom().scaleExtent([0.5, 8]).on("zoom", zoomed);
+/* const zoom = d3
+  .zoom()
+  .scaleExtent([1, 8])
+  .translateExtent([
+    [margin.left, margin.top],
+    [w, h],
+  ])
+  .on("zoom", zoomed);
 
 function zoomed({ transform }) {
   const zx = transform.rescaleX(xScaleSVG).interpolate(d3.interpolateRound);
-  const zy = transform.rescaleY(yScaleSVG).interpolate(d3.interpolateRound);
   gx.call(xAxis, zx);
-  gy.call(yAxis, zy);
+
+  updatePercentileLineScales(svg, { xScaleSVG: zx, yScaleSVG });
 }
 
 svg.call(zoom).call(zoom.transform, d3.zoomIdentity); */
@@ -768,7 +800,6 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
   position: sticky;
   top: 0;
   margin: 0 auto;
-  background-color: var(--theme-background-alt);
 }
 
 .scroll-info,
@@ -777,7 +808,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 }
 .scroll-section {
   position:relative;
-  margin: 0 auto 60vh;
+  margin: 0 auto 50lvh;
   z-index: 2;
 }
 

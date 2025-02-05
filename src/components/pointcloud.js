@@ -52,11 +52,10 @@ export class Pointcloud {
    * Draws all points on the canvas at the specified alpha transparency.
    */
   draw(alpha) {
-    // Clear the canvas to avoid ghosting
-    this.context.fillStyle = this.colors.background;
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    // Clear the canvas by making it fully transparent
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Set the point color and transparency
+    // Set the point color to white and transparency
     this.context.fillStyle = this.colors.text;
     this.context.globalAlpha = alpha;
 
@@ -119,8 +118,7 @@ export class Pointcloud {
         requestAnimationFrame(fade);
       } else {
         // Once fully faded, clear the canvas
-        this.context.fillStyle = this.colors.background;
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       }
     };
 
