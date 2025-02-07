@@ -4,10 +4,10 @@ import { Generators } from "npm:@observablehq/stdlib";
 const relativeHeight = 0.6;
 
 const margin = {
-  top: 64,
-  right: 16,
-  bottom: 64,
-  left: 16,
+  top: 32,
+  right: 0,
+  bottom: 32,
+  left: 0,
 };
 
 const lineWidths = {

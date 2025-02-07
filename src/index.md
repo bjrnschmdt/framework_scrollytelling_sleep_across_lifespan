@@ -62,14 +62,30 @@ const w = width;
 ```
 
 <!-- ```js
-// Reactive height based on orientation
-const h = (() => {
-  const isLandscape = w > window.innerHeight;
-  return isLandscape
-    ? window.innerHeight * relativeHeight
-    : window.innerHeight * relativeHeight; // 16:9 for landscape, 60vh for portrait
-})();
+w;
+const h = window.innerHeight;
 ``` -->
+
+```js
+const scrollInfo = d3.select(".scroll-info"); // Adjust selector as needed
+```
+
+```js
+const initialVH = window.innerHeight; // Store initial height
+```
+
+```js
+const currentVH = h;
+
+// Calculate the necessary margin shift (negative to compensate for increased height)
+const marginCompensation = initialVH - currentVH;
+console.log("Margin compensation:", marginCompensation);
+scrollInfo.style("margin-bottom", `${marginCompensation}px`);
+```
+
+```js
+console.log("height", h);
+```
 
 <!-- ```js
 // Reactive height based on orientation
@@ -93,15 +109,15 @@ const h = Generators.observe((change) => {
 ```
 
 ```js
-console.log("height", h);
-```
-
-```js
 const { xScaleSVG, yScaleSVG, timeScale } = createScales({ w, h });
 ```
 
 ```js
 const variant = getURLParameter("v") || "dot";
+```
+
+```js
+logEvent("kielscn_schlafdauer_type", { type: variant });
 ```
 
 ```js
@@ -287,50 +303,35 @@ const scrollyProps = {
   },
   9: {
     ...baseStep,
-    age: chartValue.age,
-    sleepTime: chartValue.sleepTime,
     showPointcloud: true,
     showPercentiles: ["C"],
-    isExplorable: true,
     variant,
   },
   10: {
     ...baseStep,
-    age: chartValue.age,
-    sleepTime: chartValue.sleepTime,
     showPointcloud: true,
     showPercentiles: ["C"],
-    isExplorable: true,
     variant,
     xDomain: [5, 10],
   },
   11: {
     ...baseStep,
-    age: chartValue.age,
-    sleepTime: chartValue.sleepTime,
     showPointcloud: true,
     showPercentiles: ["C"],
-    isExplorable: true,
     variant,
     xDomain: [11, 17],
   },
   12: {
     ...baseStep,
-    age: chartValue.age,
-    sleepTime: chartValue.sleepTime,
     showPointcloud: true,
     showPercentiles: ["C"],
-    isExplorable: true,
     variant,
     xDomain: [18, 65],
   },
   13: {
     ...baseStep,
-    age: chartValue.age,
-    sleepTime: chartValue.sleepTime,
     showPointcloud: true,
     showPercentiles: ["C"],
-    isExplorable: true,
     variant,
     xDomain: [66, 94],
   },
@@ -557,8 +558,8 @@ function updateChart({ data, stepProps, changes, hopIndex }) {
     }
 
     // Update exploration mode
-    if (changes.isExplorable) {
-      pointerInteraction.isExplorable = () => stepProps?.isExplorable || false;
+    if ("isExplorable" in changes) {
+      pointerInteraction.isExplorable = stepProps?.isExplorable || false;
     }
 
     // Update type specific plot
@@ -738,16 +739,17 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 
 <section class="scroll-container">
   <div class="scroll-info">${chartElement}</div>
-  <div class="scroll-section card" data-step="1">Auf der Y-Achse links ist die Schlafdauer eingetragen, unten auf der X-Achse das Alter.</div>
-  <div class="scroll-section card" data-step="2">Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000 Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert. Die Daten der Erwachsenen beruhen auf Selbsteinschätzungen, die der Kinder auf Angaben der Eltern. Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen: Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig.</div>
-  <div class="scroll-section card" data-step="3">Die Linien geben Perzentile an und zeigen, wie sich die Datenpunkte in der Stichprobe verteilen. Was das konkret heißt, siehst du im folgenden Bild:</div>
-  <div class="scroll-section card" data-step="4">Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</div>
-   <div class="scroll-section card" data-step="5" id="user-input">
-  Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.
+  <div class="scroll-section card" data-step="1"><p>Auf der Y-Achse links ist die Schlafdauer eingetragen, unten auf der X-Achse das Alter.</p></div>
+  <div class="scroll-section card" data-step="2"><p>Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000 Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert. Die Daten der Erwachsenen beruhen auf Selbsteinschätzungen, die der Kinder auf Angaben der Eltern. Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen: Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig.</p></div>
+  <div class="scroll-section card" data-step="3"><p>Die Linien geben Perzentile an und zeigen, wie sich die Datenpunkte in der Stichprobe verteilen. Was das konkret heißt, siehst du im folgenden Bild:</p></div>
+  <div class="scroll-section card" data-step="4"><p>Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p></div>
+   <div class="scroll-section card" data-step="5" id="user-input"><p>
+  Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.</p>
   ${ageInput}${sleepTimeInput}</div>
-  <div class="scroll-section card" data-step="6">Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</div> 
-  <div class="scroll-section card" data-step="7">Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}${feedbackInput}</div>  
-  <div class="scroll-section card" data-step="8">Bewege den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder.</div>
+  <div class="scroll-section card" data-step="6">
+  <p>Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</p></div> 
+  <div class="scroll-section card" data-step="7"><p>Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}${feedbackInput}</div>  
+  <div class="scroll-section card" data-step="8"><p>Bewege den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder.</div>
   <div class="scroll-section card" data-step="9">
   <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
   <h2>Die Gestaltung der Grafik war ansprechend.</h2>
@@ -768,16 +770,6 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
     <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
 </div>
 </section>
-<!-- <div class="outro card">
-    <h2>Altersgruppe bis 10 Jahre</h2>
-    <p> Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
-    <h2>11–17 Jahre</h2>
-    <p>Während der Pubertät fällt die Schlafdauer dramatisch ab; gleichzeitig nimmt die Streuung zu. Da sich in dieser Phase die innere Uhr meist auf spätere Bettzeiten einstellt, die Schule aber in der Regel früh beginnt, bekommen Jugendliche oft weniger Schlaf, als es Fachleute empfehlen.</p>
-    <h2>18–65 Jahre</h2>
-    <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7 Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
-    <h2>Über 66 Jahre</h2>
-    <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
-</div> -->
 <!-- <div class="outro card">
   <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
   <h2>Die Gestaltung der Grafik war ansprechend.</h2>
@@ -804,25 +796,26 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 
 .scroll-info,
 .scroll-section {
-  transition: all 0.3s ease;
+  /* transition: all 0.3s ease; */
 }
 .scroll-section {
-  position:relative;
-  margin: 0 auto 50lvh;
+  position: relative;
+  margin: 0 auto 80svh;
   z-index: 2;
+  opacity: 1;
 }
 
 .card {
   max-width: 32rem;
 }
 
-.scroll-section.inactive {
+.scroll-section.inactive > * {
   opacity: 0.5; /* Adjust to desired dimming level */
   transition: opacity 0.3s ease; /* Smooth transition */
 }
 
 .scroll-section:last-of-type {
-  margin-bottom: 60vh;
+  margin-bottom: 80svh;
 }
 
 .outro {
