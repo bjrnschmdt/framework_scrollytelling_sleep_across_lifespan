@@ -79,18 +79,9 @@ const currentVH = h;
 
 // Calculate the necessary margin shift (negative to compensate for increased height)
 const marginCompensation = initialVH - currentVH;
-console.log("Margin compensation:", marginCompensation);
+/* console.log("Margin compensation:", marginCompensation); */
 scrollInfo.style("margin-bottom", `${marginCompensation}px`);
 ```
-
-```js
-console.log("height", h);
-```
-
-<!-- ```js
-// Reactive height based on orientation
-const h = window.innerHeight;
-``` -->
 
 ```js
 const h = Generators.observe((change) => {
@@ -199,7 +190,6 @@ function diffStepProps(newProps, oldProps) {
       diff[key] = { old: oldProps[key], new: newProps[key] };
     }
   }
-
   return diff;
 }
 ```
@@ -216,11 +206,16 @@ const setStableStepProps = (x) => (stableStepProps.value = x);
 ```
 
 ```js
-const changes = diffStepProps(stepProps, stableStepProps);
+// reset the stableStepProps to the baseStep on resize
+// This is a quick and dirty way to reset the stableStepProps on resize
+// I might want to do this in a more controlled way
+// maybe adding debounce to the resize event
+w, h;
+setStableStepProps(baseStep);
 ```
 
 ```js
-/* console.log("Changes:", changes); */
+const changes = diffStepProps(stepProps, stableStepProps);
 ```
 
 ```js
