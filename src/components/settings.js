@@ -36,8 +36,8 @@ const nthresholdsSleep = 36;
 const thresholdsSleep = d3.range(sleepMin, sleepMax + sleepStep, sleepStep);
 
 const ageMin = 5;
-const ageMax = 95;
-const nthresholdsAge = 90;
+const ageMax = 96;
+const nthresholdsAge = 91;
 const thresholdsAge = d3.ticks(ageMin, ageMax, nthresholdsAge);
 const fontFamily = "Roboto";
 const fontSize = "12px";

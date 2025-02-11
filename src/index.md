@@ -238,8 +238,9 @@ const baseStep = {
   tooltipText: undefined,
   isExplorable: false,
   variant: "none",
-  xDomain: [5, 94],
+  xDomain: [5, 95],
   yDomain: [4, 13],
+  mobileTicks: d3.ticks(5, 95, 18), // 18/5, 45/2, 90/1
 };
 ```
 
@@ -309,6 +310,7 @@ const scrollyProps = {
     showPercentiles: ["C"],
     variant,
     xDomain: [5, 10],
+    mobileTicks: d3.ticks(5, 95, 90),
   },
   11: {
     ...baseStep,
@@ -316,6 +318,7 @@ const scrollyProps = {
     showPercentiles: ["C"],
     variant,
     xDomain: [11, 17],
+    mobileTicks: d3.ticks(5, 95, 90),
   },
   12: {
     ...baseStep,
@@ -323,6 +326,7 @@ const scrollyProps = {
     showPercentiles: ["C"],
     variant,
     xDomain: [18, 65],
+    mobileTicks: d3.ticks(5, 95, 90),
   },
   13: {
     ...baseStep,
@@ -330,6 +334,7 @@ const scrollyProps = {
     showPercentiles: ["C"],
     variant,
     xDomain: [66, 94],
+    mobileTicks: d3.ticks(5, 95, 90),
   },
 };
 ```
@@ -550,7 +555,6 @@ function updateChart({
   newWidth,
   newHeight,
 }) {
-  console.log("updateChart", stepProps);
   canvas.width = newWidth * canvasScaleFactor;
   canvas.height = newHeight * canvasScaleFactor;
 
@@ -576,6 +580,7 @@ function updateChart({
     showPercentiles: stepProps.showPercentiles,
     xScaleSVG,
     yScaleSVG,
+    tickValues: stepProps.mobileTicks,
   });
 
   // Update only if there are changes
@@ -584,11 +589,9 @@ function updateChart({
 
     // Update if the domain has changed
     if (changes.xDomain || changes.yDomain) {
-      console.log("Ticks before", xScaleSVG.ticks());
       // Update scales
       xScaleSVG.domain(stepProps.xDomain);
       yScaleSVG.domain(stepProps.yDomain);
-      console.log("Ticks after", xScaleSVG.ticks());
 
       /* updatePercentileLineScalesWithTicks(svg, {
         dataSet,

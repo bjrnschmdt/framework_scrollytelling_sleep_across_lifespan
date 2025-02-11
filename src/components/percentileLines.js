@@ -53,6 +53,44 @@ const flattenData = (dataSet) => {
 };
 
 /**
+ * Filters the flattened data by sampling every Nth data point based on the step
+ * between ticks. In other words, if the tick step is 10, only data points whose
+ * x value (age) lies on a grid defined by (domainMin + n*step) are kept.
+ *
+ * @param {Array<Object>} flatData - Flattened data array.
+ * @param {Function} xScaleSVG - The x scale.
+ * @param {number} tickCount - The desired number of ticks.
+ * @returns {Array<Object>} Filtered data array.
+ */
+const filterDataByTickStep = (flatData, xScaleSVG, tickCount) => {
+  const [domainMin, domainMax] = xScaleSVG.domain();
+
+  // Compute the tick step using d3.tickStep
+  const step = d3.tickStep(domainMin, domainMax, tickCount);
+
+  // Filter the data: keep data points whose (age - domainMin)/step is nearly an integer.
+  return flatData.filter((d) => {
+    const relative = (d.age - domainMin) / step;
+    return Math.abs(relative - Math.round(relative)) < 1e-6;
+  });
+};
+
+/**
+ * Filters the flattened data by keeping only data points whose age matches one of the given tick values.
+ *
+ * @param {Array<Object>} flatData - Flattened data array.
+ * @param {Array<number>} tickValues - Array of tick values to filter by.
+ * @returns {Array<Object>} Filtered data array.
+ */
+const filterDataByTickValues = (flatData, tickValues) => {
+  // Convert the tick array into a Set for fast lookup
+  const tickSet = new Set(tickValues);
+
+  // Filter the data: keep only data points whose age is in the tickSet.
+  return flatData.filter((d) => tickSet.has(d.age));
+};
+
+/**
  * Draws (or updates) the percentile lines (each as a path element) within a single container group.
  *
  * The data is first flattened, then filtered by the tick step, and finally grouped by percentile.
@@ -67,7 +105,7 @@ const flattenData = (dataSet) => {
  */
 export const drawPercentiles = (
   group,
-  { dataSet, showPercentiles, xScaleSVG, yScaleSVG }
+  { dataSet, showPercentiles, xScaleSVG, yScaleSVG, tickValues, tickCount }
 ) => {
   const lineGen = d3
     .line()
@@ -78,8 +116,18 @@ export const drawPercentiles = (
   // Flatten the data and filter it based on the tick step.
   const flatData = flattenData(dataSet);
 
+  const filteredDataByTickStep = filterDataByTickStep(
+    flatData,
+    xScaleSVG,
+    tickCount
+  );
+  const filteredDataByTickValues = filterDataByTickValues(flatData, tickValues);
+
   // Group the filtered data by percentile.
-  const groupedByPercentile = d3.groups(flatData, (d) => d.percentile);
+  const groupedByPercentile = d3.groups(
+    filteredDataByTickValues,
+    (d) => d.percentile
+  );
 
   // Filter groups based on the showPercentiles criteria.
   const visiblePercentiles = groupedByPercentile.filter(
