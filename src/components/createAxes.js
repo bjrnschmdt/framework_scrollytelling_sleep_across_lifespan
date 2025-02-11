@@ -4,6 +4,18 @@ import { settings } from "./settings.js";
 import { formatTime } from "./helperFunctions.js";
 
 const { margin, fontSize, fontFamily } = settings;
+const duration = 400;
+
+// Helper function to style the x-axis
+function styleXAxis(g) {
+  g.selectAll(".tick text")
+    .style("fill", "white")
+    .style("font", `${fontSize} ${fontFamily}`);
+
+  /* g.selectAll(".tick:first-of-type text").style("text-anchor", "start"); */
+  g.selectAll(".tick line").attr("stroke", "white");
+  g.select(".domain").attr("stroke", "white");
+}
 
 // Helper function to style the y-axis
 function styleYAxis(g, { w }) {
@@ -17,23 +29,14 @@ function styleYAxis(g, { w }) {
     .style("paint-order", "stroke");
 
   g.selectAll(".tick line")
+    .transition()
+    .duration(100)
     .attr("x1", 0)
     .attr("x2", w - margin.left - margin.right)
     .attr("stroke-opacity", 0.4)
     .attr("stroke-dasharray", "2,2");
 
   g.select(".domain").remove(); // Remove the axis line
-}
-
-// Helper function to style the x-axis
-function styleXAxis(g) {
-  g.selectAll(".tick text")
-    .style("fill", "white")
-    .style("font", `${fontSize} ${fontFamily}`);
-
-  /* g.selectAll(".tick:first-of-type text").style("text-anchor", "start"); */
-  g.selectAll(".tick line").attr("stroke", "white");
-  g.select(".domain").attr("stroke", "white");
 }
 
 export function createAxes(svg, { xScaleSVG, yScaleSVG, w, h }) {
@@ -71,18 +74,19 @@ export function createAxes(svg, { xScaleSVG, yScaleSVG, w, h }) {
     gy,
     xAxis,
     yAxis,
-    updateAxes: (x, y) => {
+    updateAxes: (x, y, newWidth, newHeight) => {
       gx.transition()
-        .duration(1000)
+        .duration(600)
+        .attr("transform", `translate(0,${newHeight - margin.bottom})`)
         .call(xAxis, x)
         .selection()
         .call(styleXAxis); // Reapply styles for the x-axis
 
       gy.transition()
-        .duration(1000)
+        .duration(600)
         .call(yAxis, y)
         .selection()
-        .call((g) => styleYAxis(g, { w })); // Reapply styles for the y-axis
+        .call((g) => styleYAxis(g, { w: newWidth })); // Reapply styles for the y-axis
     },
   };
 }

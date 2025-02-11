@@ -22,8 +22,9 @@ import { createAxes } from "./components/createAxes.js";
 import { Pointcloud } from "./components/pointcloud.js";
 /* import PercentileLines from "./components/PercentileLines.js"; */
 import {
+  drawPercentiles,
   drawGroupedPercentileLines,
-  updatePercentileLineScales,
+  updatePercentileLineScalesWithTicks,
 } from "./components/percentileLines.js";
 import { drawRecommendedArea } from "./components/recommendedArea.js";
 import { updatePlot, exitPlot } from "./components/plot.js";
@@ -75,7 +76,7 @@ const initialVH = window.innerHeight; // Store initial height
 ```
 
 ```js
-const currentVH = h;
+const currentVH = height;
 
 // Calculate the necessary margin shift (negative to compensate for increased height)
 const marginCompensation = initialVH - currentVH;
@@ -84,7 +85,7 @@ scrollInfo.style("margin-bottom", `${marginCompensation}px`);
 ```
 
 ```js
-const h = Generators.observe((change) => {
+const height = Generators.observe((change) => {
   // Define a function to notify the new height.
   const notify = () => change(window.innerHeight);
 
@@ -100,7 +101,7 @@ const h = Generators.observe((change) => {
 ```
 
 ```js
-const { xScaleSVG, yScaleSVG, timeScale } = createScales({ w, h });
+/* const { xScaleSVG, yScaleSVG, timeScale } = createScales({ w, h }); */
 ```
 
 ```js
@@ -210,7 +211,7 @@ const setStableStepProps = (x) => (stableStepProps.value = x);
 // This is a quick and dirty way to reset the stableStepProps on resize
 // I might want to do this in a more controlled way
 // maybe adding debounce to the resize event
-w, h;
+/* width, height; */
 setStableStepProps(baseStep);
 ```
 
@@ -428,6 +429,14 @@ const interestValue = Generators.input(interestInput);
 <!-- Main Visualization code -->
 
 ```js
+const initialWidth = document
+  .querySelector("main")
+  .getBoundingClientRect().width;
+const initialHeight = window.innerHeight;
+```
+
+```js
+console.log("block rerun");
 const container = d3.create("div");
 container.style("position", "relative");
 
@@ -440,55 +449,76 @@ container.node().value = {
   sleepTime: undefined,
 };
 
-canvas.width = w * canvasScaleFactor;
-canvas.height = h * canvasScaleFactor;
+console.log("main:", initialWidth, initialHeight);
 
-canvas.style.width = `${w}px`;
-canvas.style.height = `${h}px`;
+canvas.width = initialWidth * canvasScaleFactor;
+canvas.height = initialHeight * canvasScaleFactor;
+
+canvas.style.width = `${initialWidth}px`;
+canvas.style.height = `${initialHeight}px`;
 
 const svg = container
   .append("svg")
   .attr("class", "svg")
-  .attr("width", w)
-  .attr("height", h)
+  .attr("width", initialWidth)
+  .attr("height", initialHeight)
   .style("position", "absolute")
   .style("top", "0px")
   .style("left", "0px");
 
 const defs = svg.append("defs");
 
-defs
+const clipPath = defs
   .append("clipPath")
   .attr("id", "plot-clip")
   .append("rect")
   .attr("x", margin.left)
   .attr("y", margin.top)
-  .attr("width", w - margin.left - margin.right)
-  .attr("height", h - margin.top - margin.bottom);
+  .attr("width", initialWidth - margin.left - margin.right)
+  .attr("height", initialHeight - margin.top - margin.bottom);
 
-const pointcloud = new Pointcloud(context, canvas, {
+const { xScaleSVG, yScaleSVG, timeScale } = createScales({
+  w: initialWidth,
+  h: initialHeight,
+});
+
+/* const pointcloud = new Pointcloud(context, canvas, {
   simulatedData,
   xScale: xScaleSVG,
   yScale: yScaleSVG,
-});
-
-/* const percentileLines = new PercentileLines(svg, { xScaleSVG, yScaleSVG }); */
+}); */
 
 // Create Axes
-const { gx, gy, xAxis, yAxis, updateAxes } = createAxes(svg, {
+const { gx, gy, xAxis, yAxis, updateAxes /* , styleYAxis  */ } = createAxes(
+  svg,
+  {
+    xScaleSVG,
+    yScaleSVG,
+    w: initialWidth,
+    h: initialHeight,
+  }
+);
+
+const percentilesGroup = svg
+  .append("g")
+  .attr("class", "percentiles")
+  .attr("clip-path", "url(#plot-clip)");
+
+const crosshair = initializeCrosshair(
+  svg,
   xScaleSVG,
   yScaleSVG,
-  w,
-  h,
-});
+  initialWidth,
+  initialHeight
+);
 
-const crosshair = initializeCrosshair(svg, xScaleSVG, yScaleSVG, w, h);
+const { crosshairXLine, crosshairYLine } = crosshair;
 
 // Setup the pointer interactions like pointerMoved and pointerClicked
 const pointerInteraction = new PointerInteraction(svg, {
   margin,
-  w,
-  h,
+  w: initialWidth,
+  h: initialHeight,
   xScaleSVG,
   yScaleSVG,
   container,
@@ -512,45 +542,88 @@ function zoomed({ transform }) {
 
 svg.call(zoom).call(zoom.transform, d3.zoomIdentity); */
 
-function updateChart({ data, stepProps, changes, hopIndex }) {
+function updateChart({
+  data,
+  stepProps,
+  changes,
+  hopIndex,
+  newWidth,
+  newHeight,
+}) {
+  console.log("updateChart", stepProps);
+  canvas.width = newWidth * canvasScaleFactor;
+  canvas.height = newHeight * canvasScaleFactor;
+
+  canvas.style.width = `${newWidth}px`;
+  canvas.style.height = `${newHeight}px`;
+
+  svg.attr("width", newWidth).attr("height", newHeight);
+
+  clipPath
+    .attr("width", newWidth - margin.left - margin.right)
+    .attr("height", newHeight - margin.top - margin.bottom);
+
+  xScaleSVG.range([margin.left, newWidth - margin.right]);
+  yScaleSVG.range([newHeight - margin.bottom, margin.top]);
+
+  updateAxes(xScaleSVG, yScaleSVG, newWidth, newHeight);
+
+  // Update crosshairs
+  updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG);
+
+  drawPercentiles(percentilesGroup, {
+    dataSet,
+    showPercentiles: stepProps.showPercentiles,
+    xScaleSVG,
+    yScaleSVG,
+  });
+
   // Update only if there are changes
   if (Object.keys(changes).length > 0) {
     /* console.log("changes", changes); */
 
     // Update if the domain has changed
     if (changes.xDomain || changes.yDomain) {
+      console.log("Ticks before", xScaleSVG.ticks());
       // Update scales
       xScaleSVG.domain(stepProps.xDomain);
       yScaleSVG.domain(stepProps.yDomain);
+      console.log("Ticks after", xScaleSVG.ticks());
 
-      updatePercentileLineScales(svg, { xScaleSVG, yScaleSVG });
-
-      updatePointcloudScales(pointcloud, {
+      /* updatePercentileLineScalesWithTicks(svg, {
+        dataSet,
+        showPercentiles: stepProps.showPercentiles,
         xScaleSVG,
         yScaleSVG,
-      });
+        ticks: xScaleSVG.ticks(),
+      }); */
+
+      /* updatePointcloudScales(pointcloud, {
+        xScaleSVG,
+        yScaleSVG,
+      }); */
 
       // Update axes
-      updateAxes(xScaleSVG, yScaleSVG);
+      updateAxes(xScaleSVG, yScaleSVG, newWidth, newHeight);
 
       // Update crosshairs
-      updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w);
+      updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, newWidth);
     }
 
     // Update pointcloud visibility
-    if (changes.showPointcloud) {
+    /* if (changes.showPointcloud) {
       pointcloud.setVisibility(stepProps.showPointcloud);
-    }
+    } */
 
     // Update percentiles visibility
-    if (changes.showPercentiles) {
+    /* if (changes.showPercentiles) {
       drawGroupedPercentileLines(svg, {
         dataSet,
         showPercentiles: stepProps.showPercentiles,
         xScaleSVG,
         yScaleSVG,
       });
-    }
+    } */
 
     // Update exploration mode
     if ("isExplorable" in changes) {
@@ -564,7 +637,7 @@ function updateChart({ data, stepProps, changes, hopIndex }) {
           updatePercentilePlot(data, xScaleSVG, yScaleSVG);
           break;
         case "dot":
-          updateDotPlot(data, stepProps, xScaleSVG, yScaleSVG, h);
+          updateDotPlot(data, stepProps, xScaleSVG, yScaleSVG, newHeight);
           break;
         case "box":
           updateBoxPlot(data, xScaleSVG, yScaleSVG);
@@ -574,7 +647,7 @@ function updateChart({ data, stepProps, changes, hopIndex }) {
             xScaleSVG,
             yScaleSVG,
             hopIndex,
-            h,
+            h: newHeight,
           });
           break;
         case "hop_traced":
@@ -583,7 +656,7 @@ function updateChart({ data, stepProps, changes, hopIndex }) {
             yScaleSVG,
             hopCount,
             hopIndex,
-            h,
+            h: newHeight,
           });
           break;
         case "none":
@@ -596,7 +669,7 @@ function updateChart({ data, stepProps, changes, hopIndex }) {
 
     // Update crosshairs
     if (changes.age || changes.sleepTime || changes.tooltipText) {
-      updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, w);
+      updateCrosshairs(stepProps, crosshair, xScaleSVG, yScaleSVG, newWidth);
     }
 
     setStableStepProps(stepProps);
@@ -604,13 +677,14 @@ function updateChart({ data, stepProps, changes, hopIndex }) {
 }
 
 container.node().updateChart = updateChart;
+/* container.node().updateDimensions = updateDimensions; */
 ```
 
-```js
+<!-- ```js
 function updatePointcloudScales(pointcloud, { xScaleSVG, yScaleSVG }) {
   pointcloud.transitionScales(xScaleSVG.copy(), yScaleSVG.copy(), 1000); // Animate over 1 second
 }
-```
+``` -->
 
 ```js
 const chartElement = container.node();
@@ -623,6 +697,8 @@ const updateChart = chartElement.updateChart({
   stepProps,
   changes,
   hopIndex: j,
+  newWidth: width,
+  newHeight: height,
 });
 ```
 

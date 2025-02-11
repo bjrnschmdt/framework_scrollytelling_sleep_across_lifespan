@@ -131,8 +131,7 @@ export function updateCrosshairs(
     tooltipText,
   },
   xScaleSVG,
-  yScaleSVG,
-  w
+  yScaleSVG
 ) {
   let x = Number(xScaleSVG(data.age));
   let y = Number(yScaleSVG(data.sleepTime));
@@ -146,6 +145,8 @@ export function updateCrosshairs(
 
   const domainX = xScaleSVG.domain()[0];
   const domainY = yScaleSVG.domain()[1];
+  const rangeX = xScaleSVG.range()[1];
+  const rangeY = yScaleSVG.range()[0];
 
   // -------------------------
   // Tooltip visibility logic
@@ -165,7 +166,7 @@ export function updateCrosshairs(
     y = Number(yScaleSVG(domainY));
     textAge = domainX;
     textSleep = domainY;
-    duration = 400;
+    duration = 600;
     tickOpacity = 1;
     pointOpacity = 0;
     /* labelXOffset = 0; */
@@ -202,20 +203,27 @@ export function updateCrosshairs(
     .transition()
     .duration(duration)
     .attr("x", x)
+    .attr("y", rangeY)
     .attr("dx", labelXOffset)
     .text(`${ageFormat(textAge)} Jahre (Alter)`);
 
-  crosshairXLine.transition().duration(duration).attr("x1", x).attr("x2", x);
+  crosshairXLine
+    .transition()
+    .duration(duration)
+    .attr("x1", x)
+    .attr("x2", x)
+    .attr("y1", rangeY)
+    .attr("y2", rangeY + 6);
 
   // Move Y label & line
   crosshairYLabel
     .transition("dxTransitionLabel")
-    .duration(200)
-    .attr("x", intersect ? w - margin.right : margin.left);
+    .duration(duration)
+    .attr("x", intersect ? rangeX : margin.left);
 
   crosshairYLabel
     .transition("textanchorTransitionLabel")
-    .duration(100)
+    .duration(duration)
     .delay(100)
     .style("text-anchor", intersect ? "end" : "start");
 
@@ -225,5 +233,10 @@ export function updateCrosshairs(
     .attr("y", y)
     .text(`${formatTime(textSleep)} Stunden (Schlafdauer)`);
 
-  crosshairYLine.transition().duration(duration).attr("y1", y).attr("y2", y);
+  crosshairYLine
+    .transition()
+    .duration(duration)
+    .attr("x2", rangeX)
+    .attr("y1", y)
+    .attr("y2", y);
 }
