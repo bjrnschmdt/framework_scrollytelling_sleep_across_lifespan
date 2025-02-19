@@ -1,18 +1,8 @@
 // pointerInteraction.js
 import * as d3 from "npm:d3";
 
-import { createDebouncedLogger, set } from "./helperFunctions.js";
+import { createDebouncedLogger, set, roundToStep } from "./helperFunctions.js";
 import { logInteraction } from "./logger.js";
-
-/**
- * Utility function to round a value to the nearest step.
- * @param {number} value - The value to round.
- * @param {number} step - The step size for rounding.
- * @returns {number} - The rounded value.
- */
-function roundToStep(value, step) {
-  return Math.round(value / step) * step;
-}
 
 /**
  * PointerInteraction handles pointer-based interactivity (mouse/touch) for an SVG element.

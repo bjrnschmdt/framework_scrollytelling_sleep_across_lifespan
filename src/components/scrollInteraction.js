@@ -1,5 +1,8 @@
 import * as d3 from "npm:d3";
-import { createDebouncedLogger, set } from "./helperFunctions.js";
+import { createDebouncedLogger, set, roundToStep } from "./helperFunctions.js";
+import { settings } from "./settings.js";
+
+const { sleepMin, sleepMax, margin } = settings;
 
 export class ScrollInteraction {
   /**
@@ -7,12 +10,14 @@ export class ScrollInteraction {
    * @param {HTMLElement} element - The scrollable container (default: `#body`).
    * @param {Object} chartElement - Observable's reactive chart object.
    * @param {Function} xScaleSVG - D3 scale function mapping age to pixel position.
+   * @param {Function} yScaleSVG - D3 scale mapping the chart's vertical range.
    * @param {number} width - The width of the container.
    */
   constructor(
     element = document.querySelector("#body"),
     chartElement,
     xScaleSVG,
+    yScaleSVG,
     width
   ) {
     // Scroll container element (default: #body)
@@ -23,6 +28,7 @@ export class ScrollInteraction {
 
     // D3 scale function mapping age to horizontal pixel position
     this.xScaleSVG = xScaleSVG;
+    this.yScaleSVG = yScaleSVG;
 
     // Width of the scrollable area
     this.width = width;
@@ -36,7 +42,34 @@ export class ScrollInteraction {
     this.scrollLeft = 0; // Stores current scroll position
     this.updateSource = null; // Track the source of updates (either 'scroll' or 'slider')
 
+    // Add debounced vertical scroll listener for sleepTime updates.
+    // This will update chartValue.sleepTime when the window scroll is within the defined area.
+    this.debouncedVerticalScroll = this.debounce(
+      this.handleVerticalScroll.bind(this),
+      100
+    );
+    window.addEventListener(
+      "scroll",
+      /* this.debouncedVerticalScroll */ this.handleVerticalScroll.bind(this)
+    );
+
     this.init(); // Attach event listeners
+  }
+
+  /**
+   * A simple debounce helper.
+   * @param {Function} func - The function to debounce.
+   * @param {number} wait - Delay in milliseconds.
+   * @returns {Function}
+   */
+  debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        func.apply(this, args);
+      }, wait);
+    };
   }
 
   /**
@@ -209,4 +242,74 @@ export class ScrollInteraction {
     this.isTransitioning = isTransitioning;
     console.log(`Transition state set to: ${isTransitioning}`);
   } */
+
+  /**
+   * Checks the vertical scroll position of the page and,
+   * if it falls between the lower boundary of the element with data-step="8"
+   * and the upper boundary of the element with data-step="9",
+   * calculates a new sleepTime value (with an offset so that the effective scroll
+   * position is centered on the chart) and updates the chartElement.
+   */
+  handleVerticalScroll() {
+    if (!this.isExplorable) {
+      return;
+    }
+    // Select the two step elements
+    const step8 = document.querySelector('[data-step="8"]');
+    const step9 = document.querySelector('[data-step="9"]');
+    if (!step8 || !step9) return;
+
+    // Get the absolute positions for step8 and step9
+    const step8Rect = step8.getBoundingClientRect();
+    const step9Rect = step9.getBoundingClientRect();
+    const lowerBoundary = step8Rect.bottom + window.scrollY;
+    const upperBoundary = step9Rect.top + window.scrollY;
+
+    // Calculate the offset based on the chart's vertical range and top margin:
+    const chartRange = this.yScaleSVG.range();
+    const chartHeight = Math.abs(chartRange[1] - chartRange[0]);
+    const offset = chartHeight / 2 + margin.top;
+
+    // Adjust currentScrollY so that it reflects the center of the chart.
+    const currentScrollY = window.scrollY + offset;
+    /* console.log(
+      "Adjusted vertical scroll:",
+      currentScrollY,
+      " (window.scrollY + offset:",
+      window.scrollY,
+      "+",
+      offset,
+      ")"
+    ); */
+
+    // Only update if within the desired vertical range
+    if (currentScrollY >= lowerBoundary && currentScrollY <= upperBoundary) {
+      // Create a linear scale mapping the vertical scroll position to sleepTime
+      const sleepScale = d3
+        .scaleLinear()
+        .domain([lowerBoundary, upperBoundary])
+        .range([sleepMin, sleepMax])
+        .clamp(true);
+      const newSleepTimeUnrounded = sleepScale(currentScrollY);
+      const newSleepTime = roundToStep(newSleepTimeUnrounded, 0.25);
+      console.log("newSleepTime", newSleepTime);
+
+      // Update chartElement.sleepTime only if it has changed
+      if (this.chartElement.value.sleepTime !== newSleepTime) {
+        set(this.chartElement, {
+          ...this.chartElement.value,
+          sleepTime: newSleepTime,
+        });
+      }
+    }
+  }
+
+  // --- (Optional) Clean up when the component is unmounted ---
+  destroy() {
+    window.removeEventListener(
+      "scroll",
+      /* this.debouncedVerticalScroll */ this.handleVerticalScroll.bind(this)
+    );
+    // Remove any other event listeners if necessary.
+  }
 }

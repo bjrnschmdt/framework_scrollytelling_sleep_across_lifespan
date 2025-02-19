@@ -357,9 +357,17 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 9,
     height: height,
+    age: chartValue.age,
+    sleepTime: chartValue.sleepTime,
     showPointcloud: true,
     showPercentiles: ["C"],
+    isExplorable: true,
     variant,
+    xDomain: isEnhanced
+      ? baseStep.xDomain
+      : [chartValue.age - 5, chartValue.age + 5],
+    mobileTicks: d3.ticks(5, 95, 90),
+    triggerSource: "scroll",
   },
   10: {
     ...baseStep,
@@ -622,6 +630,7 @@ if (isEnhanced) {
     body.node(),
     container.node(),
     xScaleSVG,
+    yScaleSVG,
     width
   );
 }
@@ -630,74 +639,73 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
   console.log("updateChart");
   console.log("changes", changes);
 
-  const isScrolling = !isEnhanced ? scrollInteraction.getScrollState() : false; // Fetch only if mobile
-
-  // if height of domain changes
-  if (changes?.height || changes?.xDomain) {
-    const newHeight = stepProps.height;
-
-    // calculating the absolute domain for calculating new total width
-    const { totalWidth } = updateXDomain(xScaleSVG, stepProps, width, margin);
-
-    yScaleSVG.range([newHeight - margin.bottom, margin.top]); // dimension change
-
-    canvas.width = totalWidth * canvasScaleFactor; // domain change
-    canvas.height = newHeight * canvasScaleFactor; // domain change
-
-    canvas.style.width = `${totalWidth}px`; // domain change
-    canvas.style.height = `${newHeight}px`; // domain change
-
-    svg
-      .transition("updateDimensions")
-      .duration(600)
-      .attr("width", totalWidth)
-      .attr("height", newHeight); // domain change
-    yAxisSVG.attr("width", width).attr("height", newHeight); // dimension change
-
-    clipPath
-      .attr("width", totalWidth - margin.left - margin.right)
-      .attr("height", newHeight - margin.top - margin.bottom);
-
-    if (isEnhanced) {
-      pointerInteraction.setDimensions(width, newHeight);
-    }
-
-    updateAxes(xScaleSVG, yScaleSVG, width, newHeight);
-
-    // Update crosshairs
-    updateCrosshairs(
-      stepProps,
-      crosshair,
-      xScaleSVG,
-      yScaleSVG,
-      isEnhanced,
-      600
-    );
-
-    drawPercentiles(percentilesGroup, {
-      dataSet,
-      showPercentiles: stepProps.showPercentiles,
-      xScaleSVG,
-      yScaleSVG,
-      tickValues: stepProps.mobileTicks,
-    });
-
-    const duration = stepProps.triggerSource === "slider" ? 100 : 600;
-
-    if (!isEnhanced) {
-      scrollInteraction.programmaticScroll(stepProps.xDomain[0], duration);
-    } else {
-      programmaticScroll({
-        targetDomainLeft: stepProps.xDomain[0],
-        element: body.node(),
-        xScale: xScaleSVG,
-        duration: 600,
-      });
-    }
-  }
-
   // Update only if there are changes
   if (Object.keys(changes).length > 0) {
+    console.log("inside if statement");
+    // if height of domain changes
+    if (changes?.height || changes?.xDomain) {
+      const newHeight = stepProps.height;
+
+      // calculating the absolute domain for calculating new total width
+      const { totalWidth } = updateXDomain(xScaleSVG, stepProps, width, margin);
+
+      yScaleSVG.range([newHeight - margin.bottom, margin.top]); // height change
+
+      canvas.width = totalWidth * canvasScaleFactor; // domain change
+      canvas.height = newHeight * canvasScaleFactor; // height change
+
+      canvas.style.width = `${totalWidth}px`; // domain change
+      canvas.style.height = `${newHeight}px`; // height change
+
+      svg
+        .transition("updateDimensions")
+        .duration(600)
+        .attr("width", totalWidth) // domain change
+        .attr("height", newHeight); // height change
+      yAxisSVG.attr("height", newHeight); // height change
+
+      clipPath
+        .attr("width", totalWidth - margin.left - margin.right) // domain change
+        .attr("height", newHeight - margin.top - margin.bottom); // height change
+
+      if (isEnhanced) {
+        pointerInteraction.setDimensions(width, newHeight);
+      }
+
+      updateAxes(xScaleSVG, yScaleSVG, width, newHeight);
+
+      // Update crosshairs
+      updateCrosshairs(
+        stepProps,
+        crosshair,
+        xScaleSVG,
+        yScaleSVG,
+        isEnhanced,
+        600
+      );
+
+      drawPercentiles(percentilesGroup, {
+        dataSet,
+        showPercentiles: stepProps.showPercentiles,
+        xScaleSVG,
+        yScaleSVG,
+        tickValues: stepProps.mobileTicks,
+      });
+
+      const duration = stepProps.triggerSource === "slider" ? 100 : 600;
+
+      if (!isEnhanced) {
+        scrollInteraction.programmaticScroll(stepProps.xDomain[0], duration);
+      } else {
+        programmaticScroll({
+          targetDomainLeft: stepProps.xDomain[0],
+          element: body.node(),
+          xScale: xScaleSVG,
+          duration: 600,
+        });
+      }
+    }
+
     // Update pointcloud visibility
     /* if (changes.showPointcloud) {
       pointcloud.setVisibility(stepProps.showPointcloud);

@@ -216,3 +216,13 @@ export function programmaticScroll({
       };
     });
 }
+
+/**
+ * Utility function to round a value to the nearest step.
+ * @param {number} value - The value to round.
+ * @param {number} step - The step size for rounding.
+ * @returns {number} - The rounded value.
+ */
+export function roundToStep(value, step) {
+  return Math.round(value / step) * step;
+}
