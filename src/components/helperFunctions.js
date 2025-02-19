@@ -178,11 +178,7 @@ export function createDebouncedLogger(callback, delay) {
  * @param {number} margin - Margin settings.
  * @returns {Object} - Returns { start, end, totalWidth }
  */
-export function updateXDomain(xScale, stepProps, changes, width, margin) {
-  const start = changes?.xDomain
-    ? xScale(changes.xDomain.old[0])
-    : xScale(stepProps.xDomain[0]);
-
+export function updateXDomain(xScale, stepProps, width, margin) {
   const absoluteDomain = stepProps.xDomain[1] - stepProps.xDomain[0];
   const domainWithOffset = ageMin + absoluteDomain;
   const newDomain = [ageMin, domainWithOffset];
@@ -196,9 +192,5 @@ export function updateXDomain(xScale, stepProps, changes, width, margin) {
     .domain([ageMin, ageMax - 1])
     .range([margin.left, totalWidth - margin.right]);
 
-  const end = changes?.xDomain
-    ? xScale(changes.xDomain.new[0])
-    : xScale(stepProps.xDomain[0]);
-
-  return { start, end, totalWidth };
+  return { totalWidth };
 }

@@ -28,9 +28,10 @@ export class ScrollInteraction {
     this.width = width;
 
     // State tracking
-    this.isScrolling = false; // Tracks whether scrolling is happening
+    this.isScrolling = false; // Tracks whether user scrolling is happening
     this.isExplorable = false; // Controls whether the user can scroll manually
-    this.isTransitioning = false; // Prevents updates during domain transitions
+    this.ignoreScrollEvent = false; // Prevents unwanted scroll events
+    /* this.isTransitioning = false; */ // Prevents updates during domain transitions
     this.lastTouchTime = 0; // Helps detect quick swipe gestures
     this.scrollTimeout = null; // Timeout for debounce-like scroll detection
     this.scrollLeft = 0; // Stores current scroll position
@@ -125,8 +126,15 @@ export class ScrollInteraction {
   } */
 
   handleScroll() {
-    if (this.isTransitioning || this.updateSource === "slider") return;
-
+    // Skip processing if a programmatic scroll was just triggered
+    if (
+      /* this.isTransitioning ||  */ this.updateSource === "slider" ||
+      this.ignoreScrollEvent
+    ) {
+      /* console.log("Ignoring scroll event"); */
+      return;
+    }
+    /* console.log("handleScroll called"); */
     this.isScrolling = true;
     this.updateSource = "scroll";
 
@@ -135,14 +143,14 @@ export class ScrollInteraction {
     );
 
     if (ageScroll !== this.chartElement.value.age) {
-      console.log("set ChartElement to ageScroll", ageScroll);
+      /* console.log("set ChartElement to ageScroll", ageScroll); */
       set(this.chartElement, { ...this.chartElement.value, age: ageScroll });
     }
 
     // Reset scrolling state after a delay
     clearTimeout(this.scrollTimeout);
     this.scrollTimeout = setTimeout(() => {
-      console.log("set isScrolling to false");
+      /* console.log("set isScrolling to false"); */
       this.isScrolling = false;
       this.updateSource = null;
     }, 150);
@@ -174,14 +182,22 @@ export class ScrollInteraction {
     this.element.scrollLeft = scrollValue;
   } */
 
-  programmaticScroll(targetAge, duration) {
+  programmaticScroll(targetDomainLeft, duration) {
     if (this.isScrolling) return;
+    /* console.log("programmaticScroll called"); */
 
     this.isTransitioning = true;
+    /* console.log("set isTransitioning to true"); */
     this.updateSource = "slider";
 
-    const targetScroll = this.xScaleSVG(targetAge) - this.width / 2;
+    // Set flag to ignore subsequent scroll events
+    this.ignoreScrollEvent = true;
+
+    // Use the provided left-bound value directly:
+    const targetScroll = this.xScaleSVG(targetDomainLeft);
     const element = this.element;
+    /* console.log("targetDomainLeft", targetDomainLeft);
+    console.log("targetScroll", targetScroll); */
 
     d3.transition()
       .duration(duration)
@@ -196,8 +212,14 @@ export class ScrollInteraction {
         };
       })
       .on("end", () => {
-        this.isTransitioning = false;
+        /* this.isTransitioning = false; */
         this.updateSource = null;
+        /* console.log("set isTransitioning to false"); */
+        // Clear the ignore flag after a short delay to allow the final scroll event to be suppressed
+        setTimeout(() => {
+          this.ignoreScrollEvent = false;
+          console.log("set ignoreScrollEvent to false");
+        }, 200);
       });
   }
 
@@ -223,8 +245,8 @@ export class ScrollInteraction {
    * Prevents unwanted updates during animations.
    * @param {boolean} isTransitioning - `true` to block updates, `false` otherwise.
    */
-  setTransitionState(isTransitioning) {
+  /* setTransitionState(isTransitioning) {
     this.isTransitioning = isTransitioning;
     console.log(`Transition state set to: ${isTransitioning}`);
-  }
+  } */
 }

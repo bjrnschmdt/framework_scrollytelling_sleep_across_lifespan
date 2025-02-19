@@ -133,7 +133,7 @@ const height = Generators.observe((change) => {
 ```
 
 ```js
-console.log("height", height);
+/* console.log("height", height); */
 ```
 
 <!-- ```js
@@ -206,6 +206,10 @@ logSectionVisible(scrollyStep);
 ```
 
 ```js
+/* console.log("scrollyStep", scrollyStep); */
+```
+
+```js
 const debouncedLoggers = {
   age: createDebouncedLogger((value) => logInput("age", value), 500),
   sleepTime: createDebouncedLogger(
@@ -216,7 +220,7 @@ const debouncedLoggers = {
 };
 ```
 
-```js
+<!-- ```js
 const debouncedWidth = createDebouncedLogger(
   (value) => console.log("width", value),
   500
@@ -225,7 +229,7 @@ const debouncedWidth = createDebouncedLogger(
 
 ```js
 debouncedWidth(width);
-```
+``` -->
 
 ```js
 debouncedLoggers.age(ageValue);
@@ -284,7 +288,7 @@ function diffStepProps(newProps, oldProps) {
 ```js
 const stableStepProps = Mutable(baseStep);
 const setStableStepProps = (x) => {
-  console.log("New stableStepProps value:", x);
+  /* console.log("New stableStepProps value:", x); */
   stableStepProps.value = x;
 };
 ```
@@ -292,7 +296,7 @@ const setStableStepProps = (x) => {
 ```js
 const prevDimensions = Mutable({ width: initialWidth, height: initialHeight });
 const setPrevDimensions = (x) => {
-  console.log("New prevDimensions value:", x);
+  /* console.log("New prevDimensions value:", x); */
   prevDimensions.value = x;
 };
 ```
@@ -338,27 +342,31 @@ const baseStep = {
   yDomain: [4, 13],
   mobileTicks: d3.ticks(5, 95, 18), // 18/5, 45/2, 90/1
   triggerSource: null,
+  height: initialHeight,
 };
 ```
 
 ```js
 const scrollyProps = {
-  0: { ...baseStep, scrollStep: 0 },
-  1: { ...baseStep, scrollStep: 1 },
+  0: { ...baseStep, scrollStep: 0, height: height },
+  1: { ...baseStep, scrollStep: 1, height: height },
   2: {
     ...baseStep,
     scrollStep: 2,
+    height: height,
     showPointcloud: true,
   },
   3: {
     ...baseStep,
     scrollStep: 3,
+    height: height,
     showPointcloud: true,
     showPercentiles: ["C"],
   },
   4: {
     ...baseStep,
     scrollStep: 4,
+    height: height,
     age: 31,
     sleepTime: 7,
     showPointcloud: false,
@@ -370,6 +378,7 @@ const scrollyProps = {
   5: {
     ...baseStep,
     scrollStep: 5,
+    height: height,
     age: ageValue,
     sleepTime: sleepTimeValue,
     showPointcloud: true,
@@ -382,6 +391,7 @@ const scrollyProps = {
   6: {
     ...baseStep,
     scrollStep: 6,
+    height: height,
     age: ageValue,
     sleepTime: sleepTimeValue,
     showPointcloud: true,
@@ -393,6 +403,7 @@ const scrollyProps = {
   7: {
     ...baseStep,
     scrollStep: 7,
+    height: height,
     age: ageValue,
     sleepTime: sleepTimeValue,
     showPointcloud: true,
@@ -404,6 +415,7 @@ const scrollyProps = {
   8: {
     ...baseStep,
     scrollStep: 8,
+    height: height,
     age: chartValue.age,
     sleepTime: chartValue.sleepTime,
     showPointcloud: true,
@@ -419,6 +431,7 @@ const scrollyProps = {
   9: {
     ...baseStep,
     scrollStep: 9,
+    height: height,
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
@@ -426,6 +439,7 @@ const scrollyProps = {
   10: {
     ...baseStep,
     scrollStep: 10,
+    height: height,
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
@@ -435,6 +449,7 @@ const scrollyProps = {
   11: {
     ...baseStep,
     scrollStep: 11,
+    height: height,
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
@@ -444,6 +459,7 @@ const scrollyProps = {
   12: {
     ...baseStep,
     scrollStep: 12,
+    height: height,
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
@@ -453,6 +469,7 @@ const scrollyProps = {
   13: {
     ...baseStep,
     scrollStep: 13,
+    height: height,
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
@@ -568,7 +585,7 @@ const initialHeight = window.innerHeight;
 ```
 
 ```js
-console.log("block rerun");
+/* console.log("block rerun"); */
 const container = d3.create("div");
 container.style("position", "relative");
 
@@ -597,7 +614,7 @@ container.node().value = {
   sleepTime: isEnhanced ? undefined : 7,
 };
 
-console.log("main:", initialWidth, initialHeight);
+/* console.log("main:", initialWidth, initialHeight); */
 
 canvas.width = initialWidth * canvasScaleFactor;
 canvas.height = initialHeight * canvasScaleFactor;
@@ -689,30 +706,31 @@ function updateChart({
   changes,
   hopIndex,
   newWidth,
-  newHeight,
-  prevDimensions,
+  /* newHeight,
+  prevDimensions, */
   isEnhanced,
 }) {
   console.log("updateChart");
+  console.log("changes", changes);
   // only set scrollLeft if the chart is not explorable
   // meaning the slider input section is visible
   // to prevent the scrollLeft to set the chartValue
   // as only intended in the chart input section
-  if (
+  /* if (
     changes?.age &&
     !stepProps.isExplorable &&
     stepProps.triggerSource === "slider"
   ) {
     scrollInteraction.programmaticScroll(
-      changes.age.new ?? stepProps.xDomain[0],
+      stepProps.xDomain[0],
       100
     );
-  }
+  } */
 
   const isScrolling = !isEnhanced ? scrollInteraction.getScrollState() : false; // Fetch only if mobile
 
   /* console.log("updateChart"); */
-  console.log(
+  /*   console.log(
     "prevHeight",
     prevDimensions.height,
     "newHeight",
@@ -721,15 +739,17 @@ function updateChart({
     isScrolling,
     "changes",
     changes
-  );
+  ); */
 
   // domain transition
   if (
     /* (!isScrolling || isEnhanced) &&  */ // Skip condition if horizontal scrolling is happening on mobile, like in the explorable section
-    prevDimensions.width !== newWidth ||
-    prevDimensions.height !== newHeight ||
-    (changes?.xDomain && changes?.scrollStep) // Only run domain updates if NOT triggered by slider and a step change happens
+    /* prevDimensions.width !== newWidth ||
+    prevDimensions.height !== newHeight || */
+    changes?.height ||
+    changes?.xDomain /* && changes?.scrollStep */ // Only run domain updates if NOT triggered by slider and a step change happens
   ) {
+    const newHeight = stepProps.height;
     isTransitioning = true; // Prevents updates during transition
 
     console.log(
@@ -740,16 +760,10 @@ function updateChart({
       newHeight
     );
 
-    /* if (stepProps.age === undefined || stepProps.sleepTime === undefined) {
-      console.log("age or sleepTime is undefined");
-      return;
-    } */
-
     // calculating the absolute domain for calculating new total width
-    const { start, end, totalWidth } = updateXDomain(
+    const { totalWidth } = updateXDomain(
       xScaleSVG,
       stepProps,
-      changes,
       newWidth,
       margin
     );
@@ -797,39 +811,12 @@ function updateChart({
       tickValues: stepProps.mobileTicks,
     });
 
-    // Necessary for the transition to work; otherwise, the transition would be interrupted by a new call to update triggered by the mutable setStableStepProps
-    /* if (Object.keys(changes).length === 0) {
-      return;
-    } */
+    const duration = stepProps.triggerSource === "slider" ? 100 : 600;
 
-    const element = body.node();
-    const duration = 600;
+    !isEnhanced &&
+      scrollInteraction.programmaticScroll(stepProps.xDomain[0], duration);
 
-    !isEnhanced && scrollInteraction.setTransitionState(true); // Notify that a transition starts
-
-    const transition = d3
-      .transition("scrollLeftTweenDomain")
-      .duration(duration);
-    // Scroll animation
-    transition.tween("scrollDomain", function () {
-      const interpolator = d3.interpolateNumber(element.scrollLeft, end);
-      return function (t) {
-        console.log(
-          "interpolator(t) dimension or domain change",
-          interpolator(t)
-        );
-        element.scrollLeft = interpolator(t);
-      };
-    });
-
-    transition.on("end", () => {
-      !isEnhanced && scrollInteraction.setTransitionState(false); // Notify that transition has ended
-      if (stepProps.isExplorable && !isEnhanced) {
-        scrollInteraction.setExplorable(true);
-      }
-    });
-
-    setPrevDimensions({ width: newWidth, height: newHeight });
+    /* setPrevDimensions({ width: newWidth, height: newHeight }); */
   }
 
   // Update only if there are changes
@@ -860,7 +847,8 @@ function updateChart({
     }
 
     // Update type specific plot
-    if (changes.variant || changes.age || changes.sleepTime) {
+    if (changes.variant || changes.age || changes.sleepTime || changes.height) {
+      const newHeight = stepProps.height;
       switch (stepProps.variant) {
         case "percentile":
           updatePercentilePlot(data, xScaleSVG, yScaleSVG);
