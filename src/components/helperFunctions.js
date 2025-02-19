@@ -194,3 +194,25 @@ export function updateXDomain(xScale, stepProps, width, margin) {
 
   return { totalWidth };
 }
+
+export function programmaticScroll({
+  targetDomainLeft,
+  element,
+  xScale,
+  duration,
+}) {
+  const targetScroll = xScale(targetDomainLeft);
+
+  d3.transition()
+    .duration(duration)
+    .tween("scrollTween", function () {
+      const interpolator = d3.interpolateNumber(
+        element.scrollLeft,
+        targetScroll
+      );
+      return function (t) {
+        console.log("tween", interpolator(t));
+        element.scrollLeft = interpolator(t);
+      };
+    });
+}

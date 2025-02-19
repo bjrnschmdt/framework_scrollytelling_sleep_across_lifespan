@@ -11,6 +11,7 @@ import {
   createDebouncedLogger,
   formatTime,
   updateXDomain,
+  programmaticScroll,
 } from "./components/helperFunctions.js";
 import { dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
@@ -133,48 +134,6 @@ const height = Generators.observe((change) => {
 ```
 
 ```js
-/* console.log("height", height); */
-```
-
-<!-- ```js
-chartElement;
-// this has to be called once the chartElement is available
-const scrollLeft = Generators.observe((change) => {
-  const element = document.querySelector("#body");
-  if (!element) return;
-
-  const onScroll = () => change(element.scrollLeft);
-  element.addEventListener("scroll", onScroll);
-  onScroll(); // Initialize with the current value
-
-  return () => element.removeEventListener("scroll", onScroll);
-});
-```
-
-```js
-const ageScroll = Math.round(xScaleSVG.invert(scrollLeft + width / 2));
-```
-
-```js
-if (ageScroll !== chartElement.value.age /* && scrollyStep.value === 7 */) {
-  console.log("set ChartElement to ageScroll", ageScroll);
-  set(chartElement, { ...chartElement.value, age: ageScroll });
-}
-```
-
-```js
-console.log("ageScroll", ageScroll);
-``` -->
-
-```js
-/* console.log("chartValue", chartValue); */
-```
-
-```js
-/* const { xScaleSVG, yScaleSVG, timeScale } = createScales({ w, h }); */
-```
-
-```js
 const variant = getURLParameter("v") || "dot";
 ```
 
@@ -219,17 +178,6 @@ const debouncedLoggers = {
   estimate: createDebouncedLogger((value) => logInput("estimate", value), 500),
 };
 ```
-
-<!-- ```js
-const debouncedWidth = createDebouncedLogger(
-  (value) => console.log("width", value),
-  500
-);
-```
-
-```js
-debouncedWidth(width);
-``` -->
 
 ```js
 debouncedLoggers.age(ageValue);
@@ -281,33 +229,10 @@ function diffStepProps(newProps, oldProps) {
 ```
 
 ```js
-// Initial computation of stepProps from your getSteps function:
-/* const initialStepProps = scrollyProps[scrollyStep]; */
-```
-
-```js
 const stableStepProps = Mutable(baseStep);
 const setStableStepProps = (x) => {
-  /* console.log("New stableStepProps value:", x); */
   stableStepProps.value = x;
 };
-```
-
-```js
-const prevDimensions = Mutable({ width: initialWidth, height: initialHeight });
-const setPrevDimensions = (x) => {
-  /* console.log("New prevDimensions value:", x); */
-  prevDimensions.value = x;
-};
-```
-
-```js
-// reset the stableStepProps to the baseStep on resize
-// This is a quick and dirty way to reset the stableStepProps on resize
-// I might want to do this in a more controlled way
-// maybe adding debounce to the resize event
-/* width, height; */
-/* setStableStepProps(baseStep); */
 ```
 
 ```js
@@ -591,7 +516,7 @@ container.style("position", "relative");
 
 const yAxisSVG = container
   .append("svg")
-  .attr("width", initialWidth)
+  .attr("width", width)
   .attr("height", initialHeight)
   .style("position", "absolute")
   .style("pointer-events", "none")
@@ -614,21 +539,19 @@ container.node().value = {
   sleepTime: isEnhanced ? undefined : 7,
 };
 
-/* console.log("main:", initialWidth, initialHeight); */
-
-canvas.width = initialWidth * canvasScaleFactor;
+canvas.width = width * canvasScaleFactor;
 canvas.height = initialHeight * canvasScaleFactor;
 
-canvas.style.width = `${initialWidth}px`;
+canvas.style.width = `${width}px`;
 canvas.style.height = `${initialHeight}px`;
 canvas.style.display = "block";
 
-let totalWidth = initialWidth;
+let totalWidth = width;
 
 const svg = body
   .append("svg")
   .attr("class", "svg")
-  .attr("width", initialWidth)
+  .attr("width", width)
   .attr("height", initialHeight)
   .style("position", "absolute")
   .style("top", "0px")
@@ -643,11 +566,11 @@ const clipPath = defs
   .append("rect")
   .attr("x", margin.left)
   .attr("y", margin.top)
-  .attr("width", initialWidth - margin.left - margin.right)
+  .attr("width", width - margin.left - margin.right)
   .attr("height", initialHeight - margin.top - margin.bottom);
 
 const { xScaleSVG, yScaleSVG, timeScale } = createScales({
-  w: initialWidth,
+  w: width,
   h: initialHeight,
 });
 
@@ -664,14 +587,19 @@ const { gx, gy, xAxis, yAxis, updateAxes /* , styleYAxis  */ } = createAxes(
   {
     xScaleSVG,
     yScaleSVG,
-    w: initialWidth,
+    w: width,
     h: initialHeight,
   }
 );
 
 const percentilesGroup = svg.append("g").attr("class", "percentiles");
-/* .attr("clip-path", "url(#plot-clip)") */ const crosshair =
-  initializeCrosshair(svg, xScaleSVG, yScaleSVG, initialWidth, initialHeight);
+const crosshair = initializeCrosshair(
+  svg,
+  xScaleSVG,
+  yScaleSVG,
+  width,
+  initialHeight
+);
 
 const { crosshairXLine, crosshairYLine } = crosshair;
 
@@ -682,7 +610,7 @@ let scrollInteraction;
 if (isEnhanced) {
   pointerInteraction = new PointerInteraction(svg, {
     margin,
-    w: initialWidth,
+    w: width,
     h: initialHeight,
     xScaleSVG,
     yScaleSVG,
@@ -694,73 +622,22 @@ if (isEnhanced) {
     body.node(),
     container.node(),
     xScaleSVG,
-    initialWidth
+    width
   );
 }
 
-let isTransitioning = false;
-
-function updateChart({
-  data,
-  stepProps,
-  changes,
-  hopIndex,
-  newWidth,
-  /* newHeight,
-  prevDimensions, */
-  isEnhanced,
-}) {
+function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
   console.log("updateChart");
   console.log("changes", changes);
-  // only set scrollLeft if the chart is not explorable
-  // meaning the slider input section is visible
-  // to prevent the scrollLeft to set the chartValue
-  // as only intended in the chart input section
-  /* if (
-    changes?.age &&
-    !stepProps.isExplorable &&
-    stepProps.triggerSource === "slider"
-  ) {
-    scrollInteraction.programmaticScroll(
-      stepProps.xDomain[0],
-      100
-    );
-  } */
 
   const isScrolling = !isEnhanced ? scrollInteraction.getScrollState() : false; // Fetch only if mobile
 
-  /* console.log("updateChart"); */
-  /*   console.log(
-    "prevHeight",
-    prevDimensions.height,
-    "newHeight",
-    newHeight,
-    "isScrolling",
-    isScrolling,
-    "changes",
-    changes
-  ); */
-
-  // domain transition
+  // if height of domain changes
   if (changes?.height || changes?.xDomain) {
     const newHeight = stepProps.height;
-    isTransitioning = true; // Prevents updates during transition
-
-    console.log(
-      "domains or dimensions changed",
-      changes,
-      prevDimensions,
-      newWidth,
-      newHeight
-    );
 
     // calculating the absolute domain for calculating new total width
-    const { totalWidth } = updateXDomain(
-      xScaleSVG,
-      stepProps,
-      newWidth,
-      margin
-    );
+    const { totalWidth } = updateXDomain(xScaleSVG, stepProps, width, margin);
 
     yScaleSVG.range([newHeight - margin.bottom, margin.top]); // dimension change
 
@@ -775,17 +652,17 @@ function updateChart({
       .duration(600)
       .attr("width", totalWidth)
       .attr("height", newHeight); // domain change
-    yAxisSVG.attr("width", newWidth).attr("height", newHeight); // dimension change
+    yAxisSVG.attr("width", width).attr("height", newHeight); // dimension change
 
     clipPath
       .attr("width", totalWidth - margin.left - margin.right)
       .attr("height", newHeight - margin.top - margin.bottom);
 
     if (isEnhanced) {
-      pointerInteraction.setDimensions(newWidth, newHeight);
+      pointerInteraction.setDimensions(width, newHeight);
     }
 
-    updateAxes(xScaleSVG, yScaleSVG, newWidth, newHeight);
+    updateAxes(xScaleSVG, yScaleSVG, width, newHeight);
 
     // Update crosshairs
     updateCrosshairs(
@@ -807,29 +684,35 @@ function updateChart({
 
     const duration = stepProps.triggerSource === "slider" ? 100 : 600;
 
-    !isEnhanced &&
+    if (!isEnhanced) {
       scrollInteraction.programmaticScroll(stepProps.xDomain[0], duration);
+    } else {
+      programmaticScroll({
+        targetDomainLeft: stepProps.xDomain[0],
+        element: body.node(),
+        xScale: xScaleSVG,
+        duration: 600,
+      });
+    }
   }
 
   // Update only if there are changes
   if (Object.keys(changes).length > 0) {
-    /* console.log("changes", changes); */
-
     // Update pointcloud visibility
     /* if (changes.showPointcloud) {
       pointcloud.setVisibility(stepProps.showPointcloud);
     } */
 
     // Update percentiles visibility
-    /* if (changes.showPercentiles) {
-      drawPercentiles(svg, {
+    if (changes.showPercentiles) {
+      drawPercentiles(percentilesGroup, {
         dataSet,
         showPercentiles: stepProps.showPercentiles,
         xScaleSVG,
         yScaleSVG,
         tickValues: stepProps.mobileTicks,
       });
-    } */
+    }
 
     // Update exploration mode
     if ("isExplorable" in changes && isEnhanced) {
@@ -912,9 +795,6 @@ const updateChart = chartElement.updateChart({
   stepProps,
   changes,
   hopIndex: j,
-  newWidth: width,
-  newHeight: height,
-  prevDimensions,
   isEnhanced,
 });
 ```
