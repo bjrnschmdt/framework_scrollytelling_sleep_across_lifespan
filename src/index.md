@@ -742,13 +742,7 @@ function updateChart({
   ); */
 
   // domain transition
-  if (
-    /* (!isScrolling || isEnhanced) &&  */ // Skip condition if horizontal scrolling is happening on mobile, like in the explorable section
-    /* prevDimensions.width !== newWidth ||
-    prevDimensions.height !== newHeight || */
-    changes?.height ||
-    changes?.xDomain /* && changes?.scrollStep */ // Only run domain updates if NOT triggered by slider and a step change happens
-  ) {
+  if (changes?.height || changes?.xDomain) {
     const newHeight = stepProps.height;
     isTransitioning = true; // Prevents updates during transition
 
@@ -815,8 +809,6 @@ function updateChart({
 
     !isEnhanced &&
       scrollInteraction.programmaticScroll(stepProps.xDomain[0], duration);
-
-    /* setPrevDimensions({ width: newWidth, height: newHeight }); */
   }
 
   // Update only if there are changes
@@ -901,7 +893,6 @@ function updateChart({
 }
 
 container.node().updateChart = updateChart;
-/* container.node().updateDimensions = updateDimensions; */
 ```
 
 <!-- ```js

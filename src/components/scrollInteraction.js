@@ -31,7 +31,6 @@ export class ScrollInteraction {
     this.isScrolling = false; // Tracks whether user scrolling is happening
     this.isExplorable = false; // Controls whether the user can scroll manually
     this.ignoreScrollEvent = false; // Prevents unwanted scroll events
-    /* this.isTransitioning = false; */ // Prevents updates during domain transitions
     this.lastTouchTime = 0; // Helps detect quick swipe gestures
     this.scrollTimeout = null; // Timeout for debounce-like scroll detection
     this.scrollLeft = 0; // Stores current scroll position
@@ -104,27 +103,6 @@ export class ScrollInteraction {
     }, 50);
   }
 
-  /**
-   * Handles the scroll event.
-   * - Updates the scroll state and syncs it with `chartElement`.
-   * - Prevents interactions during transitions.
-   */
-  /*   handleScroll(event) {
-    if (!this.isExplorable || this.isTransitioning) {
-      event.stopPropagation(); // Stops scroll event propagation
-      return;
-    }
-
-    this.isScrolling = true;
-    this.updateScrollState();
-
-    // Debounce-like behavior: wait 150ms after scrolling stops
-    clearTimeout(this.scrollTimeout);
-    this.scrollTimeout = setTimeout(() => {
-      this.isScrolling = false;
-    }, 150);
-  } */
-
   handleScroll() {
     // Skip processing if a programmatic scroll was just triggered
     if (
@@ -155,24 +133,6 @@ export class ScrollInteraction {
       this.updateSource = null;
     }, 150);
   }
-
-  /**
-   * Updates the current scroll position and syncs it with the `chartElement`'s age.
-   */
-  /*   updateScrollState() {
-    this.scrollLeft = this.element.scrollLeft; // Get current scroll position
-
-    // Convert scroll position to age using the xScale function
-    const ageScroll = Math.round(
-      this.xScaleSVG.invert(this.scrollLeft + this.width / 2)
-    );
-
-    // Sync age value with the visualization only if it has changed
-    if (ageScroll !== this.chartElement.value.age) {
-      console.log("set ChartElement to ageScroll", ageScroll);
-      set(this.chartElement, { ...this.chartElement.value, age: ageScroll });
-    }
-  } */
 
   /**
    * Programmatically scrolls to a specific position.
