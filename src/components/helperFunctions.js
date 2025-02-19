@@ -1,5 +1,8 @@
 import * as d3 from "npm:d3";
 import { precalculateHeights, calculateCX } from "./plotDot.js";
+import { settings } from "./settings.js";
+
+const { ageMin, ageMax } = settings;
 
 // Functions
 export function set(input, value) {
@@ -164,4 +167,38 @@ export function createDebouncedLogger(callback, delay) {
       callback(data);
     }, delay);
   };
+}
+
+/**
+ * Updates the x-domain and recomputes necessary dimensions.
+ * @param {Object} xScale - D3 scale object for x-axis.
+ * @param {Object} stepProps - Current scrollytelling step properties.
+ * @param {Object} changes - Object tracking changes in properties.
+ * @param {number} width - New chart width.
+ * @param {number} margin - Margin settings.
+ * @returns {Object} - Returns { start, end, totalWidth }
+ */
+export function updateXDomain(xScale, stepProps, changes, width, margin) {
+  const start = changes?.xDomain
+    ? xScale(changes.xDomain.old[0])
+    : xScale(stepProps.xDomain[0]);
+
+  const absoluteDomain = stepProps.xDomain[1] - stepProps.xDomain[0];
+  const domainWithOffset = ageMin + absoluteDomain;
+  const newDomain = [ageMin, domainWithOffset];
+
+  // Temporarily update scale to compute total width
+  xScale.domain(newDomain).range([margin.left, width - margin.right]);
+  const totalWidth = xScale(ageMax - 1) + margin.right;
+
+  // Reset domain to original but adjust range
+  xScale
+    .domain([ageMin, ageMax - 1])
+    .range([margin.left, totalWidth - margin.right]);
+
+  const end = changes?.xDomain
+    ? xScale(changes.xDomain.new[0])
+    : xScale(stepProps.xDomain[0]);
+
+  return { start, end, totalWidth };
 }

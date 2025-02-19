@@ -94,6 +94,11 @@ export class PointerInteraction {
     this.svg.style("cursor", locked ? "not-allowed" : "crosshair");
   }
 
+  setDimensions(newWidth, newHeight) {
+    this.w = newWidth;
+    this.h = newHeight;
+  }
+
   /**
    * Handles pointer movement, calculates position and value, and triggers updates if values change.
    * @param {Event} event - The pointer event.
@@ -154,9 +159,8 @@ export class PointerInteraction {
    * Attaches pointer event listeners to the SVG element.
    */
   attachEventListeners() {
-    this.svg
-      .on("pointerenter pointermove", this.pointerMoved.bind(this))
-      .on("click", this.pointerClicked.bind(this))
-      .on("touchstart", (event) => event.preventDefault()); // Prevent default touch behaviors
+    this.svg.on("pointerenter pointermove", this.pointerMoved.bind(this));
+    /* .on("click", this.pointerClicked.bind(this)) */
+    /* .on("touchstart", (event) => event.preventDefault()); */ // Prevent default touch behaviors
   }
 }

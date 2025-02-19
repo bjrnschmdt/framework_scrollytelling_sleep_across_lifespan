@@ -131,13 +131,15 @@ export function updateCrosshairs(
     tooltipText,
   },
   xScaleSVG,
-  yScaleSVG
+  yScaleSVG,
+  isEnhanced,
+  duration = 100
 ) {
   let x = Number(xScaleSVG(data.age));
   let y = Number(yScaleSVG(data.sleepTime));
   let textAge = data.age;
   let textSleep = data.sleepTime;
-  let duration = 100;
+  /* let duration = 100; */
   let tickOpacity = 0.4;
   let pointOpacity = 1;
   let intersect = data.age < 23;
@@ -159,6 +161,10 @@ export function updateCrosshairs(
   if (tooltipIsVisible) {
     tooltipText.text(data.tooltipText);
   }
+
+  /* if (isEnhanced) {
+    duration = 100;
+  } */
 
   // if cursor outside margins the crosshair get reset
   if (isNaN(x) || isNaN(y)) {

@@ -39,7 +39,7 @@ function styleYAxis(g, { w }) {
   g.select(".domain").remove(); // Remove the axis line
 }
 
-export function createAxes(svg, { xScaleSVG, yScaleSVG, w, h }) {
+export function createAxes(svg, yAxisSVG, { xScaleSVG, yScaleSVG, w, h }) {
   const xAxis = (g, x) => {
     g.call(d3.axisBottom(x).tickFormat(d3.format("02")));
     styleXAxis(g);
@@ -62,7 +62,7 @@ export function createAxes(svg, { xScaleSVG, yScaleSVG, w, h }) {
     .attr("transform", `translate(0,${h - margin.bottom})`)
     .call(xAxis, xScaleSVG);
 
-  const gy = svg
+  const gy = yAxisSVG
     .append("g")
     .attr("class", "y-axis")
     .attr("transform", `translate(${margin.left},0)`)
