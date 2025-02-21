@@ -2,11 +2,13 @@ import * as d3 from "npm:d3";
 import { createDebouncedLogger, set, roundToStep } from "./helperFunctions.js";
 import { settings } from "./settings.js";
 
+// Destructure constants from settings for easy configuration.
 const { sleepMin, sleepMax, margin } = settings;
 
 export class ScrollInteraction {
   /**
    * Manages horizontal scrolling for the visualization.
+   *
    * @param {HTMLElement} element - The scrollable container (default: `#body`).
    * @param {Object} chartElement - Observable's reactive chart object.
    * @param {Function} xScaleSVG - D3 scale function mapping age to pixel position.
@@ -20,178 +22,84 @@ export class ScrollInteraction {
     yScaleSVG,
     width
   ) {
-    // Scroll container element (default: #body)
     this.element = element;
-
-    // Reference to the Observable chart element, which holds the state
     this.chartElement = chartElement;
-
-    // D3 scale function mapping age to horizontal pixel position
     this.xScaleSVG = xScaleSVG;
     this.yScaleSVG = yScaleSVG;
-
-    // Width of the scrollable area
     this.width = width;
 
-    // State tracking
-    this.isScrolling = false; // Tracks whether user scrolling is happening
-    this.isExplorable = false; // Controls whether the user can scroll manually
-    this.ignoreScrollEvent = false; // Prevents unwanted scroll events
-    this.lastTouchTime = 0; // Helps detect quick swipe gestures
-    this.scrollTimeout = null; // Timeout for debounce-like scroll detection
-    this.scrollLeft = 0; // Stores current scroll position
-    this.updateSource = null; // Track the source of updates (either 'scroll' or 'slider')
+    // Flags to manage scroll behavior
+    this.isExplorable = false;
+    this.forceProgrammaticScroll = false;
+    this.ignoreScrollEvent = false;
 
-    // Add debounced vertical scroll listener for sleepTime updates.
-    // This will update chartValue.sleepTime when the window scroll is within the defined area.
-    this.debouncedVerticalScroll = this.debounce(
-      this.handleVerticalScroll.bind(this),
-      100
-    );
-    window.addEventListener(
-      "scroll",
-      /* this.debouncedVerticalScroll */ this.handleVerticalScroll.bind(this)
-    );
+    // Bind event handlers to preserve "this" context and store them for cleanup.
+    this.boundHandleScroll = this.handleScroll.bind(this);
+    this.boundHandleVerticalScroll = this.handleVerticalScroll.bind(this);
 
-    this.init(); // Attach event listeners
+    this.init();
   }
 
   /**
-   * A simple debounce helper.
-   * @param {Function} func - The function to debounce.
-   * @param {number} wait - Delay in milliseconds.
-   * @returns {Function}
-   */
-  debounce(func, wait) {
-    let timeout;
-    return function (...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        func.apply(this, args);
-      }, wait);
-    };
-  }
-
-  /**
-   * Initializes event listeners for scrolling and touch interactions.
+   * Initializes the scroll event listeners.
    */
   init() {
-    this.element.addEventListener(
-      "touchstart",
-      this.handleTouchStart.bind(this),
-      { passive: false }
-    );
-    this.element.addEventListener(
-      "touchmove",
-      this.handleTouchMove.bind(this),
-      { passive: false }
-    );
-    this.element.addEventListener("touchend", this.handleTouchEnd.bind(this), {
+    // The 'passive' flag helps improve scroll performance.
+    this.element.addEventListener("scroll", this.boundHandleScroll, {
       passive: true,
     });
-    this.element.addEventListener("scroll", this.handleScroll.bind(this), {
+    window.addEventListener("scroll", this.boundHandleVerticalScroll, {
       passive: true,
     });
-
-    // Set initial scroll position
-    /* this.updateScrollState(); */
   }
 
   /**
-   * Handles the start of a touch event.
-   * Blocks scrolling if explorability is disabled.
+   * Removes event listeners to clean up resources.
    */
-  handleTouchStart(event) {
-    if (!this.isExplorable) {
-      event.preventDefault(); // Prevents user-initiated scrolling
-      return;
-    }
-    this.lastTouchTime = Date.now();
-    this.isScrolling = true;
+  destroy() {
+    this.element.removeEventListener("scroll", this.boundHandleScroll);
+    window.removeEventListener("scroll", this.boundHandleVerticalScroll);
   }
 
   /**
-   * Handles touch movement.
-   * Blocks scrolling if explorability is disabled.
+   * Handles horizontal scrolling. Calculates the new age value based on the
+   * current scroll position and updates the reactive chart if it changes.
    */
-  handleTouchMove(event) {
-    if (!this.isExplorable) {
-      event.preventDefault(); // Stops unwanted movement
-      return;
-    }
-    this.isScrolling = true;
-  }
-
-  /**
-   * Handles the end of a touch event.
-   * Detects quick swipes and allows inertia scrolling.
-   */
-  handleTouchEnd() {
-    if (!this.isExplorable) return;
-
-    setTimeout(() => {
-      if (Date.now() - this.lastTouchTime < 500) {
-        this.isScrolling = true; // Allows inertia scrolling
-      }
-    }, 50);
-  }
-
   handleScroll() {
-    // Skip processing if a programmatic scroll was just triggered
-    if (
-      /* this.isTransitioning ||  */ this.updateSource === "slider" ||
-      this.ignoreScrollEvent
-    ) {
-      /* console.log("Ignoring scroll event"); */
-      return;
-    }
-    /* console.log("handleScroll called"); */
-    this.isScrolling = true;
-    this.updateSource = "scroll";
+    // Skip processing if a programmatic scroll was just triggered.
+    if (this.ignoreScrollEvent) return;
 
+    // Calculate the age by inverting the x-scale using the center of the view.
     const ageScroll = Math.round(
       this.xScaleSVG.invert(this.element.scrollLeft + this.width / 2)
     );
 
+    // Update the reactive chart only if the age value has changed.
     if (ageScroll !== this.chartElement.value.age) {
-      /* console.log("set ChartElement to ageScroll", ageScroll); */
       set(this.chartElement, { ...this.chartElement.value, age: ageScroll });
     }
-
-    // Reset scrolling state after a delay
-    clearTimeout(this.scrollTimeout);
-    this.scrollTimeout = setTimeout(() => {
-      /* console.log("set isScrolling to false"); */
-      this.isScrolling = false;
-      this.updateSource = null;
-    }, 150);
   }
 
   /**
-   * Programmatically scrolls to a specific position.
-   * @param {number} scrollValue - The pixel value to scroll to.
+   * Smoothly scrolls the container horizontally to a target domain value.
+   *
+   * @param {number} targetDomainLeft - The domain value to scroll to.
+   * @param {number} duration - Duration of the scroll animation in milliseconds.
    */
-  /*  programmaticScroll(scrollValue) {
-    this.element.scrollLeft = scrollValue;
-  } */
-
   programmaticScroll(targetDomainLeft, duration) {
-    if (this.isScrolling) return;
-    /* console.log("programmaticScroll called"); */
+    // Only perform programmatic scrolling if not in explorable mode
+    // or if a forced scroll is requested.
+    if (this.isExplorable && !this.forceProgrammaticScroll) return;
 
-    this.isTransitioning = true;
-    /* console.log("set isTransitioning to true"); */
-    this.updateSource = "slider";
-
-    // Set flag to ignore subsequent scroll events
+    // Reset force flag and ignore subsequent scroll events during animation.
+    this.forceProgrammaticScroll = false;
     this.ignoreScrollEvent = true;
 
-    // Use the provided left-bound value directly:
+    // Calculate the target scroll offset based on the x-scale.
     const targetScroll = this.xScaleSVG(targetDomainLeft);
     const element = this.element;
-    /* console.log("targetDomainLeft", targetDomainLeft);
-    console.log("targetScroll", targetScroll); */
 
+    // Use D3 transitions to smoothly animate the scrollLeft property.
     d3.transition()
       .duration(duration)
       .tween("scrollTween", function () {
@@ -200,101 +108,90 @@ export class ScrollInteraction {
           targetScroll
         );
         return function (t) {
-          console.log("tween", interpolator(t));
-          element.scrollLeft = interpolator(t);
+          // Using requestAnimationFrame here ensures a smooth update.
+          requestAnimationFrame(() => {
+            element.scrollLeft = interpolator(t);
+          });
         };
       })
       .on("end", () => {
-        /* this.isTransitioning = false; */
-        this.updateSource = null;
-        /* console.log("set isTransitioning to false"); */
-        // Clear the ignore flag after a short delay to allow the final scroll event to be suppressed
+        // Re-enable scroll event processing after a brief delay.
+        // Consider adding an "interrupt" handler if needed.
         setTimeout(() => {
           this.ignoreScrollEvent = false;
-          console.log("set ignoreScrollEvent to false");
-        }, 200);
+        }, 100);
       });
   }
 
   /**
-   * Returns whether the user is actively scrolling.
-   * @returns {boolean} `true` if scrolling, `false` otherwise.
-   */
-  getScrollState() {
-    return this.isScrolling;
-  }
-
-  /**
    * Enables or disables user-initiated scrolling.
+   *
    * @param {boolean} state - `true` to enable scrolling, `false` to disable.
    */
   setExplorable(state) {
+    // Only update if there's a change in state.
+    if (state === this.isExplorable) return;
+
     this.isExplorable = state;
-    console.log(`ScrollExplorable set to: ${state}`);
+    // You can use plain JS here, e.g., this.element.style.overflowX = state ? "auto" : "hidden";
+    // Using d3.select for consistency with other parts of the code.
+    this.element.style.overflowX = state ? "auto" : "hidden";
+    // If disabling exploration, reset the scroll position based on the current age.
+    if (!state) {
+      this.element.scrollLeft = this.xScaleSVG(this.chartElement.value.age);
+    }
   }
 
   /**
-   * Sets whether a domain transition is in progress.
-   * Prevents unwanted updates during animations.
-   * @param {boolean} isTransitioning - `true` to block updates, `false` otherwise.
+   * Sets a flag to force programmatic scrolling even if explorable mode is active.
+   *
+   * @param {boolean} state - True to force programmatic scrolling.
    */
-  /* setTransitionState(isTransitioning) {
-    this.isTransitioning = isTransitioning;
-    console.log(`Transition state set to: ${isTransitioning}`);
-  } */
+  setForceProgrammaticScroll(state) {
+    this.forceProgrammaticScroll = state;
+  }
 
   /**
-   * Checks the vertical scroll position of the page and,
-   * if it falls between the lower boundary of the element with data-step="8"
-   * and the upper boundary of the element with data-step="9",
-   * calculates a new sleepTime value (with an offset so that the effective scroll
-   * position is centered on the chart) and updates the chartElement.
+   * Handles vertical scrolling. When in explorable mode and if the window's scroll
+   * is within a specified range (between elements with data-step="8" and data-step="9"),
+   * calculates a new sleepTime value and updates the reactive chart.
    */
   handleVerticalScroll() {
-    if (!this.isExplorable) {
-      return;
-    }
-    // Select the two step elements
+    // Only proceed if in explorable mode.
+    if (!this.isExplorable) return;
+
+    // Select the two DOM elements that define the vertical scroll boundaries.
     const step8 = document.querySelector('[data-step="8"]');
     const step9 = document.querySelector('[data-step="9"]');
-    if (!step8 || !step9) return;
+    if (!step8 || !step9) return; // Exit if boundaries are not found.
 
-    // Get the absolute positions for step8 and step9
+    // Get the absolute positions for the boundary elements.
     const step8Rect = step8.getBoundingClientRect();
     const step9Rect = step9.getBoundingClientRect();
     const lowerBoundary = step8Rect.bottom + window.scrollY;
     const upperBoundary = step9Rect.top + window.scrollY;
 
-    // Calculate the offset based on the chart's vertical range and top margin:
+    // Calculate the vertical offset: half the chart's height plus the top margin.
     const chartRange = this.yScaleSVG.range();
     const chartHeight = Math.abs(chartRange[1] - chartRange[0]);
     const offset = chartHeight / 2 + margin.top;
 
-    // Adjust currentScrollY so that it reflects the center of the chart.
+    // Adjust the current scrollY to represent the chart's center position.
     const currentScrollY = window.scrollY + offset;
-    /* console.log(
-      "Adjusted vertical scroll:",
-      currentScrollY,
-      " (window.scrollY + offset:",
-      window.scrollY,
-      "+",
-      offset,
-      ")"
-    ); */
 
-    // Only update if within the desired vertical range
+    // Update the sleepTime only if the current scroll is within the boundaries.
     if (currentScrollY >= lowerBoundary && currentScrollY <= upperBoundary) {
-      // Create a linear scale mapping the vertical scroll position to sleepTime
+      // Map the vertical scroll position linearly to a sleepTime value.
       const sleepScale = d3
         .scaleLinear()
         .domain([lowerBoundary, upperBoundary])
         .range([sleepMin, sleepMax])
         .clamp(true);
+
       const newSleepTimeUnrounded = sleepScale(currentScrollY);
       const newSleepTime = roundToStep(newSleepTimeUnrounded, 0.25);
-      console.log("newSleepTime", newSleepTime);
 
-      // Update chartElement.sleepTime only if it has changed
+      // Update the chart if the sleepTime has changed.
       if (this.chartElement.value.sleepTime !== newSleepTime) {
         set(this.chartElement, {
           ...this.chartElement.value,
@@ -302,14 +199,5 @@ export class ScrollInteraction {
         });
       }
     }
-  }
-
-  // --- (Optional) Clean up when the component is unmounted ---
-  destroy() {
-    window.removeEventListener(
-      "scroll",
-      /* this.debouncedVerticalScroll */ this.handleVerticalScroll.bind(this)
-    );
-    // Remove any other event listeners if necessary.
   }
 }

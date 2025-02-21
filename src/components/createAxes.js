@@ -40,8 +40,11 @@ function styleYAxis(g, { w }) {
 }
 
 export function createAxes(svg, yAxisSVG, { xScaleSVG, yScaleSVG, w, h }) {
-  const xAxis = (g, x) => {
-    g.call(d3.axisBottom(x).tickFormat(d3.format("02")));
+  const xAxis = (g, x, xTicks) => {
+    g.call(
+      d3.axisBottom(x).tickValues(xTicks) // Use dynamic tick values
+      /* .tickFormat(d3.format("02")) */ // no formatting on request of SR
+    );
     styleXAxis(g);
   };
 
@@ -60,7 +63,7 @@ export function createAxes(svg, yAxisSVG, { xScaleSVG, yScaleSVG, w, h }) {
     .append("g")
     .attr("class", "x-axis")
     .attr("transform", `translate(0,${h - margin.bottom})`)
-    .call(xAxis, xScaleSVG);
+    .call(xAxis, xScaleSVG, d3.ticks(5, 95, 9)); // Default tick values
 
   const gy = yAxisSVG
     .append("g")
@@ -74,11 +77,11 @@ export function createAxes(svg, yAxisSVG, { xScaleSVG, yScaleSVG, w, h }) {
     gy,
     xAxis,
     yAxis,
-    updateAxes: (x, y, newWidth, newHeight) => {
+    updateAxes: (x, y, newWidth, newHeight, xTicks) => {
       gx.transition()
         .duration(600)
         .attr("transform", `translate(0,${newHeight - margin.bottom})`)
-        .call(xAxis, x)
+        .call(xAxis, x, xTicks)
         .selection()
         .call(styleXAxis); // Reapply styles for the x-axis
 

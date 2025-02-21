@@ -62,9 +62,10 @@ export function setupIntersectionObserver({
     /* rootMargin: `0px -${window.innerHeight / 4}px -${
       window.innerHeight / 4
     }px 0px`, */
-    rootMargin: `-${(window.innerHeight / 100) * 10}px 0px -${
+    /* rootMargin: `-${(window.innerHeight / 100) * 10}px 0px -${
       (window.innerHeight / 100) * 10
-    }px 0px`,
+    }px 0px`, */
+    rootMargin: "0px",
     // threshold: 0.5, // Uncomment if you want a specific threshold
   };
 

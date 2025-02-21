@@ -78,6 +78,7 @@ const isEnhanced = width > 800;
 
 ```js
 const scrollInfo = d3.select(".scroll-info"); // Adjust selector as needed
+const outro = d3.select(".outro"); // Adjust selector as needed
 ```
 
 ```js
@@ -91,6 +92,7 @@ const currentVH = height;
 const marginCompensation = initialVH - currentVH;
 /* console.log("Margin compensation:", marginCompensation); */
 scrollInfo.style("margin-bottom", `${marginCompensation}px`);
+outro.style("margin-top", `${marginCompensation * -1}px`);
 ```
 
 <!-- ```js
@@ -265,7 +267,8 @@ const baseStep = {
   xDomain: [5, 95],
   xDomainMobile: [5, 95],
   yDomain: [4, 13],
-  mobileTicks: d3.ticks(5, 95, 18), // 18/5, 45/2, 90/1
+  ticks: d3.ticks(5, 95, 9), // 18/5, 45/2, 90/1
+  xResolution: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 18),
   triggerSource: null,
   height: initialHeight,
 };
@@ -273,8 +276,16 @@ const baseStep = {
 
 ```js
 const scrollyProps = {
-  0: { ...baseStep, scrollStep: 0, height: height },
-  1: { ...baseStep, scrollStep: 1, height: height },
+  0: {
+    ...baseStep,
+    scrollStep: 0,
+    height: height,
+  },
+  1: {
+    ...baseStep,
+    scrollStep: 1,
+    height: height,
+  },
   2: {
     ...baseStep,
     scrollStep: 2,
@@ -297,8 +308,9 @@ const scrollyProps = {
     showPointcloud: false,
     showPercentiles: ["C"],
     tooltipText: "Karin",
-    xDomain: isEnhanced ? [5, 95] : [26, 36],
-    mobileTicks: d3.ticks(5, 95, 90),
+    xDomain: isEnhanced ? [5, 95] : [25, 37],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: d3.ticks(5, 95, 45),
   },
   5: {
     ...baseStep,
@@ -309,8 +321,9 @@ const scrollyProps = {
     showPointcloud: true,
     showPercentiles: ["C"],
     tooltipText: "Du",
-    xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5, ageValue + 5],
-    mobileTicks: d3.ticks(5, 95, 90),
+    xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: d3.ticks(5, 95, 45),
     triggerSource: "slider",
   },
   6: {
@@ -322,8 +335,9 @@ const scrollyProps = {
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
-    xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5, ageValue + 5],
-    mobileTicks: d3.ticks(5, 95, 90),
+    xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: d3.ticks(5, 95, 45),
   },
   7: {
     ...baseStep,
@@ -334,8 +348,9 @@ const scrollyProps = {
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
-    xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5, ageValue + 5],
-    mobileTicks: d3.ticks(5, 95, 90),
+    xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: d3.ticks(5, 95, 45),
   },
   8: {
     ...baseStep,
@@ -349,8 +364,9 @@ const scrollyProps = {
     variant,
     xDomain: isEnhanced
       ? baseStep.xDomain
-      : [chartValue.age - 5, chartValue.age + 5],
-    mobileTicks: d3.ticks(5, 95, 90),
+      : [chartValue.age - 5.5, chartValue.age + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
     triggerSource: "scroll",
   },
   9: {
@@ -365,8 +381,9 @@ const scrollyProps = {
     variant,
     xDomain: isEnhanced
       ? baseStep.xDomain
-      : [chartValue.age - 5, chartValue.age + 5],
-    mobileTicks: d3.ticks(5, 95, 90),
+      : [chartValue.age - 5.5, chartValue.age + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
     triggerSource: "scroll",
   },
   10: {
@@ -376,8 +393,9 @@ const scrollyProps = {
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
-    xDomain: [5, 10],
-    mobileTicks: d3.ticks(5, 95, 90),
+    xDomain: [5, 10.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 90),
   },
   11: {
     ...baseStep,
@@ -386,8 +404,9 @@ const scrollyProps = {
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
-    xDomain: [11, 17],
-    mobileTicks: d3.ticks(5, 95, 90),
+    xDomain: [5, 10.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 90),
   },
   12: {
     ...baseStep,
@@ -396,8 +415,9 @@ const scrollyProps = {
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
-    xDomain: [18, 65],
-    mobileTicks: d3.ticks(5, 95, 90),
+    xDomain: [10.5, 17.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 90),
   },
   13: {
     ...baseStep,
@@ -406,8 +426,20 @@ const scrollyProps = {
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
-    xDomain: [66, 94],
-    mobileTicks: d3.ticks(5, 95, 90),
+    xDomain: isEnhanced ? [17.5, 67.5] : [17.5, 67.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: d3.ticks(5, 95, 18),
+  },
+  14: {
+    ...baseStep,
+    scrollStep: 14,
+    height: height,
+    showPointcloud: true,
+    showPercentiles: ["C"],
+    variant,
+    xDomain: isEnhanced ? [64, 95] : [62.5, 92.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: d3.ticks(5, 95, 18),
   },
 };
 ```
@@ -543,8 +575,8 @@ const context = canvas.getContext("2d");
 
 // Initialize the value of the container
 container.node().value = {
-  age: isEnhanced ? undefined : 20,
-  sleepTime: isEnhanced ? undefined : 7,
+  age: isEnhanced ? undefined : 89,
+  sleepTime: isEnhanced ? undefined : 0,
 };
 
 canvas.width = width * canvasScaleFactor;
@@ -601,13 +633,15 @@ const { gx, gy, xAxis, yAxis, updateAxes /* , styleYAxis  */ } = createAxes(
 );
 
 const percentilesGroup = svg.append("g").attr("class", "percentiles");
-const crosshair = initializeCrosshair(
+const crosshair = initializeCrosshair({
   svg,
   xScaleSVG,
   yScaleSVG,
   width,
-  initialHeight
-);
+  height: initialHeight,
+  yAxisSVG,
+  isEnhanced,
+});
 
 const { crosshairXLine, crosshairYLine } = crosshair;
 
@@ -642,8 +676,23 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
   // Update only if there are changes
   if (Object.keys(changes).length > 0) {
     console.log("inside if statement");
+
+    if (changes.scrollStep && !isEnhanced) {
+      console.log("scrollStep change");
+      scrollInteraction.setForceProgrammaticScroll(true);
+    }
+
+    // Update exploration mode
+    if ("isExplorable" in changes && isEnhanced) {
+      pointerInteraction.isExplorable = stepProps?.isExplorable || false;
+    } else if ("isExplorable" in changes && !isEnhanced) {
+      console.log("set horizontal scrolling to", stepProps.isExplorable);
+      scrollInteraction.setExplorable(stepProps?.isExplorable || false);
+    }
+
     // if height of domain changes
     if (changes?.height || changes?.xDomain) {
+      console.log("height or xDomain change");
       const newHeight = stepProps.height;
 
       // calculating the absolute domain for calculating new total width
@@ -669,10 +718,10 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
         .attr("height", newHeight - margin.top - margin.bottom); // height change
 
       if (isEnhanced) {
-        pointerInteraction.setDimensions(width, newHeight);
+        pointerInteraction.setDimensions(width, newHeight); // height change
       }
 
-      updateAxes(xScaleSVG, yScaleSVG, width, newHeight);
+      updateAxes(xScaleSVG, yScaleSVG, width, newHeight, stepProps.ticks); // both change
 
       // Update crosshairs
       updateCrosshairs(
@@ -689,10 +738,10 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
         showPercentiles: stepProps.showPercentiles,
         xScaleSVG,
         yScaleSVG,
-        tickValues: stepProps.mobileTicks,
+        tickValues: stepProps.xResolution,
       });
 
-      const duration = stepProps.triggerSource === "slider" ? 100 : 600;
+      const duration = stepProps.triggerSource === "slider" ? 600 : 600;
 
       if (!isEnhanced) {
         scrollInteraction.programmaticScroll(stepProps.xDomain[0], duration);
@@ -718,15 +767,8 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
         showPercentiles: stepProps.showPercentiles,
         xScaleSVG,
         yScaleSVG,
-        tickValues: stepProps.mobileTicks,
+        tickValues: stepProps.xResolution,
       });
-    }
-
-    // Update exploration mode
-    if ("isExplorable" in changes && isEnhanced) {
-      pointerInteraction.isExplorable = stepProps?.isExplorable || false;
-    } else if ("isExplorable" in changes && !isEnhanced) {
-      scrollInteraction.isExplorable = stepProps?.isExplorable || false;
     }
 
     // Update type specific plot
@@ -905,10 +947,6 @@ function updateVisualizationDescription(visualizationType) {
 updateVisualizationDescription(variant);
 ```
 
-```js
-
-```
-
 # Schlafdauer über die Lebensspanne
 
 Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so lange schlafen wie du? Und wie sieht es mit der Schlafdauer in der Gesamtbevölkerung so aus? Finde es mit unserer interaktiven Grafik heraus! Scrolle einfach nach unten - die Inhalte entfalten sich Schritt für Schritt, während du weiter scrollst.
@@ -916,43 +954,47 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 <section class="scroll-container">
   <div class="scroll-info">${chartElement}</div>
   <div class="scroll-section card" data-step="1"><p>Auf der Y-Achse links ist die Schlafdauer eingetragen, unten auf der X-Achse das Alter.</p></div>
-  <div class="scroll-section card" data-step="2"><p>Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000 Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert. Die Daten der Erwachsenen beruhen auf Selbsteinschätzungen, die der Kinder auf Angaben der Eltern. Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen: Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig.</p></div>
+  <div class="scroll-section card" data-step="2"><p>Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000 Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert.</p></div>
   <div class="scroll-section card" data-step="3"><p>Die Linien geben Perzentile an und zeigen, wie sich die Datenpunkte in der Stichprobe verteilen. Was das konkret heißt, siehst du im folgenden Bild:</p></div>
   <div class="scroll-section card" data-step="4"><p>Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p></div>
-   <div class="scroll-section card" data-step="5" id="user-input"><p>
+  <div class="scroll-section card" data-step="5" id="user-input"><p>
   Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.</p>
   ${ageInput}${sleepTimeInput}</div>
   <div class="scroll-section card" data-step="6">
-  <p>Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</p></div> 
+    <p>Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</p></div> 
   <div class="scroll-section card" data-step="7"><p>Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}${feedbackInput}</div>  
-  <div class="scroll-section card" data-step="8"><p>Bewege den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder.</div>
+  <div class="scroll-section card" data-step="8"><p>Bewege den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn du genug erkundet hast, scrolle einfach weiter.</div>
   <div class="scroll-section card" data-step="9">
-  <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
-  <h2>Die Gestaltung der Grafik war ansprechend.</h2>
-  ${aestheticsInput}
-  <h2>Das Thema hat mich interessiert.</h2>
-  ${interestInput}
-</div>
-    <div class="scroll-section card" data-step="10"><h2>Altersgruppe bis 10 Jahre</h2>
-    <p> Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
-    </div>
-    <div class="scroll-section card" data-step="11"><h2>11–17 Jahre</h2>
+    <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
+    <h2>Die Gestaltung der Grafik war ansprechend.</h2>
+    ${aestheticsInput}
+    <h2>Das Thema hat mich interessiert.</h2>
+    ${interestInput}
+  </div>
+  <div class="scroll-section card" data-step="10">
+    <p>Sehen wir uns nun die Altersgruppen ein wenig genauer an. Dafür haben wir näher herangezoomt. Die x-Achse unten hat sich also verändert und zeigt jeweils nur die Altersgruppe an, um die es gerade geht.</p>
+  </div>
+  <div class="scroll-section card" data-step="11"><h2>Altersgruppe bis 10 Jahre</h2>
+    <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
+  </div>
+  <div class="scroll-section card" data-step="12"><h2>11–17 Jahre</h2>
     <p>Während der Pubertät fällt die Schlafdauer dramatisch ab; gleichzeitig nimmt die Streuung zu. Da sich in dieser Phase die innere Uhr meist auf spätere Bettzeiten einstellt, die Schule aber in der Regel früh beginnt, bekommen Jugendliche oft weniger Schlaf, als es Fachleute empfehlen.</p>
-    </div>
-      <div class="scroll-section card" data-step="12"><h2>18–65 Jahre</h2>
+  </div>
+  <div class="scroll-section card" data-step="13"><h2>18–65 Jahre</h2>
     <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7 Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
-   </div>
-  <div class="scroll-section card" data-step="13"><h2>Über 66 Jahre</h2>
+  </div>
+  <div class="scroll-section card" data-step="14"><h2>Über 66 Jahre</h2>
     <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
-</div>
+  </div>
 </section>
-<!-- <div class="outro card">
-  <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
-  <h2>Die Gestaltung der Grafik war ansprechend.</h2>
-  ${aestheticsInput}
-  <h2>Das Thema hat mich interessiert.</h2>
-  ${interestInput}
-</div> -->
+<div class="outro card">
+  <p>Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen. Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig.
+  Dieses Phänomen ist nur eins von vielen, mit denen sich die Schlafforschung befasst. Auf unseren Themenseiten findest du zahlreiche Artikel zu den Themen <a href="https://www.spektrum.de/thema/schlaf/1295691">Schlaf</a> und <a href="https://www.spektrum.de/thema/traeumen/1356995">Träumen</a>.</p>
+  <p>Methodischer Hintergrund: Die Basis für die Grafik sind die Daten <a href="https://www.nature.com/articles/s41562-020-00965-x">dieser</a> Metaanalyse von Kocevska et al. Eine Metaanalyse fügt die Ergebnisse von vielen einzelnen Studien zusammen und gewinnt dadurch an Aussagekraft. Aus den statistischen Kennwerten haben wir eine realistische Verteilung nachgebildet und daraus die Perzentile berechnet.</p>
+  <p>Die Grafik wurde erstellt vom Kiel Science Communication Network (KielSCN).</p>
+  <p><em>Texte:</em> Stephan Reiche, Anna von Hopffgarten und Carolin Wagener</p>
+  <p><em>Grafikdesign und Umsetzung:</em> Björn Döge</p>
+</div>
 
 <!-- CSS -->
 
@@ -976,7 +1018,7 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 }
 .scroll-section {
   position: relative;
-  margin: 0 auto 80svh;
+  margin: 0 auto 100svh;
   z-index: 2;
   opacity: 1;
 }
@@ -991,16 +1033,27 @@ Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so la
 }
 
 .scroll-section:last-of-type {
-  margin-bottom: 80svh;
+  margin-bottom: 100svh;
 }
 
 .outro {
   margin: 0 auto 2rem;
+  transition: margin 0.6s ease;
 }
 
 #answer {
   display: none;
   overflow: hidden;
+}
+
+#body {
+  overflow-x: scroll;
+  -ms-overflow-style: none;  /* Hide scrollbar for Internet Explorer and Edge */
+  scrollbar-width: none;  /* Hide scrollbar for Firefox */
+}
+
+#body::-webkit-scrollbar {
+  display: none;  /* Hide scrollbar for Chrome, Safari, and newer Edge */
 }
 
 </style>
