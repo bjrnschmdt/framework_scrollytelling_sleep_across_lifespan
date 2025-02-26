@@ -665,130 +665,133 @@ if (isEnhanced) {
 }
 
 let currentWidth = initialWidth;
+let currentStepProps = baseStep;
 
-function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
+function updateChart({ data, stepProps, /* changes, */ hopIndex, isEnhanced }) {
   debugLog("update", "updateChart");
+  const changes = diffStepProps(stepProps, currentStepProps);
   debugLog("update", "changes", changes);
 
-  // Update only if there are changes
-  if (Object.keys(changes).length > 0) {
-    let duration = null;
+  let duration = null;
 
-    // Setup update plan
-    let updatePlan = {
-      updateHeight: false,
-      updateWidth: false,
-      updateScrollState: false,
-      updateDimensions: false,
-      updateScales: false,
-      updateAxes: false,
-      updateInteractions: false,
-      updatePercentiles: false,
-      updatePointcloud: false,
-      updatePlots: false,
-      updateCrosshairs: false,
-      updateScroll: false,
-      // ... add other update flags as necessary
-    };
-    if (changes.xDomain) {
-      const absDomainOld = changes.xDomain?.old[1] - changes.xDomain?.old[0];
-      const absDomainNew = changes.xDomain?.new[1] - changes.xDomain?.new[0];
-      const isDomainChange = absDomainOld !== absDomainNew;
-      updatePlan.updateWidth = isDomainChange; // if domain interval changes, update width
-      updatePlan.updateDimensions = isDomainChange; // if domain interval changes, update dimensions
-      updatePlan.updateScales = isDomainChange; // if domain interval changes, update scales
-      updatePlan.updateAxes = isDomainChange; // if domain interval changes, update axes
-      updatePlan.updatePercentiles = isDomainChange; // if domain interval changes, update percentiles
-      updatePlan.updatePointcloud = isDomainChange; // if domain interval changes, update pointcloud
-      updatePlan.updateScroll = true;
-    }
-    if (changes.height) {
-      updatePlan.updateHeight = true;
-      updatePlan.updateDimensions = true;
-      updatePlan.updateScales = true;
-      updatePlan.updateAxes = true;
-      updatePlan.updatePercentiles = true;
-      updatePlan.updatePointcloud = true;
-      updatePlan.updatePlots = true;
-      updatePlan.updateCrosshairs = true;
-    }
-    if (changes.isExplorable) {
-      updatePlan.updateInteractions = true;
-    }
-    if (changes.showPercentiles) {
-      updatePlan.updatePercentiles = true;
-    }
-    if (changes.scrollStep) {
-      updatePlan.updateScrollState = true;
-      /* updatePlan.updateScroll = true; */
-    }
-    if (changes.variant || changes.age || changes.sleepTime || changes.height) {
-      updatePlan.updatePlots = true;
-    }
-    if (changes.age || changes.sleepTime || changes.tooltipText) {
-      updatePlan.updateCrosshairs = true;
-    }
-    if (changes.showPointcloud) {
-      updatePlan.updatePointcloud = true;
-    }
+  // Setup update plan
+  let updatePlan = {
+    updateHeight: false,
+    updateWidth: false,
+    updateScrollState: false,
+    updateDimensions: false,
+    updateScales: false,
+    updateAxes: false,
+    updateInteractions: false,
+    updatePercentiles: false,
+    updatePointcloud: false,
+    updatePlots: false,
+    updateCrosshairs: false,
+    updateScroll: false,
+    // ... add other update flags as necessary
+  };
+  if (stepProps.variant === "hop" || stepProps.variant === "hop_traced") {
+    updatePlan.updatePlots = true;
+  }
+  if (changes.xDomain) {
+    const absDomainOld = changes.xDomain?.old[1] - changes.xDomain?.old[0];
+    const absDomainNew = changes.xDomain?.new[1] - changes.xDomain?.new[0];
+    const isDomainChange = absDomainOld !== absDomainNew;
+    updatePlan.updateWidth = isDomainChange; // if domain interval changes, update width
+    updatePlan.updateDimensions = isDomainChange; // if domain interval changes, update dimensions
+    updatePlan.updateScales = isDomainChange; // if domain interval changes, update scales
+    updatePlan.updateAxes = isDomainChange; // if domain interval changes, update axes
+    updatePlan.updatePercentiles = isDomainChange; // if domain interval changes, update percentiles
+    updatePlan.updatePointcloud = isDomainChange; // if domain interval changes, update pointcloud
+    updatePlan.updateScroll = true;
+  }
+  if (changes.height) {
+    updatePlan.updateHeight = true;
+    updatePlan.updateDimensions = true;
+    updatePlan.updateScales = true;
+    updatePlan.updateAxes = true;
+    updatePlan.updatePercentiles = true;
+    updatePlan.updatePointcloud = true;
+    updatePlan.updatePlots = true;
+    updatePlan.updateCrosshairs = true;
+  }
+  if (changes.isExplorable) {
+    updatePlan.updateInteractions = true;
+  }
+  if (changes.showPercentiles) {
+    updatePlan.updatePercentiles = true;
+  }
+  if (changes.scrollStep) {
+    updatePlan.updateScrollState = true;
+    /* updatePlan.updateScroll = true; */
+  }
+  if (changes.variant || changes.age || changes.sleepTime || changes.height) {
+    updatePlan.updatePlots = true;
+  }
+  if (changes.age || changes.sleepTime || changes.tooltipText) {
+    updatePlan.updateCrosshairs = true;
+  }
+  if (changes.showPointcloud) {
+    updatePlan.updatePointcloud = true;
+  }
 
-    debugLog("update", "updatePlan", updatePlan);
+  debugLog("update", "updatePlan", updatePlan);
 
-    // Execute updates based on the update plan
+  // Execute updates based on the update plan
 
-    let newWidth = currentWidth;
-    let newHeight = svg.attr("height");
+  let newWidth = currentWidth;
+  let newHeight = svg.attr("height");
 
-    if (updatePlan.updateInteractions) {
-      // Update dimensions/state in pointerInteraction or scrollInteraction.
-      // setting this before updating the xScale is important
-      debugLog("update", "updateInteractions");
-      if (isEnhanced) {
-        pointerInteraction.isExplorable = stepProps.isExplorable || false;
-      } else if (!isEnhanced) {
-        /* debugLog(
+  if (updatePlan.updateInteractions) {
+    // Update dimensions/state in pointerInteraction or scrollInteraction.
+    // setting this before updating the xScale is important
+    debugLog("update", "updateInteractions");
+    if (isEnhanced) {
+      pointerInteraction.isExplorable = stepProps.isExplorable || false;
+    } else if (!isEnhanced) {
+      /* debugLog(
           "update",
           "set horizontal scrolling to",
           stepProps.isExplorable
         ); */
-        scrollInteraction.setExplorable(stepProps.isExplorable || false); // attention! this uses the old xScaleSVG for calculating the element.scrollLeft
-      }
+      scrollInteraction.setExplorable(stepProps.isExplorable || false); // attention! this uses the old xScaleSVG for calculating the element.scrollLeft
     }
+  }
 
-    if (updatePlan.updateWidth) {
-      // Update width based on new xDomain.
-      debugLog("update", "updateWidth");
-      const { totalWidth } = updateXDomain(xScaleSVG, stepProps, width, margin); // attention! this mutates the xScaleSVG
-      newWidth = totalWidth;
-    }
+  if (updatePlan.updateWidth) {
+    // Update width based on new xDomain.
+    debugLog("update", "updateWidth");
+    const { totalWidth } = updateXDomain(xScaleSVG, stepProps, width, margin); // attention! this mutates the xScaleSVG
+    newWidth = totalWidth;
+  }
 
-    if (updatePlan.updateHeight) {
-      debugLog("update", "updateHeight");
-      newHeight = stepProps.height;
-    }
+  if (updatePlan.updateHeight) {
+    debugLog("update", "updateHeight");
+    newHeight = stepProps.height;
+  }
 
-    if (updatePlan.updateScrollState && !isEnhanced) {
-      // Update scroll state in pointerInteraction or scrollInteraction.
-      debugLog("update", "updateScrollState");
-      scrollInteraction.setForceProgrammaticScroll(true);
-    }
+  if (updatePlan.updateScrollState && !isEnhanced) {
+    // Update scroll state in pointerInteraction or scrollInteraction.
+    debugLog("update", "updateScrollState");
+    scrollInteraction.setForceProgrammaticScroll(true);
+  }
 
-    if (updatePlan.updateDimensions) {
-      // Update SVG, canvas, and clipPath dimensions.
-      debugLog("update", "updateDimensions");
+  if (updatePlan.updateDimensions) {
+    // Update SVG, canvas, and clipPath dimensions.
+    debugLog("update", "updateDimensions");
 
-      canvas.width = newWidth * canvasScaleFactor; // domain change
-      canvas.height = newHeight * canvasScaleFactor; // height change
+    canvas.width = newWidth * canvasScaleFactor; // domain change
+    canvas.height = newHeight * canvasScaleFactor; // height change
 
-      canvas.style.width = `${newWidth}px`; // domain change
-      canvas.style.height = `${newHeight}px`; // height change
+    canvas.style.width = `${newWidth}px`; // domain change
+    canvas.style.height = `${newHeight}px`; // height change
 
-      svg
-        .transition("updateDimensions")
-        .duration(600)
-        .attr("width", newWidth) // domain change
-        .attr("height", newHeight); // height change
-      /* .on("start", () => {
+    svg
+      .transition("updateDimensions")
+      .duration(600)
+      .attr("width", newWidth) // domain change
+      .attr("height", newHeight); // height change
+    /* .on("start", () => {
           console.log("started", svg.attr("width"));
         })
         .on("interrupt", () => {
@@ -798,143 +801,143 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
           console.log("ended", svg.attr("width"));
         }); */
 
-      /*       yAxisSVG.attr("height", newHeight); // height change */
+    /*       yAxisSVG.attr("height", newHeight); // height change */
 
-      clipPath
-        .attr("width", newWidth - margin.left - margin.right) // domain change
-        .attr("height", newHeight - margin.top - margin.bottom); // height change
+    clipPath
+      .attr("width", newWidth - margin.left - margin.right) // domain change
+      .attr("height", newHeight - margin.top - margin.bottom); // height change
 
-      if (isEnhanced) {
-        pointerInteraction.setDimensions(width, newHeight); // height change
-      }
+    if (isEnhanced) {
+      pointerInteraction.setDimensions(width, newHeight); // height change
     }
+  }
 
-    if (updatePlan.updateScales) {
-      debugLog("update", "updateScales");
-      // Recalculate scales based on new dimensions or domain.
-      xScaleSVG
-        .domain([ageMin, ageMax - 1])
-        .range([margin.left, newWidth - margin.right]);
-      yScaleSVG.range([newHeight - margin.bottom, margin.top]);
+  if (updatePlan.updateScales) {
+    debugLog("update", "updateScales");
+    // Recalculate scales based on new dimensions or domain.
+    xScaleSVG
+      .domain([ageMin, ageMax - 1])
+      .range([margin.left, newWidth - margin.right]);
+    yScaleSVG.range([newHeight - margin.bottom, margin.top]);
+  }
+
+  if (updatePlan.updateAxes) {
+    // Update axes with new scales.
+    debugLog("update", "updateAxes");
+    /* yAxisSVG.attr("height", newHeight); */ // height change
+    updateAxes(xScaleSVG, yScaleSVG, width, newHeight, stepProps.ticks); // both change
+  }
+
+  if (updatePlan.updatePercentiles) {
+    // Redraw or update percentile elements.
+    debugLog("update", "updatePercentiles");
+    drawPercentiles(percentilesGroup, {
+      dataSet,
+      showPercentiles: stepProps.showPercentiles,
+      xScaleSVG,
+      yScaleSVG,
+      tickValues: stepProps.xResolution,
+    });
+  }
+
+  if (updatePlan.updatePointcloud) {
+    // Update pointcloud if needed.
+    debugLog("update", "updatePointcloud");
+    /* pointcloud.setVisibility(stepProps.showPointcloud); */
+  }
+
+  if (updatePlan.updatePlots) {
+    // Execute type specific plot updates.
+    debugLog("update", "updatePlots");
+    debugLog("update", "variant", stepProps.variant);
+    switch (stepProps.variant) {
+      case "percentile":
+        updatePercentilePlot(data, xScaleSVG, yScaleSVG);
+        break;
+      case "dot":
+        updateDotPlot(data, stepProps, xScaleSVG, yScaleSVG, newHeight);
+        break;
+      case "box":
+        updateBoxPlot(data, xScaleSVG, yScaleSVG);
+        break;
+      case "hop":
+        updateHOPPlot(data, {
+          xScaleSVG,
+          yScaleSVG,
+          hopIndex,
+          h: newHeight,
+        });
+        break;
+      case "hop_traced":
+        updateHOPPlot(data, {
+          xScaleSVG,
+          yScaleSVG,
+          hopCount,
+          hopIndex,
+          h: newHeight,
+        });
+        break;
+      case "none":
+        exitPlot();
+        break;
+      default:
+        console.error("Unknown plot type selected");
     }
+  }
 
-    if (updatePlan.updateAxes) {
-      // Update axes with new scales.
-      debugLog("update", "updateAxes");
-      /* yAxisSVG.attr("height", newHeight); */ // height change
-      updateAxes(xScaleSVG, yScaleSVG, width, newHeight, stepProps.ticks); // both change
-    }
+  if (changes.age || changes.sleepTime) {
+    duration = getDuration(stepProps.triggerSource);
+    debugLog("update", "age and height change", duration);
+  }
 
-    if (updatePlan.updatePercentiles) {
-      // Redraw or update percentile elements.
-      debugLog("update", "updatePercentiles");
-      drawPercentiles(percentilesGroup, {
-        dataSet,
-        showPercentiles: stepProps.showPercentiles,
-        xScaleSVG,
-        yScaleSVG,
-        tickValues: stepProps.xResolution,
+  if (changes.height) {
+    duration = getDuration("height");
+    debugLog("update", "height change", duration);
+  }
+
+  if (changes.xDomain) {
+    duration = 600;
+    debugLog("update", "xDomain change", duration);
+  }
+
+  if (updatePlan.updateCrosshairs) {
+    // Refresh crosshairs. Maybe adjust the duration.
+    debugLog("update", "updateCrosshairs", duration);
+    // duration on mobile and on height change should be ? ms
+    // duration on mobile and on slider change should be ? ms
+    // duration on mobile and on scroll change should be ? ms
+    // duration on desktop and on height change should be ? ms
+    // duration on desktop and on slider change should be ? ms
+    // duration on desktop and on scroll change should be ? ms
+    /* const duration = stepProps.triggerSource === "slider" ? 600 : 600; */
+
+    updateCrosshairs(
+      stepProps,
+      crosshair,
+      xScaleSVG,
+      yScaleSVG,
+      isEnhanced,
+      duration
+    );
+  }
+
+  if (updatePlan.updateScroll) {
+    debugLog("update", "updateScroll", duration);
+    /* const duration = stepProps.triggerSource === "slider" ? 600 : 600; */
+
+    if (!isEnhanced) {
+      scrollInteraction.programmaticScroll(stepProps.xDomain[0], duration);
+    } else {
+      programmaticScroll({
+        targetDomainLeft: stepProps.xDomain[0],
+        element: body.node(),
+        xScale: xScaleSVG,
+        duration: 600,
       });
     }
-
-    if (updatePlan.updatePointcloud) {
-      // Update pointcloud if needed.
-      debugLog("update", "updatePointcloud");
-      /* pointcloud.setVisibility(stepProps.showPointcloud); */
-    }
-
-    if (updatePlan.updatePlots) {
-      // Execute type specific plot updates.
-      debugLog("update", "updatePlots");
-      switch (stepProps.variant) {
-        case "percentile":
-          updatePercentilePlot(data, xScaleSVG, yScaleSVG);
-          break;
-        case "dot":
-          updateDotPlot(data, stepProps, xScaleSVG, yScaleSVG, newHeight);
-          break;
-        case "box":
-          updateBoxPlot(data, xScaleSVG, yScaleSVG);
-          break;
-        case "hop":
-          updateHOPPlot(data, {
-            xScaleSVG,
-            yScaleSVG,
-            hopIndex,
-            h: newHeight,
-          });
-          break;
-        case "hop_traced":
-          updateHOPPlot(data, {
-            xScaleSVG,
-            yScaleSVG,
-            hopCount,
-            hopIndex,
-            h: newHeight,
-          });
-          break;
-        case "none":
-          exitPlot();
-          break;
-        default:
-          console.error("Unknown plot type selected");
-      }
-    }
-
-    if (changes.age || changes.sleepTime) {
-      duration = getDuration(stepProps.triggerSource);
-      debugLog("update", "age and height change", duration);
-    }
-
-    if (changes.height) {
-      duration = getDuration("height");
-      debugLog("update", "height change", duration);
-    }
-
-    if (changes.xDomain) {
-      duration = 600;
-      debugLog("update", "xDomain change", duration);
-    }
-
-    if (updatePlan.updateCrosshairs) {
-      // Refresh crosshairs. Maybe adjust the duration.
-      debugLog("update", "updateCrosshairs", duration);
-      // duration on mobile and on height change should be ? ms
-      // duration on mobile and on slider change should be ? ms
-      // duration on mobile and on scroll change should be ? ms
-      // duration on desktop and on height change should be ? ms
-      // duration on desktop and on slider change should be ? ms
-      // duration on desktop and on scroll change should be ? ms
-      /* const duration = stepProps.triggerSource === "slider" ? 600 : 600; */
-
-      updateCrosshairs(
-        stepProps,
-        crosshair,
-        xScaleSVG,
-        yScaleSVG,
-        isEnhanced,
-        duration
-      );
-    }
-
-    if (updatePlan.updateScroll) {
-      debugLog("update", "updateScroll", duration);
-      /* const duration = stepProps.triggerSource === "slider" ? 600 : 600; */
-
-      if (!isEnhanced) {
-        scrollInteraction.programmaticScroll(stepProps.xDomain[0], duration);
-      } else {
-        programmaticScroll({
-          targetDomainLeft: stepProps.xDomain[0],
-          element: body.node(),
-          xScale: xScaleSVG,
-          duration: 600,
-        });
-      }
-    }
-    currentWidth = newWidth;
-    setStableStepProps(stepProps);
   }
+  currentWidth = newWidth;
+  currentStepProps = stepProps;
 }
 
 container.node().updateChart = updateChart;
@@ -989,9 +992,12 @@ const updateChart = chartElement.updateChart({
 ```
 
 ```js
-chartValue;
 const j = (async function* () {
-  for (let j = 0; variant === "hop" || variant === "hop_traced"; ++j) {
+  for (
+    let j = 0;
+    stepProps.variant === "hop" || stepProps.variant === "hop_traced";
+    ++j
+  ) {
     yield j;
     await new Promise((resolve) => setTimeout(resolve, hopDuration));
   }

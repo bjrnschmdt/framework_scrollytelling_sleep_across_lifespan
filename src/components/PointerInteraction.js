@@ -150,7 +150,7 @@ export class PointerInteraction {
    */
   attachEventListeners() {
     this.svg.on("pointerenter pointermove", this.pointerMoved.bind(this));
-    /* .on("click", this.pointerClicked.bind(this)) */
+    this.svg.on("click", this.pointerClicked.bind(this));
     /* .on("touchstart", (event) => event.preventDefault()); */ // Prevent default touch behaviors
   }
 }

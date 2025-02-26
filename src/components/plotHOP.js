@@ -37,13 +37,13 @@ function updateHOP(update, context) {
 }
 
 function filterFn(arr, context) {
-  const { index, hopCount } = context;
+  const { hopIndex, hopCount } = context;
   const maxLength = hopCount; // Desired maximum length of the array
-  const adjustedIndex = index % arr.length; // Wrap index using modulo
+  const adjustedIndex = hopIndex % arr.length; // Wrap index using modulo
   const result = [];
 
   // Build up the array incrementally
-  const currentLength = Math.min(index + 1, maxLength); // Determine current array size
+  const currentLength = Math.min(hopIndex + 1, maxLength); // Determine current array size
   for (let i = 0; i < currentLength; i++) {
     const currentIndex = (adjustedIndex - i + arr.length) % arr.length;
     result.unshift(arr[currentIndex]);
@@ -52,7 +52,7 @@ function filterFn(arr, context) {
 }
 
 export function updateHOPPlot(data, context) {
-  const { xScaleSVG, yScaleSVG, hopCount = 1, index, h } = context;
+  const { xScaleSVG, yScaleSVG, hopCount = 1, hopIndex, h } = context;
   const qdomain = [sleepMin, sleepMax];
   const qwidth = h - margin.top - margin.bottom;
   const qradius = (0.5 * qwidth * qstep) / (qdomain[1] - qdomain[0]);
@@ -64,7 +64,7 @@ export function updateHOPPlot(data, context) {
     enterFn: (enter, context) =>
       enterHOP(enter, { ...context, qradius, hopCount }),
     updateFn: (update, context) => updateHOP(update, { ...context, hopCount }),
-    filterFn: (arr) => filterFn(arr, { index, hopCount }),
+    filterFn: (arr) => filterFn(arr, { hopIndex, hopCount }),
     xScaleSVG,
     yScaleSVG,
   });
