@@ -738,7 +738,6 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
 
     let newWidth = currentWidth;
     let newHeight = svg.attr("height");
-    console.log("currentWidth", currentWidth);
 
     if (updatePlan.updateInteractions) {
       // Update dimensions/state in pointerInteraction or scrollInteraction.
@@ -752,14 +751,14 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
           "set horizontal scrolling to",
           stepProps.isExplorable
         ); */
-        scrollInteraction.setExplorable(stepProps.isExplorable || false);
+        scrollInteraction.setExplorable(stepProps.isExplorable || false); // attention! this uses the old xScaleSVG for calculating the element.scrollLeft
       }
     }
 
     if (updatePlan.updateWidth) {
       // Update width based on new xDomain.
       debugLog("update", "updateWidth");
-      const { totalWidth } = updateXDomain(xScaleSVG, stepProps, width, margin);
+      const { totalWidth } = updateXDomain(xScaleSVG, stepProps, width, margin); // attention! this mutates the xScaleSVG
       newWidth = totalWidth;
     }
 
@@ -777,15 +776,6 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
     if (updatePlan.updateDimensions) {
       // Update SVG, canvas, and clipPath dimensions.
       debugLog("update", "updateDimensions");
-      const { totalWidth: targetWidth } = updateXDomain(
-        xScaleSVG,
-        stepProps,
-        width,
-        margin
-      );
-      let newWidth = targetWidth; // Use this as the definitive new width
-      console.log("newWidth", newWidth);
-      let newHeight = stepProps.height;
 
       canvas.width = newWidth * canvasScaleFactor; // domain change
       canvas.height = newHeight * canvasScaleFactor; // height change
@@ -797,8 +787,8 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
         .transition("updateDimensions")
         .duration(600)
         .attr("width", newWidth) // domain change
-        .attr("height", newHeight) // height change
-        .on("start", () => {
+        .attr("height", newHeight); // height change
+      /* .on("start", () => {
           console.log("started", svg.attr("width"));
         })
         .on("interrupt", () => {
@@ -806,8 +796,7 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
         })
         .on("end", () => {
           console.log("ended", svg.attr("width"));
-          /* svg.attr("width", newWidth).attr("height", newHeight); */
-        });
+        }); */
 
       /*       yAxisSVG.attr("height", newHeight); // height change */
 
@@ -823,6 +812,9 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
     if (updatePlan.updateScales) {
       debugLog("update", "updateScales");
       // Recalculate scales based on new dimensions or domain.
+      xScaleSVG
+        .domain([ageMin, ageMax - 1])
+        .range([margin.left, newWidth - margin.right]);
       yScaleSVG.range([newHeight - margin.bottom, margin.top]);
     }
 

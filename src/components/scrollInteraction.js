@@ -113,9 +113,9 @@ export class ScrollInteraction {
     const targetScroll = this.xScaleSVG(targetDomainLeft);
     const element = this.element;
 
-    console.log("element.scrollLeft", element.scrollLeft);
+    /* console.log("element.scrollLeft", element.scrollLeft);
     console.log("targetDomainLeft", targetDomainLeft);
-    console.log("targetScroll", targetScroll);
+    console.log("targetScroll", targetScroll); */
 
     // Use D3 transitions to smoothly animate the scrollLeft property.
     d3.transition()
@@ -127,7 +127,7 @@ export class ScrollInteraction {
         );
         return function (t) {
           // Using requestAnimationFrame here ensures a smooth update.
-          console.log("tween", interpolator(t));
+          /* console.log("tween", interpolator(t)); */
           requestAnimationFrame(() => {
             element.scrollLeft = interpolator(t);
           });

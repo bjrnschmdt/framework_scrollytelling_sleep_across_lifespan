@@ -170,28 +170,24 @@ export function createDebouncedLogger(callback, delay) {
 }
 
 /**
- * Updates the x-domain and recomputes necessary dimensions.
+ * Computes the new x-domain and total width but does not modify the original scale.
  * @param {Object} xScale - D3 scale object for x-axis.
  * @param {Object} stepProps - Current scrollytelling step properties.
- * @param {Object} changes - Object tracking changes in properties.
  * @param {number} width - New chart width.
  * @param {number} margin - Margin settings.
- * @returns {Object} - Returns { start, end, totalWidth }
+ * @returns {Object} - Returns { totalWidth }
  */
 export function updateXDomain(xScale, stepProps, width, margin) {
   const absoluteDomain = stepProps.xDomain[1] - stepProps.xDomain[0];
   const domainWithOffset = ageMin + absoluteDomain;
   const newDomain = [ageMin, domainWithOffset];
 
-  // Temporarily update scale to compute total width
-  xScale.domain(newDomain).range([margin.left, width - margin.right]);
-  const totalWidth = xScale(ageMax - 1) + margin.right;
+  // Create a copy of xScale to perform calculations
+  const tempScale = xScale.copy();
+  tempScale.domain(newDomain).range([margin.left, width - margin.right]);
+  const totalWidth = tempScale(ageMax - 1) + margin.right;
 
-  // Reset domain to original but adjust range
-  xScale
-    .domain([ageMin, ageMax - 1])
-    .range([margin.left, totalWidth - margin.right]);
-
+  // Return values without mutating the original xScale
   return { totalWidth };
 }
 
@@ -211,7 +207,7 @@ export function programmaticScroll({
         targetScroll
       );
       return function (t) {
-        console.log("tween", interpolator(t));
+        /* console.log("tween", interpolator(t)); */
         element.scrollLeft = interpolator(t);
       };
     });
