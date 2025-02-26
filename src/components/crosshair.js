@@ -250,17 +250,6 @@ export function updateCrosshairs(
     .style("display", tooltipIsVisible ? "block" : "none")
     .attr("transform", `translate(${x}, ${y})`);
 
-  // Fade out the axis ticks if the crosshair is active
-  /*   d3.selectAll(".x-axis .tick")
-    .transition("tickXOpacityTransition")
-    .duration(200)
-    .attr("opacity", tickOpacity);
-
-  d3.selectAll(".y-axis .tick text")
-    .transition("tickYOpacityTransition")
-    .duration(200)
-    .attr("opacity", tickOpacity); */
-
   // Move the crosshair dot
   crosshairPoint
     .transition()

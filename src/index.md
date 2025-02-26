@@ -227,17 +227,6 @@ function diffStepProps(newProps, oldProps) {
 ```
 
 ```js
-const stableStepProps = Mutable(baseStep);
-const setStableStepProps = (x) => {
-  stableStepProps.value = x;
-};
-```
-
-```js
-const changes = diffStepProps(stepProps, stableStepProps);
-```
-
-```js
 const scrollyStep = Mutable(0);
 const setScrollyStep = (x) => (scrollyStep.value = x);
 ```
@@ -382,7 +371,7 @@ const scrollyProps = {
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
     triggerSource: "scroll",
   },
-  10: {
+  /*   10: {
     ...baseStep,
     scrollStep: 10,
     height: height,
@@ -392,8 +381,8 @@ const scrollyProps = {
     xDomain: [5, 10.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 90),
-  },
-  11: {
+  }, */
+  10: {
     ...baseStep,
     scrollStep: 11,
     height: height,
@@ -404,7 +393,7 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 90),
   },
-  12: {
+  11: {
     ...baseStep,
     scrollStep: 12,
     height: height,
@@ -415,7 +404,7 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 90),
   },
-  13: {
+  12: {
     ...baseStep,
     scrollStep: 13,
     height: height,
@@ -426,7 +415,7 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: d3.ticks(5, 95, 18),
   },
-  14: {
+  13: {
     ...baseStep,
     scrollStep: 14,
     height: height,
@@ -667,12 +656,10 @@ if (isEnhanced) {
 let currentWidth = initialWidth;
 let currentStepProps = baseStep;
 
-function updateChart({ data, stepProps, /* changes, */ hopIndex, isEnhanced }) {
+function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
   debugLog("update", "updateChart");
   const changes = diffStepProps(stepProps, currentStepProps);
   debugLog("update", "changes", changes);
-
-  let duration = null;
 
   // Setup update plan
   let updatePlan = {
@@ -814,8 +801,15 @@ function updateChart({ data, stepProps, /* changes, */ hopIndex, isEnhanced }) {
 
   if (updatePlan.updateAxes) {
     // Update axes with new scales.
-    debugLog("update", "updateAxes");
-    updateAxes(xScaleSVG, yScaleSVG, width, newHeight, stepProps.ticks); // both change
+    debugLog("update", "updateAxes", stepProps.age, stepProps.sleepTime);
+    updateAxes(
+      xScaleSVG,
+      yScaleSVG,
+      width,
+      newHeight,
+      stepProps.ticks,
+      stepProps
+    ); // both change
   }
 
   if (updatePlan.updatePercentiles) {
@@ -875,20 +869,20 @@ function updateChart({ data, stepProps, /* changes, */ hopIndex, isEnhanced }) {
     }
   }
 
-  if (changes.age || changes.sleepTime) {
-    duration = getDuration(stepProps.triggerSource);
-    debugLog("update", "age and height change", duration);
-  }
+  // Default duration based on trigger source
+  let duration = getDuration(stepProps.triggerSource);
 
   if (changes.height) {
     duration = getDuration("height");
     debugLog("update", "height change", duration);
   }
 
-  if (changes.xDomain) {
-    duration = 600;
-    debugLog("update", "xDomain change", duration);
+  // Override for section changes
+  if (changes.scrollStep) {
+    duration = 600; // Override with custom value for section change
   }
+
+  debugLog("update", "final duration", duration);
 
   if (updatePlan.updateCrosshairs) {
     // Refresh crosshairs. Maybe adjust the duration.
@@ -938,7 +932,7 @@ container.node().updateChart = updateChart;
 const durations = {
   mobile: {
     height: 600,
-    slider: 100,
+    slider: 200,
     scroll: 100,
   },
   desktop: {
@@ -975,7 +969,6 @@ const chartValue = Generators.input(chartElement);
 const updateChart = chartElement.updateChart({
   data: dataSet.get(stepProps.age),
   stepProps,
-  changes,
   hopIndex: j,
   isEnhanced,
 });
@@ -1060,14 +1053,14 @@ const visualizationDescriptionDiv = document.querySelector(
 
 // Object to store descriptions for each visualization type
 const visualizationDescriptions = {
-  dot: "Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.",
-  box: "Die hier gezeigte Boxplot-Darstellung zeigt, wie die Daten verteilt sind. Dabei sind die Hälfte der Daten im mittleren Bereich, also in der Box, abgebildet. Die Balken oben und unten zeigen die längsten und kürzesten Schlafdauern und bilden die andere Hälfte der Daten ab. Der Boxplot bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
+  dot: "<p>Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</p>",
+  box: "<p>Die hier gezeigte Boxplot-Darstellung zeigt, wie die Daten verteilt sind. Dabei sind die Hälfte der Daten im mittleren Bereich, also in der Box, abgebildet. Die Balken oben und unten zeigen die längsten und kürzesten Schlafdauern und bilden die andere Hälfte der Daten ab. Der Boxplot bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.</p>",
   percentile:
-    "Hier haben wir die Perzentillinien noch zusätzlich beschriftet, damit Sie sich besser zurechtfinden können. Die Beschriftung bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
-  hop: "Diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, können Sie abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
+    "<p>Hier haben wir die Perzentillinien noch zusätzlich beschriftet, damit Sie sich besser zurechtfinden können. Die Beschriftung bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.</p>",
+  hop: "<p>Diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, können Sie abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.</p>",
   hop_traced:
-    "Diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, können Sie abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
-  none: "No specific visualization selected.",
+    "<p>Diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, können Sie abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.</p>",
+  none: "<p>No specific visualization selected.</p>",
 };
 
 // Function to update the description based on the visualization type
@@ -1075,11 +1068,44 @@ function updateVisualizationDescription(visualizationType) {
   const description =
     visualizationDescriptions[visualizationType] ||
     visualizationDescriptions.none;
-  visualizationDescriptionDiv.textContent = description;
+  visualizationDescriptionDiv.innerHTML = description;
 }
 
 // Example usage: Update the description based on the current visualization type
 updateVisualizationDescription(variant);
+```
+
+```js
+const stepContent = {
+  4: {
+    desktop: `<p>Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p>`,
+    mobile: `<p>Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p><p>Damit es besser erkennbar ist, haben wir näher herangezoomt. Die x-Achse unten hat sich also verändert und zeigt jeweils nur den Altersbereich an, um den es gerade geht.</p>`,
+  },
+  8: {
+    desktop: `<p>Bewegen Sie den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn Sie genug erkundet haben, scrollen Sie einfach weiter.</p>`,
+    mobile: `<p>Sie können die Grafik nun frei erkunden. Scrollen Sie nach oben und unten, um die Schlafdauer zu verändern. Wischen Sie nach links oder rechts, um andere Altersbereiche anzuzeigen. Wenn Sie genug erkundet haben, scrollen Sie wie gehabt weiter nach unten.</p>`,
+  },
+  10: {
+    desktop: `<p>Sehen wir uns nun die Altersgruppen ein wenig genauer an. Dafür haben wir näher herangezoomt:</p>
+      <h2>Altersgruppe bis 10 Jahre</h2>
+      <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>`,
+    mobile: `<h2>Altersgruppe bis 10 Jahre</h2>
+      <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>`,
+  },
+};
+
+function updateStepContent(step) {
+  const stepDiv = document.querySelector(
+    `.scroll-section[data-step="${step}"]`
+  );
+  if (stepDiv)
+    stepDiv.innerHTML = isEnhanced
+      ? stepContent[step].desktop
+      : stepContent[step].mobile;
+}
+
+// Update all steps
+[4, 8, 10].forEach(updateStepContent);
 ```
 
 # Schlafdauer über die Lebensspanne
@@ -1103,6 +1129,7 @@ Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so la
 </div>
 <div class="scroll-section card" data-step="5" id="user-input">
   <p>Wie ist es bei Ihnen? Geben Sie hier Ihr Alter und Ihre übliche Schlafdauer (bspw. von letzter Nacht) ein, um sich in der Grafik verorten zu können! Wenn Sie weiter scrollen, können Sie sich mit anderen in Ihrem Alter vergleichen.</p>${ageInput}${sleepTimeInput}
+  <p class="disclaimer">Die auf dieser Seite erhobenen Daten werden in vollständig anonymisierter Form für wissenschaftliche Zwecke durch das Kiel Science Communication Network verwendet. Es ist kein Rückschluss auf Ihre Person möglich.</p>
 </div>
 <div class="scroll-section card" data-step="6">
   <p>Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</p>
@@ -1111,26 +1138,28 @@ Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so la
   <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}
 </div>
 <div class="scroll-section card" data-step="8">
-  <p>Bewegen Sie den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn Sie genug erkundet haben, scrollen Sie einfach weiter.
+  <p>Bewegen Sie den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn Sie genug erkundet haben, scrollen Sie einfach weiter.</p>
 </div>
 <div class="scroll-section card" data-step="9">
   <p>Uns interessiert Ihre Meinung: wie stehen Sie zu folgenden Aussagen?</p>
   <h2>Die Gestaltung der Grafik war ansprechend.</h2>${aestheticsInput}<h2>Das Thema hat mich interessiert.</h2>${interestInput}</div>
-<div class="scroll-section card" data-step="10">
+<!-- <div class="scroll-section card" data-step="10">
   <p>Sehen wir uns nun die Altersgruppen ein wenig genauer an. Dafür haben wir näher herangezoomt. Die x-Achse unten hat sich also verändert und zeigt jeweils nur die Altersgruppe an, um die es gerade geht.</p>
-</div>
-<div class="scroll-section card" data-step="11"><h2>Altersgruppe bis 10 Jahre</h2>
+</div> -->
+<div class="scroll-section card" data-step="10">
+  <p>Sehen wir uns nun die Altersgruppen ein wenig genauer an. Dafür haben wir näher herangezoomt.</p>
+  <h2>Altersgruppe bis 10 Jahre</h2>
   <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
 </div>
-<div class="scroll-section card" data-step="12">
+<div class="scroll-section card" data-step="11">
   <h2>11–17 Jahre</h2>
   <p>Während der Pubertät fällt die Schlafdauer dramatisch ab; gleichzeitig nimmt die Streuung zu. Da sich in dieser Phase die innere Uhr meist auf spätere Bettzeiten einstellt, die Schule aber in der Regel früh beginnt, bekommen Jugendliche oft weniger Schlaf, als es Fachleute empfehlen.</p>
 </div>
-<div class="scroll-section card" data-step="13">
+<div class="scroll-section card" data-step="12">
   <h2>18–65 Jahre</h2>
   <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7 Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
 </div>
-<div class="scroll-section card" data-step="14">
+<div class="scroll-section card" data-step="13">
   <h2>Über 66 Jahre</h2>
   <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
 </div>
@@ -1202,6 +1231,11 @@ Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so la
 
 #body::-webkit-scrollbar {
   display: none;  /* Hide scrollbar for Chrome, Safari, and newer Edge */
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  color: #888;
 }
 
 </style>

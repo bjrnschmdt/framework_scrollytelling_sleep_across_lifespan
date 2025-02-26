@@ -26,8 +26,6 @@ export function updatePlot({
   const filteredData = filterFn(array);
   const preprocessed = preprocessFn(filteredData);
 
-  console.log("yScaleSVG.range()", yScaleSVG.range());
-
   const plotArea = {
     xMin: xScaleSVG.range()[0],
     xMax: xScaleSVG.range()[1],

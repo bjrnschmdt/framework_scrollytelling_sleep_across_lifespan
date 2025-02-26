@@ -39,6 +39,22 @@ function styleYAxis(g, { w }) {
   g.select(".domain").remove(); // Remove the axis line
 }
 
+// Function to update tick opacity based on chartValue
+function updateTickOpacity(stepProps) {
+  const tickOpacity =
+    stepProps.age === undefined || stepProps.sleepTime === undefined ? 1 : 0.4;
+
+  d3.selectAll(".x-axis .tick text")
+    .transition("tickXOpacityTransition")
+    .duration(200)
+    .attr("opacity", tickOpacity);
+
+  d3.selectAll(".y-axis .tick text")
+    .transition("tickYOpacityTransition")
+    .duration(200)
+    .attr("opacity", tickOpacity);
+}
+
 export function createAxes(svg, yAxisSVG, { xScaleSVG, yScaleSVG, w, h }) {
   const xAxis = (g, x, xTicks) => {
     g.call(
@@ -77,7 +93,7 @@ export function createAxes(svg, yAxisSVG, { xScaleSVG, yScaleSVG, w, h }) {
     gy,
     xAxis,
     yAxis,
-    updateAxes: (x, y, newWidth, newHeight, xTicks) => {
+    updateAxes: (x, y, newWidth, newHeight, xTicks, stepProps) => {
       gx.transition()
         .duration(600)
         .attr("transform", `translate(0,${newHeight - margin.bottom})`)
@@ -90,6 +106,8 @@ export function createAxes(svg, yAxisSVG, { xScaleSVG, yScaleSVG, w, h }) {
         .call(yAxis, y)
         .selection()
         .call((g) => styleYAxis(g, { w: newWidth })); // Reapply styles for the y-axis
+
+      updateTickOpacity(stepProps); // Update tick opacity based on chartValue
     },
   };
 }
