@@ -422,7 +422,7 @@ const scrollyProps = {
     showPointcloud: true,
     showPercentiles: ["C"],
     variant,
-    xDomain: isEnhanced ? [64, 95] : [62.5, 92.5],
+    xDomain: isEnhanced ? [64, 94] : [62.5, 92.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: d3.ticks(5, 95, 18),
   },
