@@ -147,7 +147,7 @@ export class ScrollInteraction {
    *
    * @param {boolean} state - `true` to enable scrolling, `false` to disable.
    */
-  setExplorable(state, domainLeft) {
+  setExplorable(state) {
     // Only update if there's a change in state.
     if (state === this.isExplorable) return;
 
@@ -156,11 +156,6 @@ export class ScrollInteraction {
     this.element.style.overflowX = state ? "scroll" : "hidden";
     // If disabling exploration, reset the scroll position based on the current age.
     if (!state) {
-      console.log("setExplorable", this.chartElement.value.age - 5.5);
-      console.log(
-        "this.xScaleSVG(domainLeft)",
-        this.xScaleSVG(this.chartElement.value.age - 5.5)
-      );
       this.element.scrollLeft = this.xScaleSVG(
         this.chartElement.value.age - 5.5
       );
