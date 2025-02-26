@@ -791,17 +791,8 @@ function updateChart({ data, stepProps, /* changes, */ hopIndex, isEnhanced }) {
       .duration(600)
       .attr("width", newWidth) // domain change
       .attr("height", newHeight); // height change
-    /* .on("start", () => {
-          console.log("started", svg.attr("width"));
-        })
-        .on("interrupt", () => {
-          console.log("interrupted", svg.attr("width"));
-        })
-        .on("end", () => {
-          console.log("ended", svg.attr("width"));
-        }); */
 
-    /*       yAxisSVG.attr("height", newHeight); // height change */
+    yAxisSVG.attr("height", newHeight); // height change
 
     clipPath
       .attr("width", newWidth - margin.left - margin.right) // domain change
@@ -824,7 +815,6 @@ function updateChart({ data, stepProps, /* changes, */ hopIndex, isEnhanced }) {
   if (updatePlan.updateAxes) {
     // Update axes with new scales.
     debugLog("update", "updateAxes");
-    /* yAxisSVG.attr("height", newHeight); */ // height change
     updateAxes(xScaleSVG, yScaleSVG, width, newHeight, stepProps.ticks); // both change
   }
 
@@ -948,13 +938,13 @@ container.node().updateChart = updateChart;
 const durations = {
   mobile: {
     height: 600,
-    slider: 200,
+    slider: 100,
     scroll: 100,
   },
   desktop: {
-    height: 500,
-    slider: 400,
-    scroll: 450,
+    height: 600,
+    slider: 100,
+    scroll: 100,
   },
 };
 ```

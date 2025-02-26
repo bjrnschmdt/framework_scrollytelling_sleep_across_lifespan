@@ -200,24 +200,22 @@ export class ScrollInteraction {
     const currentScrollY = window.scrollY + offset;
 
     // Update the sleepTime only if the current scroll is within the boundaries.
-    if (currentScrollY >= lowerBoundary && currentScrollY <= upperBoundary) {
-      // Map the vertical scroll position linearly to a sleepTime value.
-      const sleepScale = d3
-        .scaleLinear()
-        .domain([lowerBoundary, upperBoundary])
-        .range([sleepMin, sleepMax])
-        .clamp(true);
+    // Map the vertical scroll position linearly to a sleepTime value.
+    const sleepScale = d3
+      .scaleLinear()
+      .domain([lowerBoundary, upperBoundary])
+      .range([sleepMin, sleepMax])
+      .clamp(true);
 
-      const newSleepTimeUnrounded = sleepScale(currentScrollY);
-      const newSleepTime = roundToStep(newSleepTimeUnrounded, 0.25);
+    const newSleepTimeUnrounded = sleepScale(currentScrollY);
+    const newSleepTime = roundToStep(newSleepTimeUnrounded, 0.25);
 
-      // Update the chart if the sleepTime has changed.
-      if (this.chartElement.value.sleepTime !== newSleepTime) {
-        set(this.chartElement, {
-          ...this.chartElement.value,
-          sleepTime: newSleepTime,
-        });
-      }
+    // Update the chart if the sleepTime has changed.
+    if (this.chartElement.value.sleepTime !== newSleepTime) {
+      set(this.chartElement, {
+        ...this.chartElement.value,
+        sleepTime: newSleepTime,
+      });
 
       // Log interaction data with debounce
       this.debouncedLogger({
