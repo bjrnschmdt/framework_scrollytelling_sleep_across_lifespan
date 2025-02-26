@@ -295,7 +295,7 @@ const scrollyProps = {
     tooltipText: "Karin",
     xDomain: isEnhanced ? [5, 95] : [25.5, 36.5],
     xResolution: d3.ticks(5, 95, 90),
-    ticks: d3.ticks(5, 95, 45),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
   5: {
     ...baseStep,
@@ -308,7 +308,7 @@ const scrollyProps = {
     tooltipText: "Du",
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
     xResolution: d3.ticks(5, 95, 90),
-    ticks: d3.ticks(5, 95, 45),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
     triggerSource: "slider",
   },
   6: {
@@ -321,8 +321,8 @@ const scrollyProps = {
     showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
-    xResolution: d3.ticks(5, 95, 90),
-    ticks: d3.ticks(5, 95, 45),
+    xResolution: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
   7: {
     ...baseStep,
@@ -334,8 +334,8 @@ const scrollyProps = {
     showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
-    xResolution: d3.ticks(5, 95, 90),
-    ticks: d3.ticks(5, 95, 45),
+    xResolution: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
   8: {
     ...baseStep,
@@ -710,6 +710,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
   }
   if (changes.scrollStep) {
     updatePlan.updateScrollState = true;
+    updatePlan.updateAxes = true; // necessary for desktop ticks to be updated
     /* updatePlan.updateScroll = true; */
   }
   if (changes.variant || changes.age || changes.sleepTime || changes.height) {

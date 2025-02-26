@@ -47,7 +47,16 @@ function updateTickOpacity(stepProps) {
   d3.selectAll(".x-axis .tick text")
     .transition("tickXOpacityTransition")
     .duration(200)
-    .attr("opacity", tickOpacity);
+    .attr("opacity", tickOpacity)
+    .on("start", () => {
+      console.log("Tick opacity started");
+    })
+    .on("interrupt", () => {
+      console.log("Tick opacity interrupted");
+    })
+    .on("end", () => {
+      console.log("Tick opacity finished");
+    });
 
   d3.selectAll(".y-axis .tick text")
     .transition("tickYOpacityTransition")
