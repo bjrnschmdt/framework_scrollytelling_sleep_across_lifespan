@@ -226,3 +226,16 @@ export function programmaticScroll({
 export function roundToStep(value, step) {
   return Math.round(value / step) * step;
 }
+
+const DEBUG = {
+  general: true,
+  scroll: false,
+  update: true,
+  inputs: false,
+  analytics: true,
+};
+
+// Usage: debugLog("general", "This is a general debug message.");
+export function debugLog(flag, ...args) {
+  if (DEBUG[flag]) console.log(`[${flag.toUpperCase()}]`, ...args);
+}

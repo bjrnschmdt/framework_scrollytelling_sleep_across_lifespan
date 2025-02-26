@@ -1,5 +1,6 @@
 import * as d3 from "npm:d3";
 import { createDebouncedLogger, set, roundToStep } from "./helperFunctions.js";
+import { logInteraction } from "./logger.js";
 import { settings } from "./settings.js";
 
 // Destructure constants from settings for easy configuration.
@@ -36,6 +37,9 @@ export class ScrollInteraction {
     // Bind event handlers to preserve "this" context and store them for cleanup.
     this.boundHandleScroll = this.handleScroll.bind(this);
     this.boundHandleVerticalScroll = this.handleVerticalScroll.bind(this);
+
+    // Debounced logger for interaction tracking
+    this.debouncedLogger = createDebouncedLogger(logInteraction, 500); // Log interactions after a 500ms delay
 
     this.init();
   }
@@ -78,6 +82,11 @@ export class ScrollInteraction {
     if (ageScroll !== this.chartElement.value.age) {
       set(this.chartElement, { ...this.chartElement.value, age: ageScroll });
     }
+
+    this.debouncedLogger({
+      age: ageScroll,
+      sleepTime: this.chartElement.value.sleepTime,
+    });
   }
 
   /**
@@ -89,6 +98,11 @@ export class ScrollInteraction {
   programmaticScroll(targetDomainLeft, duration) {
     // Only perform programmatic scrolling if not in explorable mode
     // or if a forced scroll is requested.
+    /* console.log(
+      "programmaticScroll fired",
+      this.isExplorable,
+      this.forceProgrammaticScroll
+    ); */
     if (this.isExplorable && !this.forceProgrammaticScroll) return;
 
     // Reset force flag and ignore subsequent scroll events during animation.
@@ -98,6 +112,10 @@ export class ScrollInteraction {
     // Calculate the target scroll offset based on the x-scale.
     const targetScroll = this.xScaleSVG(targetDomainLeft);
     const element = this.element;
+
+    console.log("element.scrollLeft", element.scrollLeft);
+    console.log("targetDomainLeft", targetDomainLeft);
+    console.log("targetScroll", targetScroll);
 
     // Use D3 transitions to smoothly animate the scrollLeft property.
     d3.transition()
@@ -109,6 +127,7 @@ export class ScrollInteraction {
         );
         return function (t) {
           // Using requestAnimationFrame here ensures a smooth update.
+          console.log("tween", interpolator(t));
           requestAnimationFrame(() => {
             element.scrollLeft = interpolator(t);
           });
@@ -128,17 +147,23 @@ export class ScrollInteraction {
    *
    * @param {boolean} state - `true` to enable scrolling, `false` to disable.
    */
-  setExplorable(state) {
+  setExplorable(state, domainLeft) {
     // Only update if there's a change in state.
     if (state === this.isExplorable) return;
 
     this.isExplorable = state;
-    // You can use plain JS here, e.g., this.element.style.overflowX = state ? "auto" : "hidden";
-    // Using d3.select for consistency with other parts of the code.
-    this.element.style.overflowX = state ? "auto" : "hidden";
+
+    this.element.style.overflowX = state ? "scroll" : "hidden";
     // If disabling exploration, reset the scroll position based on the current age.
     if (!state) {
-      this.element.scrollLeft = this.xScaleSVG(this.chartElement.value.age);
+      console.log("setExplorable", this.chartElement.value.age - 5.5);
+      console.log(
+        "this.xScaleSVG(domainLeft)",
+        this.xScaleSVG(this.chartElement.value.age - 5.5)
+      );
+      this.element.scrollLeft = this.xScaleSVG(
+        this.chartElement.value.age - 5.5
+      );
     }
   }
 
@@ -198,6 +223,12 @@ export class ScrollInteraction {
           sleepTime: newSleepTime,
         });
       }
+
+      // Log interaction data with debounce
+      this.debouncedLogger({
+        age: this.chartElement.value.age,
+        sleepTime: newSleepTime,
+      });
     }
   }
 }

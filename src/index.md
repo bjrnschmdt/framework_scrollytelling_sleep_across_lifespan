@@ -12,6 +12,7 @@ import {
   formatTime,
   updateXDomain,
   programmaticScroll,
+  debugLog,
 } from "./components/helperFunctions.js";
 import { dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
@@ -90,7 +91,6 @@ const currentVH = height;
 
 // Calculate the necessary margin shift (negative to compensate for increased height)
 const marginCompensation = initialVH - currentVH;
-/* console.log("Margin compensation:", marginCompensation); */
 scrollInfo.style("margin-bottom", `${marginCompensation}px`);
 outro.style("margin-top", `${marginCompensation * -1}px`);
 ```
@@ -164,10 +164,6 @@ initializeLogger();
 
 ```js
 logSectionVisible(scrollyStep);
-```
-
-```js
-/* console.log("scrollyStep", scrollyStep); */
 ```
 
 ```js
@@ -251,7 +247,7 @@ const stepProps = scrollyProps[scrollyStep];
 ```
 
 ```js
-console.log("stepProps", stepProps);
+debugLog("update", "stepProps", stepProps);
 ```
 
 ```js
@@ -308,7 +304,7 @@ const scrollyProps = {
     showPointcloud: false,
     showPercentiles: ["C"],
     tooltipText: "Karin",
-    xDomain: isEnhanced ? [5, 95] : [25, 37],
+    xDomain: isEnhanced ? [5, 95] : [25.5, 36.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: d3.ticks(5, 95, 45),
   },
@@ -464,7 +460,7 @@ const ageValue = Generators.input(ageInput);
 ```
 
 ```js
-console.log("ageValue", ageValue);
+debugLog("inputs", "ageValue", ageValue);
 ```
 
 ```js
@@ -550,7 +546,6 @@ const initialHeight = window.innerHeight;
 ```
 
 ```js
-/* console.log("block rerun"); */
 const container = d3.create("div");
 container.style("position", "relative");
 
@@ -567,7 +562,7 @@ const body = container
   .append("div")
   .attr("id", "body")
   .style("position", "relative")
-  .style("overflow-x", "scroll")
+  .style("overflow-x", "hidden")
   .style("-webkit-overflow-scrolling", "touch");
 
 const canvas = body.append("canvas").node();
@@ -669,99 +664,178 @@ if (isEnhanced) {
   );
 }
 
+let currentWidth = initialWidth;
+
 function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
-  console.log("updateChart");
-  console.log("changes", changes);
+  debugLog("update", "updateChart");
+  debugLog("update", "changes", changes);
 
   // Update only if there are changes
   if (Object.keys(changes).length > 0) {
-    console.log("inside if statement");
+    let duration = null;
 
-    if (changes.scrollStep && !isEnhanced) {
-      console.log("scrollStep change");
+    // Setup update plan
+    let updatePlan = {
+      updateHeight: false,
+      updateWidth: false,
+      updateScrollState: false,
+      updateDimensions: false,
+      updateScales: false,
+      updateAxes: false,
+      updateInteractions: false,
+      updatePercentiles: false,
+      updatePointcloud: false,
+      updatePlots: false,
+      updateCrosshairs: false,
+      updateScroll: false,
+      // ... add other update flags as necessary
+    };
+    if (changes.xDomain) {
+      const absDomainOld = changes.xDomain?.old[1] - changes.xDomain?.old[0];
+      const absDomainNew = changes.xDomain?.new[1] - changes.xDomain?.new[0];
+      const isDomainChange = absDomainOld !== absDomainNew;
+      updatePlan.updateWidth = isDomainChange; // if domain interval changes, update width
+      updatePlan.updateDimensions = isDomainChange; // if domain interval changes, update dimensions
+      updatePlan.updateScales = isDomainChange; // if domain interval changes, update scales
+      updatePlan.updateAxes = isDomainChange; // if domain interval changes, update axes
+      updatePlan.updatePercentiles = isDomainChange; // if domain interval changes, update percentiles
+      updatePlan.updatePointcloud = isDomainChange; // if domain interval changes, update pointcloud
+      updatePlan.updateScroll = true;
+    }
+    if (changes.height) {
+      updatePlan.updateHeight = true;
+      updatePlan.updateDimensions = true;
+      updatePlan.updateScales = true;
+      updatePlan.updateAxes = true;
+      updatePlan.updatePercentiles = true;
+      updatePlan.updatePointcloud = true;
+      updatePlan.updatePlots = true;
+      updatePlan.updateCrosshairs = true;
+    }
+    if (changes.isExplorable) {
+      updatePlan.updateInteractions = true;
+    }
+    if (changes.showPercentiles) {
+      updatePlan.updatePercentiles = true;
+    }
+    if (changes.scrollStep) {
+      updatePlan.updateScrollState = true;
+      /* updatePlan.updateScroll = true; */
+    }
+    if (changes.variant || changes.age || changes.sleepTime || changes.height) {
+      updatePlan.updatePlots = true;
+    }
+    if (changes.age || changes.sleepTime || changes.tooltipText) {
+      updatePlan.updateCrosshairs = true;
+    }
+    if (changes.showPointcloud) {
+      updatePlan.updatePointcloud = true;
+    }
+
+    debugLog("update", "updatePlan", updatePlan);
+
+    // Execute updates based on the update plan
+
+    let newWidth = currentWidth;
+    let newHeight = svg.attr("height");
+    console.log("currentWidth", currentWidth);
+
+    if (updatePlan.updateInteractions) {
+      // Update dimensions/state in pointerInteraction or scrollInteraction.
+      // setting this before updating the xScale is important
+      debugLog("update", "updateInteractions");
+      if (isEnhanced) {
+        pointerInteraction.isExplorable = stepProps.isExplorable || false;
+      } else if (!isEnhanced) {
+        /* debugLog(
+          "update",
+          "set horizontal scrolling to",
+          stepProps.isExplorable
+        ); */
+        scrollInteraction.setExplorable(stepProps.isExplorable || false);
+      }
+    }
+
+    if (updatePlan.updateWidth) {
+      // Update width based on new xDomain.
+      debugLog("update", "updateWidth");
+      const { totalWidth } = updateXDomain(xScaleSVG, stepProps, width, margin);
+      newWidth = totalWidth;
+    }
+
+    if (updatePlan.updateHeight) {
+      debugLog("update", "updateHeight");
+      newHeight = stepProps.height;
+    }
+
+    if (updatePlan.updateScrollState && !isEnhanced) {
+      // Update scroll state in pointerInteraction or scrollInteraction.
+      debugLog("update", "updateScrollState");
       scrollInteraction.setForceProgrammaticScroll(true);
     }
 
-    // Update exploration mode
-    if ("isExplorable" in changes && isEnhanced) {
-      pointerInteraction.isExplorable = stepProps?.isExplorable || false;
-    } else if ("isExplorable" in changes && !isEnhanced) {
-      console.log("set horizontal scrolling to", stepProps.isExplorable);
-      scrollInteraction.setExplorable(stepProps?.isExplorable || false);
-    }
+    if (updatePlan.updateDimensions) {
+      // Update SVG, canvas, and clipPath dimensions.
+      debugLog("update", "updateDimensions");
+      const { totalWidth: targetWidth } = updateXDomain(
+        xScaleSVG,
+        stepProps,
+        width,
+        margin
+      );
+      let newWidth = targetWidth; // Use this as the definitive new width
+      console.log("newWidth", newWidth);
+      let newHeight = stepProps.height;
 
-    // if height of domain changes
-    if (changes?.height || changes?.xDomain) {
-      console.log("height or xDomain change");
-      const newHeight = stepProps.height;
-
-      // calculating the absolute domain for calculating new total width
-      const { totalWidth } = updateXDomain(xScaleSVG, stepProps, width, margin);
-
-      yScaleSVG.range([newHeight - margin.bottom, margin.top]); // height change
-
-      canvas.width = totalWidth * canvasScaleFactor; // domain change
+      canvas.width = newWidth * canvasScaleFactor; // domain change
       canvas.height = newHeight * canvasScaleFactor; // height change
 
-      canvas.style.width = `${totalWidth}px`; // domain change
+      canvas.style.width = `${newWidth}px`; // domain change
       canvas.style.height = `${newHeight}px`; // height change
 
       svg
         .transition("updateDimensions")
         .duration(600)
-        .attr("width", totalWidth) // domain change
-        .attr("height", newHeight); // height change
-      yAxisSVG.attr("height", newHeight); // height change
+        .attr("width", newWidth) // domain change
+        .attr("height", newHeight) // height change
+        .on("start", () => {
+          console.log("started", svg.attr("width"));
+        })
+        .on("interrupt", () => {
+          console.log("interrupted", svg.attr("width"));
+        })
+        .on("end", () => {
+          console.log("ended", svg.attr("width"));
+          /* svg.attr("width", newWidth).attr("height", newHeight); */
+        });
+
+      /*       yAxisSVG.attr("height", newHeight); // height change */
 
       clipPath
-        .attr("width", totalWidth - margin.left - margin.right) // domain change
+        .attr("width", newWidth - margin.left - margin.right) // domain change
         .attr("height", newHeight - margin.top - margin.bottom); // height change
 
       if (isEnhanced) {
         pointerInteraction.setDimensions(width, newHeight); // height change
       }
+    }
 
+    if (updatePlan.updateScales) {
+      debugLog("update", "updateScales");
+      // Recalculate scales based on new dimensions or domain.
+      yScaleSVG.range([newHeight - margin.bottom, margin.top]);
+    }
+
+    if (updatePlan.updateAxes) {
+      // Update axes with new scales.
+      debugLog("update", "updateAxes");
+      /* yAxisSVG.attr("height", newHeight); */ // height change
       updateAxes(xScaleSVG, yScaleSVG, width, newHeight, stepProps.ticks); // both change
-
-      // Update crosshairs
-      updateCrosshairs(
-        stepProps,
-        crosshair,
-        xScaleSVG,
-        yScaleSVG,
-        isEnhanced,
-        600
-      );
-
-      drawPercentiles(percentilesGroup, {
-        dataSet,
-        showPercentiles: stepProps.showPercentiles,
-        xScaleSVG,
-        yScaleSVG,
-        tickValues: stepProps.xResolution,
-      });
-
-      const duration = stepProps.triggerSource === "slider" ? 600 : 600;
-
-      if (!isEnhanced) {
-        scrollInteraction.programmaticScroll(stepProps.xDomain[0], duration);
-      } else {
-        programmaticScroll({
-          targetDomainLeft: stepProps.xDomain[0],
-          element: body.node(),
-          xScale: xScaleSVG,
-          duration: 600,
-        });
-      }
     }
 
-    // Update pointcloud visibility
-    /* if (changes.showPointcloud) {
-      pointcloud.setVisibility(stepProps.showPointcloud);
-    } */
-
-    // Update percentiles visibility
-    if (changes.showPercentiles) {
+    if (updatePlan.updatePercentiles) {
+      // Redraw or update percentile elements.
+      debugLog("update", "updatePercentiles");
       drawPercentiles(percentilesGroup, {
         dataSet,
         showPercentiles: stepProps.showPercentiles,
@@ -771,9 +845,15 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
       });
     }
 
-    // Update type specific plot
-    if (changes.variant || changes.age || changes.sleepTime || changes.height) {
-      const newHeight = stepProps.height;
+    if (updatePlan.updatePointcloud) {
+      // Update pointcloud if needed.
+      debugLog("update", "updatePointcloud");
+      /* pointcloud.setVisibility(stepProps.showPointcloud); */
+    }
+
+    if (updatePlan.updatePlots) {
+      // Execute type specific plot updates.
+      debugLog("update", "updatePlots");
       switch (stepProps.variant) {
         case "percentile":
           updatePercentilePlot(data, xScaleSVG, yScaleSVG);
@@ -809,23 +889,90 @@ function updateChart({ data, stepProps, changes, hopIndex, isEnhanced }) {
       }
     }
 
-    // Update crosshairs
-    if (changes.age || changes.sleepTime || changes.tooltipText) {
+    if (changes.age || changes.sleepTime) {
+      duration = getDuration(stepProps.triggerSource);
+      debugLog("update", "age and height change", duration);
+    }
+
+    if (changes.height) {
+      duration = getDuration("height");
+      debugLog("update", "height change", duration);
+    }
+
+    if (changes.xDomain) {
+      duration = 600;
+      debugLog("update", "xDomain change", duration);
+    }
+
+    if (updatePlan.updateCrosshairs) {
+      // Refresh crosshairs. Maybe adjust the duration.
+      debugLog("update", "updateCrosshairs", duration);
+      // duration on mobile and on height change should be ? ms
+      // duration on mobile and on slider change should be ? ms
+      // duration on mobile and on scroll change should be ? ms
+      // duration on desktop and on height change should be ? ms
+      // duration on desktop and on slider change should be ? ms
+      // duration on desktop and on scroll change should be ? ms
+      /* const duration = stepProps.triggerSource === "slider" ? 600 : 600; */
+
       updateCrosshairs(
         stepProps,
         crosshair,
         xScaleSVG,
         yScaleSVG,
         isEnhanced,
-        100
+        duration
       );
     }
 
+    if (updatePlan.updateScroll) {
+      debugLog("update", "updateScroll", duration);
+      /* const duration = stepProps.triggerSource === "slider" ? 600 : 600; */
+
+      if (!isEnhanced) {
+        scrollInteraction.programmaticScroll(stepProps.xDomain[0], duration);
+      } else {
+        programmaticScroll({
+          targetDomainLeft: stepProps.xDomain[0],
+          element: body.node(),
+          xScale: xScaleSVG,
+          duration: 600,
+        });
+      }
+    }
+    currentWidth = newWidth;
     setStableStepProps(stepProps);
   }
 }
 
 container.node().updateChart = updateChart;
+```
+
+```js
+// Define duration values (set your desired durations in ms)
+const durations = {
+  mobile: {
+    height: 600,
+    slider: 200,
+    scroll: 100,
+  },
+  desktop: {
+    height: 500,
+    slider: 400,
+    scroll: 450,
+  },
+};
+```
+
+```js
+// Function to get the appropriate duration
+function getDuration(eventType) {
+  if (!isEnhanced) {
+    return durations.mobile[eventType] || 600; // Default to 300ms if undefined
+  } else {
+    return durations.desktop[eventType] || 500; // Default to 500ms if undefined
+  }
+}
 ```
 
 <!-- ```js
@@ -910,8 +1057,8 @@ const estimated = estimateValue;
 const message = document.createElement("p");
 message.textContent =
   Math.abs(estimated - trueValue) <= 5
-    ? `Super, die richtige Lösung ist ${trueValue}%. Wenn du magst, versuche es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer.`
-    : `Die richtige Antwort ist ${trueValue}%. Wenn du magst, versuche es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer.`;
+    ? `Super, die richtige Lösung ist ${trueValue}%. Wenn Sie wollen, versuchen Sie es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer.`
+    : `Die richtige Antwort ist ${trueValue}%. Wenn Sie wollen, versuchen Sie es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer.`;
 
 feedbackInput.appendChild(message);
 feedbackInput.appendChild(scrollTo); // Append the button as an element
@@ -928,10 +1075,10 @@ const visualizationDescriptions = {
   dot: "Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.",
   box: "Die hier gezeigte Boxplot-Darstellung zeigt, wie die Daten verteilt sind. Dabei sind die Hälfte der Daten im mittleren Bereich, also in der Box, abgebildet. Die Balken oben und unten zeigen die längsten und kürzesten Schlafdauern und bilden die andere Hälfte der Daten ab. Der Boxplot bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
   percentile:
-    "Hier haben wir die Perzentillinien noch zusätzlich beschriftet, damit du dich besser zurechtfinden kannst. Die Beschriftung bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
-  hop: "Diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
+    "Hier haben wir die Perzentillinien noch zusätzlich beschriftet, damit Sie sich besser zurechtfinden können. Die Beschriftung bezieht sich jeweils auf die gerade ausgewählte Altersgruppe.",
+  hop: "Diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, können Sie abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
   hop_traced:
-    "Diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, kannst du abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
+    "Diese Darstellung zeigt jeweils einzelne Datenpunkte, also einzelne Personen und ihre Schlafdauer. Je nachdem wie häufig und wo die Datenpunkte auftauchen, können Sie abschätzen, wie viele Menschen eine bestimmte Stundenanzahl schlafen. Die Datenpunkte beziehen sich jeweils auf die gerade ausgewählte Altersgruppe.",
   none: "No specific visualization selected.",
 };
 
@@ -949,47 +1096,60 @@ updateVisualizationDescription(variant);
 
 # Schlafdauer über die Lebensspanne
 
-Wie lange schläfst du im Vergleich zu anderen? Wie alt sind Menschen, die so lange schlafen wie du? Und wie sieht es mit der Schlafdauer in der Gesamtbevölkerung so aus? Finde es mit unserer interaktiven Grafik heraus! Scrolle einfach nach unten - die Inhalte entfalten sich Schritt für Schritt, während du weiter scrollst.
+Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so lange schlafen wie Sie? Und wie sieht es mit der Schlafdauer in der Gesamtbevölkerung so aus? Finden Sie es mit unserer interaktiven Grafik heraus! Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schritt, während Sie weiter scrollen.
 
 <section class="scroll-container">
-  <div class="scroll-info">${chartElement}</div>
-  <div class="scroll-section card" data-step="1"><p>Auf der Y-Achse links ist die Schlafdauer eingetragen, unten auf der X-Achse das Alter.</p></div>
-  <div class="scroll-section card" data-step="2"><p>Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000 Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert.</p></div>
-  <div class="scroll-section card" data-step="3"><p>Die Linien geben Perzentile an und zeigen, wie sich die Datenpunkte in der Stichprobe verteilen. Was das konkret heißt, siehst du im folgenden Bild:</p></div>
-  <div class="scroll-section card" data-step="4"><p>Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p></div>
-  <div class="scroll-section card" data-step="5" id="user-input"><p>
-  Wie ist es bei dir? Gib hier dein Alter und deine übliche Schlafdauer (bspw. von letzter Nacht) ein, um dich in der Grafik verorten zu können! Wenn du weiter scrollst, kannst du dich mit anderen in deinem Alter vergleichen.</p>
-  ${ageInput}${sleepTimeInput}</div>
-  <div class="scroll-section card" data-step="6">
-    <p>Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</p></div> 
-  <div class="scroll-section card" data-step="7"><p>Was würdest du schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als du?${estimateInput}${answerInput}${feedbackInput}</div>  
-  <div class="scroll-section card" data-step="8"><p>Bewege den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn du genug erkundet hast, scrolle einfach weiter.</div>
-  <div class="scroll-section card" data-step="9">
-    <p>Uns interessiert deine Meinung: wie stehst du zu folgenden Aussagen?</p>
-    <h2>Die Gestaltung der Grafik war ansprechend.</h2>
-    ${aestheticsInput}
-    <h2>Das Thema hat mich interessiert.</h2>
-    ${interestInput}
-  </div>
-  <div class="scroll-section card" data-step="10">
-    <p>Sehen wir uns nun die Altersgruppen ein wenig genauer an. Dafür haben wir näher herangezoomt. Die x-Achse unten hat sich also verändert und zeigt jeweils nur die Altersgruppe an, um die es gerade geht.</p>
-  </div>
-  <div class="scroll-section card" data-step="11"><h2>Altersgruppe bis 10 Jahre</h2>
-    <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
-  </div>
-  <div class="scroll-section card" data-step="12"><h2>11–17 Jahre</h2>
-    <p>Während der Pubertät fällt die Schlafdauer dramatisch ab; gleichzeitig nimmt die Streuung zu. Da sich in dieser Phase die innere Uhr meist auf spätere Bettzeiten einstellt, die Schule aber in der Regel früh beginnt, bekommen Jugendliche oft weniger Schlaf, als es Fachleute empfehlen.</p>
-  </div>
-  <div class="scroll-section card" data-step="13"><h2>18–65 Jahre</h2>
-    <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7 Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
-  </div>
-  <div class="scroll-section card" data-step="14"><h2>Über 66 Jahre</h2>
-    <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
-  </div>
+<div class="scroll-info">${chartElement}</div>
+
+<div class="scroll-section card" data-step="1">
+  <p>Auf der Y-Achse links ist die Schlafdauer eingetragen, unten auf der X-Achse das Alter.</p>
+</div>
+<div class="scroll-section card" data-step="2">
+  <p>Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000 Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert.</p>
+</div>
+<div class="scroll-section card" data-step="3">
+  <p>Die Linien geben Perzentile an und zeigen, wie sich die Datenpunkte in der Stichprobe verteilen. Was das konkret heißt, sehen Sie im folgenden Bild:</p>
+</div>
+<div class="scroll-section card" data-step="4">
+  <p>Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p>
+</div>
+<div class="scroll-section card" data-step="5" id="user-input">
+  <p>Wie ist es bei Ihnen? Geben Sie hier Ihr Alter und Ihre übliche Schlafdauer (bspw. von letzter Nacht) ein, um sich in der Grafik verorten zu können! Wenn Sie weiter scrollen, können Sie sich mit anderen in Ihrem Alter vergleichen.</p>${ageInput}${sleepTimeInput}
+</div>
+<div class="scroll-section card" data-step="6">
+  <p>Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</p>
+</div>
+<div class="scroll-section card" data-step="7">
+  <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}
+</div>
+<div class="scroll-section card" data-step="8">
+  <p>Bewegen Sie den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn Sie genug erkundet haben, scrollen Sie einfach weiter.
+</div>
+<div class="scroll-section card" data-step="9">
+  <p>Uns interessiert Ihre Meinung: wie stehen Sie zu folgenden Aussagen?</p>
+  <h2>Die Gestaltung der Grafik war ansprechend.</h2>${aestheticsInput}<h2>Das Thema hat mich interessiert.</h2>${interestInput}</div>
+<div class="scroll-section card" data-step="10">
+  <p>Sehen wir uns nun die Altersgruppen ein wenig genauer an. Dafür haben wir näher herangezoomt. Die x-Achse unten hat sich also verändert und zeigt jeweils nur die Altersgruppe an, um die es gerade geht.</p>
+</div>
+<div class="scroll-section card" data-step="11"><h2>Altersgruppe bis 10 Jahre</h2>
+  <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
+</div>
+<div class="scroll-section card" data-step="12">
+  <h2>11–17 Jahre</h2>
+  <p>Während der Pubertät fällt die Schlafdauer dramatisch ab; gleichzeitig nimmt die Streuung zu. Da sich in dieser Phase die innere Uhr meist auf spätere Bettzeiten einstellt, die Schule aber in der Regel früh beginnt, bekommen Jugendliche oft weniger Schlaf, als es Fachleute empfehlen.</p>
+</div>
+<div class="scroll-section card" data-step="13">
+  <h2>18–65 Jahre</h2>
+  <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7 Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
+</div>
+<div class="scroll-section card" data-step="14">
+  <h2>Über 66 Jahre</h2>
+  <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
+</div>
 </section>
+
 <div class="outro card">
-  <p>Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen. Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig.
-  Dieses Phänomen ist nur eins von vielen, mit denen sich die Schlafforschung befasst. Auf unseren Themenseiten findest du zahlreiche Artikel zu den Themen <a href="https://www.spektrum.de/thema/schlaf/1295691">Schlaf</a> und <a href="https://www.spektrum.de/thema/traeumen/1356995">Träumen</a>.</p>
+  <p>Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen. Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig. Dieses Phänomen ist nur eins von vielen, mit denen sich die Schlafforschung befasst. Auf unseren Themenseiten finden Sie zahlreiche Artikel zu den Themen <a href="https://www.spektrum.de/thema/schlaf/1295691">Schlaf</a> und <a href="https://www.spektrum.de/thema/traeumen/1356995">Träumen</a>.</p>
   <p>Methodischer Hintergrund: Die Basis für die Grafik sind die Daten <a href="https://www.nature.com/articles/s41562-020-00965-x">dieser</a> Metaanalyse von Kocevska et al. Eine Metaanalyse fügt die Ergebnisse von vielen einzelnen Studien zusammen und gewinnt dadurch an Aussagekraft. Aus den statistischen Kennwerten haben wir eine realistische Verteilung nachgebildet und daraus die Perzentile berechnet.</p>
   <p>Die Grafik wurde erstellt vom Kiel Science Communication Network (KielSCN).</p>
   <p><em>Texte:</em> Stephan Reiche, Anna von Hopffgarten und Carolin Wagener</p>

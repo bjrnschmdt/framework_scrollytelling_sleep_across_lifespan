@@ -1,4 +1,5 @@
 // logger.js
+import { debugLog } from "./helperFunctions.js";
 
 // Helper function to initialize the logging system
 export function initializeLogger() {
@@ -8,7 +9,7 @@ export function initializeLogger() {
 // Log a generic event
 export function logEvent(eventName, tags = {}) {
   try {
-    console.log("Log event", eventName, tags);
+    debugLog("analytics", "Log event", eventName, tags);
     window["optimizely"] = window["optimizely"] || [];
     window["optimizely"].push({
       type: "event",
