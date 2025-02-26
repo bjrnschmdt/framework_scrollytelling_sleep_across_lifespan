@@ -93,11 +93,11 @@ export function createAxes(svg, yAxisSVG, { xScaleSVG, yScaleSVG, w, h }) {
     gy,
     xAxis,
     yAxis,
-    updateAxes: (x, y, newWidth, newHeight, xTicks, stepProps) => {
+    updateAxes: (x, y, newWidth, newHeight, stepProps) => {
       gx.transition()
         .duration(600)
         .attr("transform", `translate(0,${newHeight - margin.bottom})`)
-        .call(xAxis, x, xTicks)
+        .call(xAxis, x, stepProps.ticks) // Use dynamic tick values
         .selection()
         .call(styleXAxis); // Reapply styles for the x-axis
 

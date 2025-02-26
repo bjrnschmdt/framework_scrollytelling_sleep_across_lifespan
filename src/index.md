@@ -801,15 +801,8 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
 
   if (updatePlan.updateAxes) {
     // Update axes with new scales.
-    debugLog("update", "updateAxes", stepProps.age, stepProps.sleepTime);
-    updateAxes(
-      xScaleSVG,
-      yScaleSVG,
-      width,
-      newHeight,
-      stepProps.ticks,
-      stepProps
-    ); // both change
+    debugLog("update", "updateAxes");
+    updateAxes(xScaleSVG, yScaleSVG, width, newHeight, stepProps); // both change
   }
 
   if (updatePlan.updatePercentiles) {
