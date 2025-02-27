@@ -47,8 +47,8 @@ function updateTickOpacity(stepProps) {
   d3.selectAll(".x-axis .tick text")
     .transition("tickXOpacityTransition")
     .duration(200)
-    .attr("opacity", tickOpacity)
-    .on("start", () => {
+    .attr("opacity", tickOpacity);
+  /* .on("start", () => {
       console.log("Tick opacity started");
     })
     .on("interrupt", () => {
@@ -56,7 +56,7 @@ function updateTickOpacity(stepProps) {
     })
     .on("end", () => {
       console.log("Tick opacity finished");
-    });
+    }); */
 
   d3.selectAll(".y-axis .tick text")
     .transition("tickYOpacityTransition")
@@ -103,14 +103,23 @@ export function createAxes(svg, yAxisSVG, { xScaleSVG, yScaleSVG, w, h }) {
     xAxis,
     yAxis,
     updateAxes: (x, y, newWidth, newHeight, stepProps) => {
-      gx.transition()
+      gx.transition("xAxisTransition")
         .duration(600)
+        /* .on("start", () =>
+          console.log("x axis transition started", gx.attr("transform"))
+        )
+        .on("interrupt", () =>
+          console.log("x axis transition interrupted", gx.attr("transform"))
+        )
+        .on("end", () =>
+          console.log("x axis transition ended", gx.attr("transform"))
+        ) */
         .attr("transform", `translate(0,${newHeight - margin.bottom})`)
         .call(xAxis, x, stepProps.ticks) // Use dynamic tick values
         .selection()
         .call(styleXAxis); // Reapply styles for the x-axis
 
-      gy.transition()
+      gy.transition("yAxisTransition")
         .duration(600)
         .call(yAxis, y)
         .selection()

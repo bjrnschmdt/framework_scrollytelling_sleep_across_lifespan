@@ -224,11 +224,11 @@ export function roundToStep(value, step) {
 }
 
 const DEBUG = {
-  general: true,
+  general: false,
   scroll: false,
-  update: true,
+  update: false,
   inputs: false,
-  analytics: true,
+  analytics: false,
 };
 
 // Usage: debugLog("general", "This is a general debug message.");

@@ -25,6 +25,11 @@ import { PointerInteraction } from "./components/pointerInteraction.js";
 import { ScrollInteraction } from "./components/scrollInteraction.js";
 import { createAxes } from "./components/createAxes.js";
 import { Pointcloud } from "./components/pointcloud.js";
+import {
+  initializeScatterPlot,
+  updateScatterPlot,
+  setScatterVisibility,
+} from "./components/scatterPlot.js";
 /* import PercentileLines from "./components/PercentileLines.js"; */
 import {
   drawPercentiles,
@@ -281,7 +286,6 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 3,
     height: height,
-    showPointcloud: true,
     showPercentiles: ["C"],
   },
   4: {
@@ -290,7 +294,6 @@ const scrollyProps = {
     height: height,
     age: 31,
     sleepTime: 7,
-    showPointcloud: false,
     showPercentiles: ["C"],
     tooltipText: "Karin",
     xDomain: isEnhanced ? [5, 95] : [25.5, 36.5],
@@ -303,7 +306,6 @@ const scrollyProps = {
     height: height,
     age: ageValue,
     sleepTime: sleepTimeValue,
-    showPointcloud: true,
     showPercentiles: ["C"],
     tooltipText: "Du",
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
@@ -317,7 +319,6 @@ const scrollyProps = {
     height: height,
     age: ageValue,
     sleepTime: sleepTimeValue,
-    showPointcloud: true,
     showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
@@ -330,7 +331,6 @@ const scrollyProps = {
     height: height,
     age: ageValue,
     sleepTime: sleepTimeValue,
-    showPointcloud: true,
     showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
@@ -343,7 +343,6 @@ const scrollyProps = {
     height: height,
     age: chartValue.age,
     sleepTime: chartValue.sleepTime,
-    showPointcloud: true,
     showPercentiles: ["C"],
     isExplorable: true,
     variant,
@@ -360,7 +359,6 @@ const scrollyProps = {
     height: height,
     age: chartValue.age,
     sleepTime: chartValue.sleepTime,
-    showPointcloud: true,
     showPercentiles: ["C"],
     isExplorable: true,
     variant,
@@ -386,7 +384,6 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 11,
     height: height,
-    showPointcloud: true,
     showPercentiles: ["C"],
     variant,
     xDomain: [5, 10.5],
@@ -397,7 +394,6 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 12,
     height: height,
-    showPointcloud: true,
     showPercentiles: ["C"],
     variant,
     xDomain: [10.5, 17.5],
@@ -408,7 +404,6 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 13,
     height: height,
-    showPointcloud: true,
     showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? [17.5, 67.5] : [17.5, 67.5],
@@ -419,7 +414,6 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 14,
     height: height,
-    showPointcloud: true,
     showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? [64, 94] : [62.5, 92.5],
@@ -598,11 +592,20 @@ const { xScaleSVG, yScaleSVG, timeScale } = createScales({
   h: initialHeight,
 });
 
+/* console.log("simulated data", simulatedData); */
+
 /* const pointcloud = new Pointcloud(context, canvas, {
   simulatedData,
   xScale: xScaleSVG,
   yScale: yScaleSVG,
 }); */
+
+// Inside your chart setup function
+const scatterGroup = initializeScatterPlot(svg, {
+  simulatedData,
+  xScaleSVG,
+  yScaleSVG,
+});
 
 // Create Axes
 const { gx, gy, xAxis, yAxis, updateAxes /* , styleYAxis  */ } = createAxes(
@@ -654,6 +657,7 @@ if (isEnhanced) {
 }
 
 let currentWidth = initialWidth;
+let currentHeight = initialHeight;
 let currentStepProps = baseStep;
 
 function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
@@ -675,6 +679,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
     updatePlots: false,
     updateCrosshairs: false,
     updateScroll: false,
+    updateScatterplot: false,
     // ... add other update flags as necessary
   };
   if (stepProps.variant === "hop" || stepProps.variant === "hop_traced") {
@@ -690,6 +695,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
     updatePlan.updateAxes = isDomainChange; // if domain interval changes, update axes
     updatePlan.updatePercentiles = isDomainChange; // if domain interval changes, update percentiles
     updatePlan.updatePointcloud = isDomainChange; // if domain interval changes, update pointcloud
+    updatePlan.updateScatterplot = isDomainChange; // if domain interval changes, update scatterplot
     updatePlan.updateScroll = true;
   }
   if (changes.height) {
@@ -699,6 +705,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
     updatePlan.updateAxes = true;
     updatePlan.updatePercentiles = true;
     updatePlan.updatePointcloud = true;
+    updatePlan.updateScatterplot = true;
     updatePlan.updatePlots = true;
     updatePlan.updateCrosshairs = true;
   }
@@ -706,6 +713,9 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
     updatePlan.updateInteractions = true;
   }
   if (changes.showPercentiles) {
+    updatePlan.updatePercentiles = true;
+  }
+  if (changes.xresolution) {
     updatePlan.updatePercentiles = true;
   }
   if (changes.scrollStep) {
@@ -721,6 +731,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
   }
   if (changes.showPointcloud) {
     updatePlan.updatePointcloud = true;
+    updatePlan.updateScatterplot = true;
   }
 
   debugLog("update", "updatePlan", updatePlan);
@@ -728,7 +739,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
   // Execute updates based on the update plan
 
   let newWidth = currentWidth;
-  let newHeight = svg.attr("height");
+  let newHeight = currentHeight;
 
   if (updatePlan.updateInteractions) {
     // Update dimensions/state in pointerInteraction or scrollInteraction.
@@ -777,12 +788,23 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
     svg
       .transition("updateDimensions")
       .duration(600)
-      .attr("width", newWidth) // domain change
-      .attr("height", newHeight); // height change
+      .attr("width", newWidth)
+      .attr("height", newHeight);
+    /* .on("start", () =>
+        console.log("dimension change started", svg.attr("height"))
+      )
+      .on("interrupt", () =>
+        console.log("dimension change interrupted", svg.attr("height"))
+      )
+      .on("end", () =>
+        console.log("dimension change ended", svg.attr("height"))
+      ); */
 
     yAxisSVG.attr("height", newHeight); // height change
 
     clipPath
+      .transition("transitionClipPath")
+      .duration(600)
       .attr("width", newWidth - margin.left - margin.right) // domain change
       .attr("height", newHeight - margin.top - margin.bottom); // height change
 
@@ -815,6 +837,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
       xScaleSVG,
       yScaleSVG,
       tickValues: stepProps.xResolution,
+      isEnhanced,
     });
   }
 
@@ -822,6 +845,16 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
     // Update pointcloud if needed.
     debugLog("update", "updatePointcloud");
     /* pointcloud.setVisibility(stepProps.showPointcloud); */
+  }
+
+  if (updatePlan.updateScatterplot) {
+    // Update scatterplot if needed.
+    debugLog("update", "updateScatterplot");
+    setScatterVisibility(stepProps.showPointcloud);
+    updateScatterPlot(scatterGroup, {
+      xScaleSVG,
+      yScaleSVG,
+    });
   }
 
   if (updatePlan.updatePlots) {
@@ -915,6 +948,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
     }
   }
   currentWidth = newWidth;
+  currentHeight = newHeight;
   currentStepProps = stepProps;
 }
 
@@ -948,11 +982,11 @@ function getDuration(eventType) {
 }
 ```
 
-<!-- ```js
+```js
 function updatePointcloudScales(pointcloud, { xScaleSVG, yScaleSVG }) {
   pointcloud.transitionScales(xScaleSVG.copy(), yScaleSVG.copy(), 1000); // Animate over 1 second
 }
-``` -->
+```
 
 ```js
 const chartElement = container.node();
@@ -1129,7 +1163,7 @@ Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so la
   <p>Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</p>
 </div>
 <div class="scroll-section card" data-step="7">
-  <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "deiner"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}
+  <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}
 </div>
 <div class="scroll-section card" data-step="8">
   <p>Bewegen Sie den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn Sie genug erkundet haben, scrollen Sie einfach weiter.</p>

@@ -105,7 +105,7 @@ const filterDataByTickValues = (flatData, tickValues) => {
  */
 export const drawPercentiles = (
   group,
-  { dataSet, showPercentiles, xScaleSVG, yScaleSVG, tickValues, tickCount }
+  { dataSet, showPercentiles, xScaleSVG, yScaleSVG, tickValues, isEnhanced }
 ) => {
   const lineGen = d3
     .line()
@@ -116,16 +116,17 @@ export const drawPercentiles = (
   // Flatten the data and filter it based on the tick step.
   const flatData = flattenData(dataSet);
 
-  const filteredDataByTickStep = filterDataByTickStep(
+  /* const filteredDataByTickStep = filterDataByTickStep(
     flatData,
     xScaleSVG,
     tickCount
-  );
+  ); */
   const filteredDataByTickValues = filterDataByTickValues(flatData, tickValues);
 
   // Group the filtered data by percentile.
   const groupedByPercentile = d3.groups(
-    filteredDataByTickValues,
+    /* filteredDataByTickValues, */
+    flatData,
     (d) => d.percentile
   );
 
@@ -139,6 +140,8 @@ export const drawPercentiles = (
         showPercentiles.includes("B")) ||
       showPercentiles.includes("C")
   );
+
+  /* console.log("visiblePercentiles", visiblePercentiles); */
 
   // Bind the visible percentile groups to path elements.
   const lines = group

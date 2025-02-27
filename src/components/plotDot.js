@@ -56,7 +56,10 @@ function updateDot(update, context) {
     .duration(400)
     .ease(d3.easeCubic)
     .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
-    .attr("x", (d) => calculateCX(d, stackMap, totalHeightMap, qradius) - 12)
+    .attr(
+      "x",
+      (d) => calculateCX(d, stackMap, totalHeightMap, qradius) - qradius
+    )
     .attr("y", (d) => yScaleSVG(d.x) - 12);
 }
 
