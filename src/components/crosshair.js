@@ -78,7 +78,7 @@ export function initializeCrosshair({
     .attr("x", 0) // Centered above the crosshair
     .attr("y", -20) // Positioned within the rectangle
     .attr("text-anchor", "middle")
-    .attr("alignment-baseline", "middle")
+    .attr("dominant-baseline", "middle")
     .attr("fill", "white")
     .style("font", `${fontSize} ${fontFamily}`)
     .text("Name"); // Default placeholder text
@@ -104,7 +104,7 @@ export function initializeCrosshair({
     .style("paint-order", "stroke")
     .style("font", `${fontSize} ${fontFamily}`)
     .style("text-anchor", "start")
-    .style("alignment-baseline", "hanging")
+    .style("dominant-baseline", "hanging")
     .text(`${ageFormat(domainX)} Jahre (Alter)`);
 
   const crosshairXLine = crosshair
@@ -129,7 +129,7 @@ export function initializeCrosshair({
     .style("paint-order", "stroke")
     .style("font", `${fontSize} ${fontFamily}`)
     .style("text-anchor", "start")
-    .style("alignment-baseline", "baseline")
+    .style("dominant-baseline", "baseline")
     .text(`${formatTime(domainY)} Stunden (Schlafdauer)`)
     .style("display", isEnhanced ? "none" : "block");
 
@@ -145,7 +145,7 @@ export function initializeCrosshair({
     .style("paint-order", "stroke")
     .style("font", `${fontSize} ${fontFamily}`)
     .style("text-anchor", "start")
-    .style("alignment-baseline", "baseline")
+    .style("dominant-baseline", "baseline")
     .text(
       isEnhanced
         ? `${formatTime(domainY)} Stunden (Schlafdauer)`
