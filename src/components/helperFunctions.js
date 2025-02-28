@@ -1,6 +1,7 @@
 import * as d3 from "npm:d3";
 import { precalculateHeights, calculateCX } from "./plotDot.js";
 import { settings } from "./settings.js";
+import { ScrollInteraction } from "./scrollInteraction.js";
 
 const { ageMin, ageMax } = settings;
 
@@ -226,9 +227,10 @@ export function roundToStep(value, step) {
 const DEBUG = {
   general: false,
   scroll: false,
-  update: false,
+  update: true,
   inputs: false,
   analytics: false,
+  ScrollInteraction: false,
 };
 
 // Usage: debugLog("general", "This is a general debug message.");

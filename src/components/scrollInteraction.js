@@ -1,5 +1,10 @@
 import * as d3 from "npm:d3";
-import { createDebouncedLogger, set, roundToStep } from "./helperFunctions.js";
+import {
+  createDebouncedLogger,
+  set,
+  roundToStep,
+  debugLog,
+} from "./helperFunctions.js";
 import { logInteraction } from "./logger.js";
 import { settings } from "./settings.js";
 
@@ -81,6 +86,7 @@ export class ScrollInteraction {
     // Update the reactive chart only if the age value has changed.
     if (ageScroll !== this.chartElement.value.age) {
       set(this.chartElement, { ...this.chartElement.value, age: ageScroll });
+      debugLog("scrollInteraction", "set age", ageScroll);
     }
 
     this.debouncedLogger({
@@ -98,24 +104,30 @@ export class ScrollInteraction {
   programmaticScroll(targetDomainLeft, duration) {
     // Only perform programmatic scrolling if not in explorable mode
     // or if a forced scroll is requested.
-    /* console.log(
+    debugLog(
+      "scrollInteraction",
       "programmaticScroll fired",
       this.isExplorable,
       this.forceProgrammaticScroll
-    ); */
+    );
     if (this.isExplorable && !this.forceProgrammaticScroll) return;
 
     // Reset force flag and ignore subsequent scroll events during animation.
     this.forceProgrammaticScroll = false;
     this.ignoreScrollEvent = true;
+    debugLog(
+      "scrollInteraction",
+      "set this.ignoreScrollEvent true",
+      this.ignoreScrollEvent
+    );
 
     // Calculate the target scroll offset based on the x-scale.
     const targetScroll = this.xScaleSVG(targetDomainLeft);
     const element = this.element;
 
-    /* console.log("element.scrollLeft", element.scrollLeft);
-    console.log("targetDomainLeft", targetDomainLeft);
-    console.log("targetScroll", targetScroll); */
+    debugLog("scrollInteraction", "element.scrollLeft", element.scrollLeft);
+    debugLog("scrollInteraction", "targetDomainLeft", targetDomainLeft);
+    debugLog("scrollInteraction", "targetScroll", targetScroll);
 
     // Use D3 transitions to smoothly animate the scrollLeft property.
     d3.transition()
@@ -138,7 +150,12 @@ export class ScrollInteraction {
         // Consider adding an "interrupt" handler if needed.
         setTimeout(() => {
           this.ignoreScrollEvent = false;
-        }, 100);
+          debugLog(
+            "scrollInteraction",
+            "set this.ignoreScrollEvent false",
+            this.ignoreScrollEvent
+          );
+        }, 150);
       });
   }
 
