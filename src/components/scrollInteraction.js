@@ -139,7 +139,7 @@ export class ScrollInteraction {
         );
         return function (t) {
           // Using requestAnimationFrame here ensures a smooth update.
-          /* console.log("tween", interpolator(t)); */
+          debugLog("scrollInteraction", "tween", interpolator(t));
           requestAnimationFrame(() => {
             element.scrollLeft = interpolator(t);
           });
