@@ -1,7 +1,7 @@
 import * as d3 from "npm:d3";
 
 let sampledData = null;
-let scatterVisible = true; // Toggle visibility state
+let scatterVisible = false;
 
 /**
  * Initializes the scatterplot by creating a group for points.
@@ -23,7 +23,10 @@ export const initializeScatterPlot = (
   if (!sampledData) {
     const width = xScaleSVG.range()[1] - xScaleSVG.range()[0];
     const sampleSize = Math.max(100, Math.floor(width * 5));
-    sampledData = d3.shuffle(simulatedData).slice(0, sampleSize); // No reshuffling
+    sampledData = d3.shuffle(simulatedData).slice(0, sampleSize); // Shuffle once
+
+    // Sort the sampled data by age to ensure left-to-right animation
+    sampledData.sort((a, b) => a.age - b.age);
   }
 
   updateScatterPlot(scatterGroup, { xScaleSVG, yScaleSVG });
@@ -32,28 +35,26 @@ export const initializeScatterPlot = (
 };
 
 /**
- * Updates the scatterplot dynamically based on screen width.
- * Also controls visibility based on `scatterVisible`.
- * @param {d3.Selection} group - D3 selection of the scatterplot group.
+ * Updates the scatterplot dynamically with a left-to-right appearance.
+ * @param {d3.Selection} group - The scatterplot group.
  * @param {Object} config - Configuration object.
  * @param {Function} config.xScaleSVG - x scale.
  * @param {Function} config.yScaleSVG - y scale.
  */
 export const updateScatterPlot = (group, { xScaleSVG, yScaleSVG }) => {
-  const dataToUse = scatterVisible ? sampledData : []; // Empty dataset hides points
-  console.log("dataToUse", dataToUse);
+  const dataToUse = scatterVisible ? sampledData : []; // Hide if not visible
 
-  // Get the number of currently rendered points before updating
-  const existingPointsCount = group.selectAll("circle").size();
+  // Sort data by age for left-to-right effect
+  dataToUse.sort((a, b) => a.age - b.age);
 
-  // Define easing function for delay (slow start, fast middle, slow end)
-  const easeFunction = d3.easeExpInOut; // You can experiment with different easing functions
+  // Define delay scale based on x (age)
+  const ageExtent = d3.extent(dataToUse, (d) => d.age);
+  const delayScale = d3.scaleLinear().domain(ageExtent).range([0, 1500]);
 
-  // Create a delay scale mapping index position to a range of delays
-  const delayScale = d3
-    .scaleSequential(easeFunction)
-    .domain([0, Math.max(existingPointsCount - 1, dataToUse.length - 1)]) // Ensure valid range
-    .range([100, 800]); // Adjust delay range (min/max delay in ms)
+  // Define a noise factor to introduce slight randomness at the appearing front
+  const falloffFraction = 1; // 10% of points at the appearing edge will have noise
+  const totalPoints = dataToUse.length;
+  const falloffStartIndex = Math.floor(totalPoints * (1 - falloffFraction));
 
   group
     .selectAll("circle")
@@ -62,14 +63,20 @@ export const updateScatterPlot = (group, { xScaleSVG, yScaleSVG }) => {
       (enter) =>
         enter
           .append("circle")
-          .attr("r", 1.5)
+          .attr("r", 1)
           .attr("fill", "#999")
           .attr("cx", (d) => xScaleSVG(d.age))
           .attr("cy", (d) => yScaleSVG(d.sleepTime))
           .attr("opacity", 0)
           .transition("scatterPlotTransitionEnter")
           .duration(400)
-          .delay((d, i) => delayScale(i)) // Apply eased delay
+          .delay((d, i) => {
+            let baseDelay = delayScale(d.age);
+            if (i >= falloffStartIndex) {
+              baseDelay += Math.random() * 300 - 150; // Add noise (-150ms to +150ms)
+            }
+            return baseDelay;
+          })
           .attr("opacity", 1),
       (update) =>
         update
@@ -80,8 +87,7 @@ export const updateScatterPlot = (group, { xScaleSVG, yScaleSVG }) => {
       (exit) =>
         exit
           .transition("scatterPlotTransitionExit")
-          .duration(400) // Reverse easing for smooth exit
-          .delay((d, i) => delayScale(existingPointsCount - 1 - i)) // Use previous count instead of dataToUse
+          .duration(400)
           .attr("opacity", 0)
           .remove()
     );
