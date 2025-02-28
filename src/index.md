@@ -258,7 +258,7 @@ const baseStep = {
   xDomainMobile: [5, 95],
   yDomain: [4, 13],
   ticks: d3.ticks(5, 95, 9), // 18/5, 45/2, 90/1
-  xResolution: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 18),
+  xResolution: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 30),
   triggerSource: null,
   height: initialHeight,
 };
@@ -307,7 +307,7 @@ const scrollyProps = {
     age: ageValue,
     sleepTime: sleepTimeValue,
     showPercentiles: ["C"],
-    tooltipText: "Du",
+    tooltipText: "Sie",
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
@@ -730,7 +730,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
     updatePlan.updateCrosshairs = true;
   }
   if (changes.showPointcloud) {
-    updatePlan.updatePointcloud = true;
+    /* updatePlan.updatePointcloud = true; */
     updatePlan.updateScatterplot = true;
   }
 
@@ -983,9 +983,9 @@ function getDuration(eventType) {
 ```
 
 ```js
-function updatePointcloudScales(pointcloud, { xScaleSVG, yScaleSVG }) {
+/* function updatePointcloudScales(pointcloud, { xScaleSVG, yScaleSVG }) {
   pointcloud.transitionScales(xScaleSVG.copy(), yScaleSVG.copy(), 1000); // Animate over 1 second
-}
+} */
 ```
 
 ```js
