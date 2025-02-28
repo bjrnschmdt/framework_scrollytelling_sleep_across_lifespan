@@ -4,6 +4,7 @@ import {
   set,
   roundToStep,
   debugLog,
+  debounce,
 } from "./helperFunctions.js";
 import { logInteraction } from "./logger.js";
 import { settings } from "./settings.js";
@@ -46,7 +47,21 @@ export class ScrollInteraction {
     // Debounced logger for interaction tracking
     this.debouncedLogger = createDebouncedLogger(logInteraction, 500); // Log interactions after a 500ms delay
 
+    // Cached values for vertical scroll calculations
+    this.lowerBoundary = 0;
+    this.upperBoundary = 0;
+    this.sleepScale = null;
+    this.chartHeight = 0;
+    this.offset = 0;
+
+    // Debounced version of updateVerticalScrollBoundaries
+    this.debouncedUpdateBoundaries = debounce(
+      this.updateVerticalScrollBoundaries.bind(this),
+      400
+    );
+
     this.init();
+    this.updateVerticalScrollBoundaries(); // Precompute boundaries
   }
 
   /**
@@ -60,6 +75,8 @@ export class ScrollInteraction {
     window.addEventListener("scroll", this.boundHandleVerticalScroll, {
       passive: true,
     });
+    // Replace direct call with the debounced function
+    window.addEventListener("resize", this.debouncedUpdateBoundaries); // Update on resize
   }
 
   /**
@@ -68,6 +85,7 @@ export class ScrollInteraction {
   destroy() {
     this.element.removeEventListener("scroll", this.boundHandleScroll);
     window.removeEventListener("scroll", this.boundHandleVerticalScroll);
+    window.removeEventListener("resize", this.debouncedUpdateBoundaries);
   }
 
   /**
@@ -188,53 +206,52 @@ export class ScrollInteraction {
     this.forceProgrammaticScroll = state;
   }
 
+  updateVerticalScrollBoundaries() {
+    // Get boundary elements
+    const step8 = document.querySelector('[data-step="8"]');
+    const step9 = document.querySelector('[data-step="9"]');
+    if (!step8 || !step9) return;
+
+    // Compute fixed boundaries
+    this.lowerBoundary = step8.getBoundingClientRect().bottom + window.scrollY;
+    this.upperBoundary = step9.getBoundingClientRect().top + window.scrollY;
+
+    // Compute scale once
+    this.sleepScale = d3
+      .scaleLinear()
+      .domain([this.lowerBoundary, this.upperBoundary])
+      .range([settings.sleepMin, settings.sleepMax])
+      .clamp(true);
+
+    // Compute offset for visualization centering once
+    const chartRange = this.yScaleSVG.range();
+    this.chartHeight = Math.abs(chartRange[1] - chartRange[0]);
+    this.offset = this.chartHeight / 2 + settings.margin.top;
+
+    debugLog("scrollInteraction", "Updated vertical boundaries and scale");
+  }
+
   /**
    * Handles vertical scrolling. When in explorable mode and if the window's scroll
    * is within a specified range (between elements with data-step="8" and data-step="9"),
    * calculates a new sleepTime value and updates the reactive chart.
    */
   handleVerticalScroll() {
-    // Only proceed if in explorable mode.
-    if (!this.isExplorable) return;
+    if (!this.isExplorable || !this.sleepScale) return;
 
-    // Select the two DOM elements that define the vertical scroll boundaries.
-    const step8 = document.querySelector('[data-step="8"]');
-    const step9 = document.querySelector('[data-step="9"]');
-    if (!step8 || !step9) return; // Exit if boundaries are not found.
+    // Use precomputed offset
+    const currentScrollY = window.scrollY + this.offset;
 
-    // Get the absolute positions for the boundary elements.
-    const step8Rect = step8.getBoundingClientRect();
-    const step9Rect = step9.getBoundingClientRect();
-    const lowerBoundary = step8Rect.bottom + window.scrollY;
-    const upperBoundary = step9Rect.top + window.scrollY;
-
-    // Calculate the vertical offset: half the chart's height plus the top margin.
-    const chartRange = this.yScaleSVG.range();
-    const chartHeight = Math.abs(chartRange[1] - chartRange[0]);
-    const offset = chartHeight / 2 + margin.top;
-
-    // Adjust the current scrollY to represent the chart's center position.
-    const currentScrollY = window.scrollY + offset;
-
-    // Update the sleepTime only if the current scroll is within the boundaries.
-    // Map the vertical scroll position linearly to a sleepTime value.
-    const sleepScale = d3
-      .scaleLinear()
-      .domain([lowerBoundary, upperBoundary])
-      .range([sleepMin, sleepMax])
-      .clamp(true);
-
-    const newSleepTimeUnrounded = sleepScale(currentScrollY);
+    // Compute new sleep time
+    const newSleepTimeUnrounded = this.sleepScale(currentScrollY);
     const newSleepTime = roundToStep(newSleepTimeUnrounded, 0.25);
 
-    // Update the chart if the sleepTime has changed.
     if (this.chartElement.value.sleepTime !== newSleepTime) {
       set(this.chartElement, {
         ...this.chartElement.value,
         sleepTime: newSleepTime,
       });
 
-      // Log interaction data with debounce
       this.debouncedLogger({
         age: this.chartElement.value.age,
         sleepTime: newSleepTime,
