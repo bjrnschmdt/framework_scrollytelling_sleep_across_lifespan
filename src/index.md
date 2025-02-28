@@ -14,7 +14,7 @@ import {
   programmaticScroll,
   debugLog,
 } from "./components/helperFunctions.js";
-import { dataSet, simulatedData } from "./components/data.js";
+/* import { dataSet, simulatedData } from "./components/data.js"; */
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
 import {
@@ -30,7 +30,6 @@ import {
   updateScatterPlot,
   setScatterVisibility,
 } from "./components/scatterPlot.js";
-/* import PercentileLines from "./components/PercentileLines.js"; */
 import {
   drawPercentiles,
   drawGroupedPercentileLines,
@@ -50,6 +49,18 @@ import {
   logInput,
   logBtnEstimate,
 } from "./components/logger.js";
+```
+
+```js
+const simulatedData = FileAttachment("./data/simulatedData.json").json();
+```
+
+```js
+const dataArray = FileAttachment("./data/dataSet.json").json();
+```
+
+```js
+const dataSet = new Map(dataArray);
 ```
 
 ```js
@@ -322,7 +333,7 @@ const scrollyProps = {
     showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
-    xResolution: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 90),
+    xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
   7: {
@@ -334,7 +345,7 @@ const scrollyProps = {
     showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
-    xResolution: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 90),
+    xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
   8: {
@@ -520,6 +531,14 @@ const interestValue = Generators.input(interestInput);
 ```
 
 <!-- Main Visualization code -->
+
+<!-- ```js
+view(Inputs.textarea({ value: JSON.stringify([...dataSet]) }));
+```
+
+```js
+view(Inputs.textarea({ value: JSON.stringify(simulatedData) }));
+``` -->
 
 ```js
 const initialWidth = document
@@ -832,7 +851,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
     // Redraw or update percentile elements.
     debugLog("update", "updatePercentiles");
     drawPercentiles(percentilesGroup, {
-      dataSet,
+      dataSet, // could be array
       showPercentiles: stepProps.showPercentiles,
       xScaleSVG,
       yScaleSVG,
