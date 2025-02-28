@@ -1,5 +1,6 @@
 // percentileLines.js
 import * as d3 from "npm:d3";
+import { interpolatePath } from "npm:d3-interpolate-path";
 import { settings } from "./settings.js";
 
 const { mostProminent, lessProminent, lineWidths, colors } = settings;
@@ -50,6 +51,17 @@ const flattenData = (dataSet) => {
       tst: p.q,
     }))
   );
+};
+
+const mapToStableLength = (flatData, tickValues) => {
+  // Convert tickValues to a Set for fast lookup
+  const tickSet = new Set(tickValues);
+
+  // Map flatData, overriding tst when age is not in tickValues
+  return flatData.map((d) => ({
+    ...d,
+    tst: tickSet.has(d.age) ? d.tst : undefined, // Keep `tst` if age is in tickValues, otherwise set to undefined
+  }));
 };
 
 /**
@@ -107,9 +119,14 @@ export const drawPercentiles = (
   group,
   { dataSet, showPercentiles, xScaleSVG, yScaleSVG, tickValues, isEnhanced }
 ) => {
+  const curveType = tickValues.length === 91 ? d3.curveNatural : d3.curveBasis;
+  const curveTypeString =
+    tickValues.length === 91 ? "d3.curveNatural" : "d3.curveBasis";
+  console.log("curveType", curveTypeString);
   const lineGen = d3
     .line()
-    .curve(d3.curveNatural)
+    .curve(curveType)
+    /* .defined((d) => d.tst !== undefined) */ // Ignore undefined tst values
     .x((p) => xScaleSVG(p.age))
     .y((p) => yScaleSVG(p.tst));
 
@@ -123,12 +140,15 @@ export const drawPercentiles = (
   ); */
   const filteredDataByTickValues = filterDataByTickValues(flatData, tickValues);
 
+  const stableData = mapToStableLength(flatData, tickValues);
+
   // Group the filtered data by percentile.
   const groupedByPercentile = d3.groups(
-    /* filteredDataByTickValues, */
-    flatData,
+    filteredDataByTickValues,
     (d) => d.percentile
   );
+
+  console.log("groupedByPercentile", groupedByPercentile);
 
   // Filter groups based on the showPercentiles criteria.
   const visiblePercentiles = groupedByPercentile.filter(
@@ -175,7 +195,12 @@ export const drawPercentiles = (
     .transition()
     .duration(600)
     .ease(d3.easeCubicInOut)
-    .attr("d", (d) => lineGen(d[1]))
+    /* .attr("d", (d) => lineGen(d[1])) */
+    .attrTween("d", function (d) {
+      var previous = d3.select(this).attr("d");
+      var current = lineGen(d[1]);
+      return interpolatePath(previous, current);
+    })
     .attr(
       "stroke-opacity",
       (d) => getStrokeProperties(d[0], showPercentiles).strokeOpacity
