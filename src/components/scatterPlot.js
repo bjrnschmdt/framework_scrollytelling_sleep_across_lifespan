@@ -42,7 +42,6 @@ export const initializeScatterPlot = (
  * @param {Function} config.yScaleSVG - y scale.
  */
 export const updateScatterPlot = (group, { xScaleSVG, yScaleSVG }) => {
-  console.log("updateScatterPlot", scatterVisible);
   const dataToUse = scatterVisible ? sampledData : []; // Hide if not visible
 
   // Sort data by age for left-to-right effect
@@ -56,8 +55,6 @@ export const updateScatterPlot = (group, { xScaleSVG, yScaleSVG }) => {
   const falloffFraction = 1; // 10% of points at the appearing edge will have noise
   const totalPoints = dataToUse.length;
   const falloffStartIndex = Math.floor(totalPoints * (1 - falloffFraction));
-
-  console.log("dataToUse ", dataToUse);
 
   group
     .selectAll("circle")

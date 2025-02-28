@@ -122,7 +122,6 @@ export const drawPercentiles = (
   const curveType = tickValues.length === 91 ? d3.curveNatural : d3.curveBasis;
   const curveTypeString =
     tickValues.length === 91 ? "d3.curveNatural" : "d3.curveBasis";
-  console.log("curveType", curveTypeString);
   const lineGen = d3
     .line()
     .curve(curveType)
@@ -148,8 +147,6 @@ export const drawPercentiles = (
     (d) => d.percentile
   );
 
-  console.log("groupedByPercentile", groupedByPercentile);
-
   // Filter groups based on the showPercentiles criteria.
   const visiblePercentiles = groupedByPercentile.filter(
     ([percentileKey]) =>
@@ -160,8 +157,6 @@ export const drawPercentiles = (
         showPercentiles.includes("B")) ||
       showPercentiles.includes("C")
   );
-
-  /* console.log("visiblePercentiles", visiblePercentiles); */
 
   // Bind the visible percentile groups to path elements.
   const lines = group
