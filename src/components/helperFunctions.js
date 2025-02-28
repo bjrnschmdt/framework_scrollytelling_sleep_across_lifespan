@@ -170,6 +170,14 @@ export function createDebouncedLogger(callback, delay) {
   };
 }
 
+export function debounce(func, delay) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
 /**
  * Computes the new x-domain and total width but does not modify the original scale.
  * @param {Object} xScale - D3 scale object for x-axis.
@@ -227,7 +235,7 @@ export function roundToStep(value, step) {
 const DEBUG = {
   general: false,
   scroll: false,
-  update: true,
+  update: false,
   inputs: false,
   analytics: false,
   ScrollInteraction: false,
