@@ -132,6 +132,9 @@ export class PointerInteraction {
    * Toggles the lock state of the plot when the pointer is clicked.
    */
   pointerClicked() {
+    if (!this.isExplorable) {
+      return;
+    }
     this.isPlotLocked = !this.isPlotLocked; // Toggle lock state
     this.updateInteractionState(this.isPlotLocked);
   }
