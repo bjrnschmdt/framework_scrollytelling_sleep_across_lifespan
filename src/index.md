@@ -594,17 +594,21 @@ const interestForm = createSemanticDifferentialInput(
 ```
 
 ```js
-const shareButton = Inputs.button("Teilen Sie diesen Artikel", {
+const shareBtn = Inputs.button("Teilen Sie diesen Artikel", {
   reduce: () => {
     if (navigator.share) {
       navigator
         .share({
           title: "Schau dir diese interaktive Grafik zur Schlafdauer an!",
-          text: "Wie lange schlafen andere in deinem Alter?",
+          text: "So viel schlafen andere in Ihrem Alter",
           url: window.location.href,
         })
-        .then(() => console.log("Erfolgreich geteilt"))
-        .catch((error) => console.error("Teilen fehlgeschlagen:", error));
+        .then(() => {
+          logEvent("kielscn_schlafdauer_shared", { shared: true }); // Log success
+        })
+        .catch((error) => {
+          logEvent("kielscn_schlafdauer_shared", { shared: false }); // Log failure
+        });
     } else {
       console.log("Web Share API wird nicht unterstützt.");
     }
@@ -1288,12 +1292,13 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
 </section>
 
 <div class="outro card">
+  <h2>Hinter den Daten</h2>
   <p>Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen. Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig. Dieses Phänomen ist nur eins von vielen, mit denen sich die Schlafforschung befasst. Auf unseren Themenseiten finden Sie zahlreiche Artikel zu den Themen <a href="https://www.spektrum.de/thema/schlaf/1295691">Schlaf</a> und <a href="https://www.spektrum.de/thema/traeumen/1356995">Träumen</a>.</p>
   <p>Methodischer Hintergrund: Die Basis für die Grafik sind die Daten <a href="https://www.nature.com/articles/s41562-020-00965-x">dieser</a> Metaanalyse von Kocevska et al. Eine Metaanalyse fügt die Ergebnisse von vielen einzelnen Studien zusammen und gewinnt dadurch an Aussagekraft. Aus den statistischen Kennwerten haben wir eine realistische Verteilung nachgebildet und daraus die Perzentile berechnet.</p>
   <p>Die Grafik wurde erstellt vom Kiel Science Communication Network (KielSCN).</p>
   <p><em>Texte:</em> Stephan Reiche, Anna von Hopffgarten und Carolin Wagener</p>
   <p><em>Grafikdesign und Umsetzung:</em> Björn Döge</p>
-  ${shareButton} 
+  ${shareBtn} 
 </div>
 
 <!-- CSS -->
