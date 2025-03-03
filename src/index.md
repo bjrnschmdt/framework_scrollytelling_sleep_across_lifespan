@@ -1,6 +1,7 @@
 ---
 theme: [midnight, alt, wide]
 toc: false
+style: custom-style.css
 ---
 
 ```js
@@ -57,6 +58,13 @@ const simulatedData = FileAttachment("./data/simulatedData.json").json();
 
 ```js
 const dataArray = FileAttachment("./data/dataSet.json").json();
+```
+
+```js
+const robotoRegular = FileAttachment("./data/Roboto-Regular.ttf").href;
+const robotoCondensedBold = FileAttachment(
+  "./data/RobotoCondensed-Bold.ttf"
+).href;
 ```
 
 ```js
@@ -583,6 +591,25 @@ const interestForm = createSemanticDifferentialInput(
   "Das Thema interessiert mich.",
   "interest"
 );
+```
+
+```js
+const shareButton = Inputs.button("Teilen Sie diesen Artikel", {
+  reduce: () => {
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Schau dir diese interaktive Grafik zur Schlafdauer an!",
+          text: "Wie lange schlafen andere in deinem Alter?",
+          url: window.location.href,
+        })
+        .then(() => console.log("Erfolgreich geteilt"))
+        .catch((error) => console.error("Teilen fehlgeschlagen:", error));
+    } else {
+      console.log("Web Share API wird nicht unterstützt.");
+    }
+  },
+});
 ```
 
 <!-- Main Visualization code -->
@@ -1266,17 +1293,12 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <p>Die Grafik wurde erstellt vom Kiel Science Communication Network (KielSCN).</p>
   <p><em>Texte:</em> Stephan Reiche, Anna von Hopffgarten und Carolin Wagener</p>
   <p><em>Grafikdesign und Umsetzung:</em> Björn Döge</p>
+  ${shareButton} 
 </div>
 
 <!-- CSS -->
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-/* @font-face {
-  font-family: "Roboto";
-  src: url(https://kielscn-spektrum-living-lab.observablehq.cloud/sleep-across-lifespan/data/Roboto-Regular.ttf) format('truetype')
-} */
-
 .scroll-container {
   margin: 1rem auto;
   padding-bottom: 1vh; /* hack to ensure last section scrolls past svg to */
@@ -1315,6 +1337,11 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
 .outro {
   margin: 0 auto 2rem;
   transition: margin 0.6s ease;
+}
+
+.outro button {
+  display: block;
+  margin: auto;
 }
 
 #answer {
