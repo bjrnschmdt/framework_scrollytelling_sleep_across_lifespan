@@ -1132,32 +1132,37 @@ const stepContent = {
     desktop: `<p>Bewegen Sie den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn Sie genug erkundet haben, scrollen Sie einfach weiter.</p>`,
     mobile: `<p>Sie können die Grafik nun frei erkunden. Scrollen Sie nach oben und unten, um die Schlafdauer zu verändern. Wischen Sie nach links oder rechts, um andere Altersbereiche anzuzeigen. Wenn Sie genug erkundet haben, scrollen Sie wie gehabt weiter nach unten.</p>`,
   },
-  10: {
-    desktop: `<p>Sehen wir uns nun die Altersgruppen ein wenig genauer an. Dafür haben wir näher herangezoomt:</p>
-      <h2>Altersgruppe bis 10 Jahre</h2>
-      <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>`,
-    mobile: `<h2>Altersgruppe bis 10 Jahre</h2>
-      <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>`,
+  9: {
+    desktop: `<p>Sehen wir uns jetzt noch einige Altersgruppen genauer an. Dafür zoomen wir näher heran:</p>`,
+    mobile: `<p>Sehen wir uns jetzt noch einige Altersgruppen genauer an:</p>`,
   },
 };
 
-function updateStepContent(step) {
+function appendStepContent(step) {
   const stepDiv = document.querySelector(
     `.scroll-section[data-step="${step}"]`
   );
-  if (stepDiv)
-    stepDiv.innerHTML = isEnhanced
+
+  if (stepDiv) {
+    // Create a wrapper div for the new content
+    const newContent = document.createElement("div");
+    newContent.innerHTML = isEnhanced
       ? stepContent[step].desktop
       : stepContent[step].mobile;
+
+    // Append instead of replacing content
+    stepDiv.appendChild(newContent);
+  }
 }
 
 // Update all steps
-[4, 8, 10].forEach(updateStepContent);
+[4, 8, 9].forEach(appendStepContent);
 ```
 
-# Schlafdauer über die Lebensspanne
+# So viel schlafen andere in Ihrem Alter
 
-Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so lange schlafen wie Sie? Und wie sieht es mit der Schlafdauer in der Gesamtbevölkerung so aus? Finden Sie es mit unserer interaktiven Grafik heraus! Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schritt, während Sie weiter scrollen.
+Finden Sie es mit unserer interaktiven Grafik heraus! Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so lange schlafen wie Sie? Und wie sieht es mit der Schlafdauer in der Gesamtbevölkerung aus?
+Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schritt, während Sie weiter scrollen.
 
 <section class="scroll-container">
 <div class="scroll-info">${chartElement}</div>
@@ -1172,7 +1177,6 @@ Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so la
   <p>Die Linien geben Perzentile an und zeigen, wie sich die Datenpunkte in der Stichprobe verteilen. Was das konkret heißt, sehen Sie im folgenden Bild:</p>
 </div>
 <div class="scroll-section card" data-step="4">
-  <p>Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p>
 </div>
 <div class="scroll-section card" data-step="5" id="user-input">
   <p>Wie ist es bei Ihnen? Geben Sie hier Ihr Alter und Ihre übliche Schlafdauer (bspw. von letzter Nacht) ein, um sich in der Grafik verorten zu können! Wenn Sie weiter scrollen, können Sie sich mit anderen in Ihrem Alter vergleichen.</p>${ageInput}${sleepTimeInput}
@@ -1185,16 +1189,13 @@ Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so la
   <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}
 </div>
 <div class="scroll-section card" data-step="8">
-  <p>Bewegen Sie den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn Sie genug erkundet haben, scrollen Sie einfach weiter.</p>
 </div>
 <div class="scroll-section card" data-step="9">
-  <p>Uns interessiert Ihre Meinung: wie stehen Sie zu folgenden Aussagen?</p>
-  <h2>Die Gestaltung der Grafik war ansprechend.</h2>${aestheticsInput}<h2>Das Thema hat mich interessiert.</h2>${interestInput}</div>
-<!-- <div class="scroll-section card" data-step="10">
-  <p>Sehen wir uns nun die Altersgruppen ein wenig genauer an. Dafür haben wir näher herangezoomt. Die x-Achse unten hat sich also verändert und zeigt jeweils nur die Altersgruppe an, um die es gerade geht.</p>
-</div> -->
+  <p>Was trifft für Sie zu?</p>
+  <h2>Die Gestaltung der Grafik ist ansprechend.</h2>${aestheticsInput}<h2>Das Thema interessiert mich.</h2>${interestInput}
+  <!-- <p>Sehen wir uns jetzt noch einige Altersgruppen genauer an. Dafür zoomen wir näher heran:</p> -->
+</div>
 <div class="scroll-section card" data-step="10">
-  <p>Sehen wir uns nun die Altersgruppen ein wenig genauer an. Dafür haben wir näher herangezoomt.</p>
   <h2>Altersgruppe bis 10 Jahre</h2>
   <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
 </div>
@@ -1224,6 +1225,10 @@ Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so la
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+/* @font-face {
+  font-family: "Roboto";
+  src: url(https://kielscn-spektrum-living-lab.observablehq.cloud/sleep-across-lifespan/data/Roboto-Regular.ttf) format('truetype')
+} */
 
 .scroll-container {
   margin: 1rem auto;
