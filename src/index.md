@@ -205,13 +205,13 @@ debouncedLoggers.sleepTime(sleepTimeValue);
 debouncedLoggers.estimate(estimateValue);
 ```
 
-```js
+<!-- ```js
 logInput("aesthetics", aestheticsValue);
-```
+``` -->
 
-```js
+<!-- ```js
 logInput("interest", interestValue);
-```
+``` -->
 
 <!-- Scrollytelling -->
 
@@ -498,7 +498,7 @@ const scrollTo = Inputs.button("Nochmal versuchen", {
 const scrollToValue = Generators.input(scrollTo);
 ```
 
-```js
+<!-- ```js
 const aestheticsInput = Inputs.radio(
   new Map([
     ["1", 1],
@@ -512,9 +512,9 @@ const aestheticsInput = Inputs.radio(
   }
 );
 const aestheticsValue = Generators.input(aestheticsInput);
-```
+``` -->
 
-```js
+<!-- ```js
 const interestInput = Inputs.radio(
   new Map([
     ["1", 1],
@@ -528,17 +528,64 @@ const interestInput = Inputs.radio(
   }
 );
 const interestValue = Generators.input(interestInput);
-```
+``` -->
 
-<!-- Main Visualization code -->
+```js
+function createSemanticDifferentialInput(label, logKey) {
+  const form = html`<form
+    style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 10px; margin-bottom: 25px; max-width: 100%;"
+  >
+    <div
+      style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: no-wrap; justify-content: flex-start; width: 100%;"
+    >
+      <span style="align-self: flex-end; text-align: left; white-space: normal;"
+        >stimme gar<wbr /> nicht zu</span
+      >
+      <div style="display: flex; gap: 5px; justify-content: center;">
+        ${Array.from({ length: 5 }, (_, i) => {
+          const wrapper = html`<div
+            style="display: flex; flex-direction: column; align-items: center; gap: 4px;"
+          >
+            <span style="font-size: 0.9rem;">${i + 1}</span>
+            <input
+              type="radio"
+              name="${logKey}"
+              value="${i + 1}"
+              style="margin: 0;"
+            />
+          </div>`;
+          return wrapper;
+        })}
+      </div>
+      <span
+        style="align-self: flex-end; text-align: right; white-space: normal;"
+        >stimme<wbr /> voll&nbsp;zu</span
+      >
+    </div>
+  </form>`;
 
-<!-- ```js
-view(Inputs.textarea({ value: JSON.stringify([...dataSet]) }));
+  form.onchange = () => {
+    form.value = form.querySelector("input:checked").value;
+    logInput(logKey, form.value);
+  };
+
+  form.value = undefined; // Default value
+  return form;
+}
 ```
 
 ```js
-view(Inputs.textarea({ value: JSON.stringify(simulatedData) }));
-``` -->
+const aestheticsForm = createSemanticDifferentialInput(
+  "Die Gestaltung der Grafik ist ansprechend.",
+  "aesthetics"
+);
+const interestForm = createSemanticDifferentialInput(
+  "Das Thema interessiert mich.",
+  "interest"
+);
+```
+
+<!-- Main Visualization code -->
 
 ```js
 const initialWidth = document
@@ -1192,7 +1239,7 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
 </div>
 <div class="scroll-section card" data-step="9">
   <p>Was trifft für Sie zu?</p>
-  <h2>Die Gestaltung der Grafik ist ansprechend.</h2>${aestheticsInput}<h2>Das Thema interessiert mich.</h2>${interestInput}
+  <h2>Die Gestaltung der Grafik ist ansprechend.</h2>${aestheticsForm}<h2>Das Thema interessiert mich.</h2>${interestForm}
   <!-- <p>Sehen wir uns jetzt noch einige Altersgruppen genauer an. Dafür zoomen wir näher heran:</p> -->
 </div>
 <div class="scroll-section card" data-step="10">
