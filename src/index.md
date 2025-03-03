@@ -1296,8 +1296,7 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <p>Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen. Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig. Dieses Phänomen ist nur eins von vielen, mit denen sich die Schlafforschung befasst. Auf unseren Themenseiten finden Sie zahlreiche Artikel zu den Themen <a href="https://www.spektrum.de/thema/schlaf/1295691">Schlaf</a> und <a href="https://www.spektrum.de/thema/traeumen/1356995">Träumen</a>.</p>
   <p>Methodischer Hintergrund: Die Basis für die Grafik sind die Daten <a href="https://www.nature.com/articles/s41562-020-00965-x">dieser</a> Metaanalyse von Kocevska et al. Eine Metaanalyse fügt die Ergebnisse von vielen einzelnen Studien zusammen und gewinnt dadurch an Aussagekraft. Aus den statistischen Kennwerten haben wir eine realistische Verteilung nachgebildet und daraus die Perzentile berechnet.</p>
   <p>Die Grafik wurde erstellt vom Kiel Science Communication Network (KielSCN).</p>
-  <p><em>Texte:</em> Stephan Reiche, Anna von Hopffgarten und Carolin Wagener</p>
-  <p><em>Grafikdesign und Umsetzung:</em> Björn Döge</p>
+  <p>Texte: Stephan Reiche, Anna von Hopffgarten und Carolin Wagener</br>Grafikdesign und Umsetzung: Björn Döge</p>
   ${shareBtn} 
 </div>
 
