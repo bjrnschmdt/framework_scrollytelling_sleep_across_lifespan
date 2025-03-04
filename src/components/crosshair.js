@@ -105,7 +105,7 @@ export function initializeCrosshair({
     .style("font", `${fontSize} ${fontFamily}`)
     .style("text-anchor", "start")
     .style("dominant-baseline", "hanging")
-    .text(`${ageFormat(domainX)} Jahre (Alter)`);
+    .text(`${domainX} Jahre (Alter)`);
 
   const crosshairXLine = crosshair
     .append("line")
@@ -202,7 +202,6 @@ export function updateCrosshairs(
   let tickOpacity = 0.4;
   let pointOpacity = 1;
   let intersect = data.age < 23;
-  let labelXOffset = -6;
 
   const domainX = xScaleSVG.domain()[0];
   const domainY = yScaleSVG.domain()[1];
@@ -234,7 +233,6 @@ export function updateCrosshairs(
     duration = 600;
     tickOpacity = 1;
     pointOpacity = 0;
-    /* labelXOffset = 0; */
   }
 
   // Move the tick extremes
@@ -264,8 +262,7 @@ export function updateCrosshairs(
     .duration(duration)
     .attr("x", x)
     .attr("y", rangeY)
-    .attr("dx", labelXOffset)
-    .text(`${ageFormat(textAge)} Jahre (Alter)`);
+    .text(`${textAge} Jahre (Alter)`);
 
   crosshairXLine
     .transition()
