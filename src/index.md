@@ -1222,14 +1222,20 @@ function appendStepContent(step) {
   );
 
   if (stepDiv) {
-    // Create a wrapper div for the new content
-    const newContent = document.createElement("div");
-    newContent.innerHTML = isEnhanced
-      ? stepContent[step].desktop
-      : stepContent[step].mobile;
+    // Check if the content is already present
+    if (!stepDiv.dataset.appended) {
+      // Create a wrapper div for the new content
+      const newContent = document.createElement("div");
+      newContent.innerHTML = isEnhanced
+        ? stepContent[step].desktop
+        : stepContent[step].mobile;
 
-    // Append instead of replacing content
-    stepDiv.appendChild(newContent);
+      // Append content
+      stepDiv.appendChild(newContent);
+
+      // Mark this step as updated to prevent duplicate insertions
+      stepDiv.dataset.appended = "true";
+    }
   }
 }
 
