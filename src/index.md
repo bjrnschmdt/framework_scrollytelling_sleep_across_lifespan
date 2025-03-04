@@ -15,6 +15,7 @@ import {
   programmaticScroll,
   debugLog,
 } from "./components/helperFunctions.js";
+import isMobile from "./components/isMobile.js";
 /* import { dataSet, simulatedData } from "./components/data.js"; */
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
@@ -91,23 +92,21 @@ const {
 const w = width;
 ```
 
-<!-- ```js
-w;
-const h = window.innerHeight;
-``` -->
+```js
+console.log("isMobile.any():", isMobile.any());
+console.log("navigator.userAgent:", navigator.userAgent);
+console.log("navigator.platform:", navigator.platform);
+console.log("navigator.maxTouchPoints:", navigator.maxTouchPoints);
+```
 
 ```js
-const userAgent = navigator.userAgent.toLowerCase();
-const isTablet =
-  (window.innerWidth > 800 &&
-    window.innerWidth < 1200 &&
-    window.innerHeight > 600) ||
-  /ipad|android(?!.*mobile)|tablet|kindle|silk|playbook/.test(userAgent);
+console.log("width:", width);
+console.log("height:", height);
 ```
 
 ```js
 // mobile breakpoint
-const isEnhanced = !(isTablet || window.innerWidth <= 800);
+const isEnhanced = !(isMobile.any() || width <= 800);
 ```
 
 ```js
