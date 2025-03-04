@@ -100,7 +100,7 @@ export function initializeCrosshair({
     .attr("dy", 7)
     .style("fill", "white")
     .style("stroke", "black")
-    .style("stroke-width", "6")
+    .style("stroke-width", "5")
     .style("paint-order", "stroke")
     .style("font", `${fontSize} ${fontFamily}`)
     .style("text-anchor", "start")
