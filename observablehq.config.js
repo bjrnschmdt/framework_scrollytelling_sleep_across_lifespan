@@ -29,8 +29,7 @@ export default {
   globalStylesheets: [],
   // Some additional configuration options and their defaults:
   // theme: "default", // try "light", "dark", "slate", etc.
-  header:
-    "<div>🚧 This project is a work in progress. Please do not share the URL. 🚧</div>", // what to show in the header (HTML)
+  // header: "<div>🚧 This project is a work in progress. Please do not share the URL. 🚧</div>",
   footer: `<p>© <script>document.write(new Date().getFullYear());</script> <a href="https://www.kielscn.de">Kiel Science Communication Network</a>. Alle Rechte vorbehalten.</p>`, // what to show in the footer (HTML)
   sidebar: false, // whether to show the sidebar
   toc: false, // whether to show the table of contents
