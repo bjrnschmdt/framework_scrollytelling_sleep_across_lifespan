@@ -2,28 +2,19 @@
 @import url("observablehq:theme-midnight.css");
 @import url("observablehq:theme-wide.css");
 @import url("observablehq:theme-alt.css");
+@import url("https://www.spektrum.de/js_css/assets/fonts/custom/fonts.css");
+@import url("https://www.spektrum.de/js_css/assets/fonts/custom/fonts_open_sans.css");
 
 /* base path production: https://www.spektrum.de/pix/interactive/kielscn_schlaf/_file/data/ */
 /* base path development: https://kielscn-spektrum-living-lab.observablehq.cloud/sleep-across-lifespan/_file/data/ */
 
-@font-face {
-  font-family: "Roboto-Regular";
-  font-style: normal;
-  font-weight: 400;
-  src: url(https://kielscn-spektrum-living-lab.observablehq.cloud/sleep-across-lifespan/_file/data/Roboto-Regular.4e147ab6.ttf) format("truetype");
+:root {
+  --sans-serif: "Open Sans", -apple-system, BlinkMacSystemFont, "avenir next", avenir, helvetica, "helvetica neue", ubuntu, roboto, noto, "segoe ui", arial, sans-serif;
 }
-
-@font-face {
-  font-family: "RobotoCondensed-Bold";
-  font-style: bold;
-  font-weight: 700;
-  src: url(https://kielscn-spektrum-living-lab.observablehq.cloud/sleep-across-lifespan/_file/data/RobotoCondensed-Bold.9bc003d6.ttf) format("truetype");
-}
-
 body {
-  font-family: "Roboto-Regular", sans-serif;
+  font-family: var(--sans-serif);
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "RobotoCondensed-Bold", sans-serif;
+  font-family: "Roboto Condensed", var(--sans-serif);
 }

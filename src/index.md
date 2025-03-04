@@ -60,12 +60,12 @@ const simulatedData = FileAttachment("./data/simulatedData.json").json();
 const dataArray = FileAttachment("./data/dataSet.json").json();
 ```
 
-```js
+<!-- ```js
 const robotoRegular = FileAttachment("./data/Roboto-Regular.ttf").href;
 const robotoCondensedBold = FileAttachment(
   "./data/RobotoCondensed-Bold.ttf"
 ).href;
-```
+``` -->
 
 ```js
 const dataSet = new Map(dataArray);
