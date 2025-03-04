@@ -97,8 +97,17 @@ const h = window.innerHeight;
 ``` -->
 
 ```js
+const userAgent = navigator.userAgent.toLowerCase();
+const isTablet =
+  (window.innerWidth > 800 &&
+    window.innerWidth < 1200 &&
+    window.innerHeight > 600) ||
+  /ipad|android(?!.*mobile)|tablet|kindle|silk|playbook/.test(userAgent);
+```
+
+```js
 // mobile breakpoint
-const isEnhanced = width > 800;
+const isEnhanced = !(isTablet || window.innerWidth <= 800);
 ```
 
 ```js
