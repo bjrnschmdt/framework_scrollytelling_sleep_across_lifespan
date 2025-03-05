@@ -93,18 +93,6 @@ const w = width;
 ```
 
 ```js
-console.log("isMobile.any():", isMobile.any());
-console.log("navigator.userAgent:", navigator.userAgent);
-console.log("navigator.platform:", navigator.platform);
-console.log("navigator.maxTouchPoints:", navigator.maxTouchPoints);
-```
-
-```js
-console.log("width:", width);
-console.log("height:", height);
-```
-
-```js
 // mobile breakpoint
 const isEnhanced = !(isMobile.any() || width <= 800);
 ```
@@ -697,8 +685,6 @@ const { xScaleSVG, yScaleSVG, timeScale } = createScales({
   h: initialHeight,
 });
 
-/* console.log("simulated data", simulatedData); */
-
 /* const pointcloud = new Pointcloud(context, canvas, {
   simulatedData,
   xScale: xScaleSVG,
@@ -895,15 +881,6 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
       .duration(600)
       .attr("width", newWidth)
       .attr("height", newHeight);
-    /* .on("start", () =>
-        console.log("dimension change started", svg.attr("height"))
-      )
-      .on("interrupt", () =>
-        console.log("dimension change interrupted", svg.attr("height"))
-      )
-      .on("end", () =>
-        console.log("dimension change ended", svg.attr("height"))
-      ); */
 
     yAxisSVG.attr("height", newHeight); // height change
 
