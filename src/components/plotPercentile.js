@@ -2,7 +2,7 @@ import * as d3 from "npm:d3";
 import { updatePlot } from "./plot.js";
 import { settings } from "./settings.js";
 
-const { percentileSelection } = settings;
+const { percentileSelection, fontSize, fontFamily } = settings;
 
 function enterPercentile(enter, context) {
   const { scales } = context;
@@ -14,7 +14,7 @@ function enterPercentile(enter, context) {
     .attr("y", (d) => yScaleSVG(d.q))
     .text((d) => `${Math.round(d.p * 100)}%`)
     .style("fill", "white")
-    .style("font", "10px Roboto")
+    .style("font", `${fontSize} ${fontFamily}`)
     .attr("text-anchor", "middle")
     .attr("alignment-baseline", "middle");
 }

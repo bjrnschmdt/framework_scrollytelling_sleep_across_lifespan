@@ -16,7 +16,7 @@ import {
   debugLog,
 } from "./components/helperFunctions.js";
 import isMobile from "./components/isMobile.js";
-/* import { dataSet, simulatedData } from "./components/data.js"; */
+import { dataSet, simulatedData } from "./components/data.js";
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
 import {
@@ -53,13 +53,13 @@ import {
 } from "./components/logger.js";
 ```
 
-```js
+<!-- ```js
 const simulatedData = FileAttachment("./data/simulatedData.json").json();
-```
+``` -->
 
-```js
+<!-- ```js
 const dataArray = FileAttachment("./data/dataSet.json").json();
-```
+``` -->
 
 <!-- ```js
 const robotoRegular = FileAttachment("./data/Roboto-Regular.ttf").href;
@@ -68,9 +68,9 @@ const robotoCondensedBold = FileAttachment(
 ).href;
 ``` -->
 
-```js
+<!-- ```js
 const dataSet = new Map(dataArray);
-```
+``` -->
 
 ```js
 const {
@@ -190,7 +190,7 @@ logSectionVisible(scrollyStep);
 const debouncedLoggers = {
   age: createDebouncedLogger((value) => logInput("age", value), 500),
   sleepTime: createDebouncedLogger(
-    (value) => logInput("sleepTime", value),
+    (value) => logInput("sleeptime", value),
     500
   ),
   estimate: createDebouncedLogger((value) => logInput("estimate", value), 500),
@@ -581,7 +581,7 @@ function createSemanticDifferentialInput(label, logKey) {
 ```js
 const aestheticsForm = createSemanticDifferentialInput(
   "Die Gestaltung der Grafik ist ansprechend.",
-  "aesthetics"
+  "aesthetic"
 );
 const interestForm = createSemanticDifferentialInput(
   "Das Thema interessiert mich.",
@@ -1188,8 +1188,8 @@ updateVisualizationDescription(variant);
 ```js
 const stepContent = {
   4: {
-    desktop: `<p>Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p>`,
-    mobile: `<p>Karin ist 31 Jahre alt und liegt mit einer Schlafdauer von 7 Stunden im 50. Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p><p>Damit es besser erkennbar ist, haben wir näher herangezoomt. Die x-Achse unten hat sich also verändert und zeigt jeweils nur den Altersbereich an, um den es gerade geht.</p>`,
+    desktop: `<p>Karin ist 31&nbsp;Jahre alt und liegt mit einer Schlafdauer von 7&nbsp;Stunden im 50.&nbsp;Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p>`,
+    mobile: `<p>Karin ist 31&nbsp;Jahre alt und liegt mit einer Schlafdauer von 7&nbsp;Stunden im 50.&nbsp;Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p><p>Damit es besser erkennbar ist, haben wir näher herangezoomt. Die x-Achse unten hat sich also verändert und zeigt jeweils nur den Altersbereich an, um den es gerade geht.</p>`,
   },
   8: {
     desktop: `<p>Bewegen Sie den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn Sie genug erkundet haben, scrollen Sie einfach weiter.</p>`,
@@ -1240,7 +1240,7 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <p>Auf der Y-Achse links ist die Schlafdauer eingetragen, unten auf der X-Achse das Alter.</p>
 </div>
 <div class="scroll-section card" data-step="2">
-  <p>Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000 Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert.</p>
+  <p>Jeder winzige Punkt in der Wolke entspricht der Schlafdauer einer Person eines bestimmten Alters. Dazu haben Fachleute die Daten von über 150.000&nbsp;Menschen aus verschiedenen Studien zusammengetragen. Je dichter die Wolke, desto mehr Menschen werden dort repräsentiert.</p>
 </div>
 <div class="scroll-section card" data-step="3">
   <p>Die Linien geben Perzentile an und zeigen, wie sich die Datenpunkte in der Stichprobe verteilen. Was das konkret heißt, sehen Sie im folgenden Bild:</p>
@@ -1265,20 +1265,20 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <!-- <p>Sehen wir uns jetzt noch einige Altersgruppen genauer an. Dafür zoomen wir näher heran:</p> -->
 </div>
 <div class="scroll-section card" data-step="10">
-  <h2>Altersgruppe bis 10 Jahre</h2>
+  <h2>Altersgruppe bis 10&nbsp;Jahre</h2>
   <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
 </div>
 <div class="scroll-section card" data-step="11">
-  <h2>11–17 Jahre</h2>
+  <h2>11–17&nbsp;Jahre</h2>
   <p>Während der Pubertät fällt die Schlafdauer dramatisch ab; gleichzeitig nimmt die Streuung zu. Da sich in dieser Phase die innere Uhr meist auf spätere Bettzeiten einstellt, die Schule aber in der Regel früh beginnt, bekommen Jugendliche oft weniger Schlaf, als es Fachleute empfehlen.</p>
 </div>
 <div class="scroll-section card" data-step="12">
-  <h2>18–65 Jahre</h2>
-  <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7 Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
+  <h2>18–65&nbsp;Jahre</h2>
+  <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7&nbsp;Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
 </div>
 <div class="scroll-section card" data-step="13">
-  <h2>Über 66 Jahre</h2>
-  <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7 Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
+  <h2>Über 66&nbsp;Jahre</h2>
+  <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7&nbsp;Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
 </div>
 </section>
 
@@ -1287,7 +1287,7 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <p>Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen. Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig. Dieses Phänomen ist nur eins von vielen, mit denen sich die Schlafforschung befasst. Auf unseren Themenseiten finden Sie zahlreiche Artikel zu den Themen <a href="https://www.spektrum.de/thema/schlaf/1295691">Schlaf</a> und <a href="https://www.spektrum.de/thema/traeumen/1356995">Träumen</a>.</p>
   <p>Methodischer Hintergrund: Die Basis für die Grafik sind die Daten <a href="https://www.nature.com/articles/s41562-020-00965-x">dieser</a> Metaanalyse von Kocevska et al. Eine Metaanalyse fügt die Ergebnisse von vielen einzelnen Studien zusammen und gewinnt dadurch an Aussagekraft. Aus den statistischen Kennwerten haben wir eine realistische Verteilung nachgebildet und daraus die Perzentile berechnet.</p>
   <p>Die Grafik wurde erstellt vom Kiel Science Communication Network (KielSCN).</p>
-  <p>Texte: Stephan Reiche, Anna von Hopffgarten und Carolin Wagener</br>Grafikdesign und Umsetzung: Björn Döge</p>
+  <p>Texte: Stephan Reiche/KielSCN, Anna von Hopffgarten/Spektrum der Wissenschaft und Carolin Wagener/Spektrum der Wissenschaft</br>Grafikdesign und Umsetzung: Björn Döge/KielSCN</p>
   ${shareBtn} 
 </div>
 
