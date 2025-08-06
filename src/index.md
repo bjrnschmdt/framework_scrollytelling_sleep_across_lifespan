@@ -473,7 +473,7 @@ const sleepTimeValue = Generators.input(sleepTimeInput);
 
 ```js
 const estimateInput = Inputs.range([0, 100], {
-  label: "Estimate in %",
+  label: "Schätzung in %",
   step: 1,
   value: 0,
   placeholder: "in %",
@@ -483,7 +483,7 @@ const estimateValue = Generators.input(estimateInput);
 
 ```js
 // This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerInput = Inputs.button("Show answer", {
+const answerInput = Inputs.button("Auflösung anzeigen", {
   value: null,
   reduce: (value) => btnEstimate(value),
   disabled: isDisabled,
@@ -1231,7 +1231,7 @@ function appendStepContent(step) {
 # So viel schlafen andere in Ihrem Alter
 
 Finden Sie es mit unserer interaktiven Grafik heraus! Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so lange schlafen wie Sie? Und wie sieht es mit der Schlafdauer in der Gesamtbevölkerung aus?
-Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schritt, während Sie weiterscrollen.
+Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schritt, während Sie weiter scrollen.
 
 <section class="scroll-container">
 <div class="scroll-info">${chartElement}</div>
@@ -1255,8 +1255,7 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <p>Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</p>
 </div>
 <div class="scroll-section card" data-step="7">
-  <!-- <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?</p>${estimateInput}${answerInput}${feedbackInput} -->
-  <p>What would you estimate — what percentage of people in your age group sleep less than you?</p>${estimateInput}${answerInput}${feedbackInput}
+  <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}
 </div>
 <div class="scroll-section card" data-step="8">
 </div>
