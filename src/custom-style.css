@@ -1,0 +1,20 @@
+@import url("observablehq:default.css");
+@import url("observablehq:theme-midnight.css");
+@import url("observablehq:theme-wide.css");
+@import url("observablehq:theme-alt.css");
+@import url("https://www.spektrum.de/js_css/assets/fonts/custom/fonts.css");
+@import url("https://www.spektrum.de/js_css/assets/fonts/custom/fonts_open_sans.css");
+
+/* base path production: https://www.spektrum.de/pix/interactive/kielscn_schlaf/_file/data/ */
+/* base path development: https://kielscn-spektrum-living-lab.observablehq.cloud/sleep-across-lifespan/_file/data/ */
+
+:root {
+  --sans-serif: "Open Sans", -apple-system, BlinkMacSystemFont, "avenir next", avenir, helvetica, "helvetica neue", ubuntu, roboto, noto, "segoe ui", arial, sans-serif;
+}
+body {
+  font-family: var(--sans-serif);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Roboto Condensed", var(--sans-serif);
+}

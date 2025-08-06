@@ -43,7 +43,7 @@ function enterDot(enter, context) {
     .attr("height", 2 * qradius)
     .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
     .style("stroke", "white")
-    .style("stroke-width", 3 * qradius);
+    .style("stroke-width", 0.8 * qradius);
 }
 
 function updateDot(update, context) {
@@ -56,8 +56,11 @@ function updateDot(update, context) {
     .duration(400)
     .ease(d3.easeCubic)
     .attr("fill-opacity", (d) => (d.q <= values.sleepTime ? "1" : "0"))
-    .attr("x", (d) => calculateCX(d, stackMap, totalHeightMap, qradius) - 12)
-    .attr("y", (d) => yScaleSVG(d.x) - 12);
+    .attr(
+      "x",
+      (d) => calculateCX(d, stackMap, totalHeightMap, qradius) - qradius
+    )
+    .attr("y", (d) => yScaleSVG(d.x) - qradius);
 }
 
 export function updateDotPlot(data, values, xScaleSVG, yScaleSVG, h) {

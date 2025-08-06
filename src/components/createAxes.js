@@ -4,6 +4,18 @@ import { settings } from "./settings.js";
 import { formatTime } from "./helperFunctions.js";
 
 const { margin, fontSize, fontFamily } = settings;
+const duration = 400;
+
+// Helper function to style the x-axis
+function styleXAxis(g) {
+  g.selectAll(".tick text")
+    .style("fill", "white")
+    .style("font", `${fontSize} ${fontFamily}`);
+
+  /* g.selectAll(".tick:first-of-type text").style("text-anchor", "start"); */
+  g.selectAll(".tick line").attr("stroke", "white");
+  g.select(".domain").attr("stroke", "white");
+}
 
 // Helper function to style the y-axis
 function styleYAxis(g, { w }) {
@@ -17,6 +29,8 @@ function styleYAxis(g, { w }) {
     .style("paint-order", "stroke");
 
   g.selectAll(".tick line")
+    .transition()
+    .duration(100)
     .attr("x1", 0)
     .attr("x2", w - margin.left - margin.right)
     .attr("stroke-opacity", 0.4)
@@ -25,20 +39,37 @@ function styleYAxis(g, { w }) {
   g.select(".domain").remove(); // Remove the axis line
 }
 
-// Helper function to style the x-axis
-function styleXAxis(g) {
-  g.selectAll(".tick text")
-    .style("fill", "white")
-    .style("font", `${fontSize} ${fontFamily}`);
+// Function to update tick opacity based on chartValue
+function updateTickOpacity(stepProps) {
+  const tickOpacity =
+    stepProps.age === undefined || stepProps.sleepTime === undefined ? 1 : 0.4;
 
-  /* g.selectAll(".tick:first-of-type text").style("text-anchor", "start"); */
-  g.selectAll(".tick line").attr("stroke", "white");
-  g.select(".domain").attr("stroke", "white");
+  d3.selectAll(".x-axis .tick text")
+    .transition("tickXOpacityTransition")
+    .duration(200)
+    .attr("opacity", tickOpacity);
+  /* .on("start", () => {
+      console.log("Tick opacity started");
+    })
+    .on("interrupt", () => {
+      console.log("Tick opacity interrupted");
+    })
+    .on("end", () => {
+      console.log("Tick opacity finished");
+    }); */
+
+  d3.selectAll(".y-axis .tick text")
+    .transition("tickYOpacityTransition")
+    .duration(200)
+    .attr("opacity", tickOpacity);
 }
 
-export function createAxes(svg, { xScaleSVG, yScaleSVG, w, h }) {
-  const xAxis = (g, x) => {
-    g.call(d3.axisBottom(x).tickFormat(d3.format("02")));
+export function createAxes(svg, yAxisSVG, { xScaleSVG, yScaleSVG, w, h }) {
+  const xAxis = (g, x, xTicks) => {
+    g.call(
+      d3.axisBottom(x).tickValues(xTicks) // Use dynamic tick values
+      /* .tickFormat(d3.format("02")) */ // no formatting on request of SR
+    );
     styleXAxis(g);
   };
 
@@ -57,9 +88,9 @@ export function createAxes(svg, { xScaleSVG, yScaleSVG, w, h }) {
     .append("g")
     .attr("class", "x-axis")
     .attr("transform", `translate(0,${h - margin.bottom})`)
-    .call(xAxis, xScaleSVG);
+    .call(xAxis, xScaleSVG, d3.ticks(5, 95, 9)); // Default tick values
 
-  const gy = svg
+  const gy = yAxisSVG
     .append("g")
     .attr("class", "y-axis")
     .attr("transform", `translate(${margin.left},0)`)
@@ -71,18 +102,30 @@ export function createAxes(svg, { xScaleSVG, yScaleSVG, w, h }) {
     gy,
     xAxis,
     yAxis,
-    updateAxes: (x, y) => {
-      gx.transition()
-        .duration(1000)
-        .call(xAxis, x)
+    updateAxes: (x, y, newWidth, newHeight, stepProps) => {
+      gx.transition("xAxisTransition")
+        .duration(600)
+        /* .on("start", () =>
+          console.log("x axis transition started", gx.attr("transform"))
+        )
+        .on("interrupt", () =>
+          console.log("x axis transition interrupted", gx.attr("transform"))
+        )
+        .on("end", () =>
+          console.log("x axis transition ended", gx.attr("transform"))
+        ) */
+        .attr("transform", `translate(0,${newHeight - margin.bottom})`)
+        .call(xAxis, x, stepProps.ticks) // Use dynamic tick values
         .selection()
         .call(styleXAxis); // Reapply styles for the x-axis
 
-      gy.transition()
-        .duration(1000)
+      gy.transition("yAxisTransition")
+        .duration(600)
         .call(yAxis, y)
         .selection()
-        .call((g) => styleYAxis(g, { w })); // Reapply styles for the y-axis
+        .call((g) => styleYAxis(g, { w: newWidth })); // Reapply styles for the y-axis
+
+      updateTickOpacity(stepProps); // Update tick opacity based on chartValue
     },
   };
 }

@@ -102,6 +102,12 @@ export function updatePlot({
       (update) => updateFn(update, context),
       (exit) => exitFn(exit, context)
     );
+
+  // Ensure the crosshair group appears on top
+  const crosshairGroup = d3.select(".crosshair");
+  if (!crosshairGroup.empty()) {
+    crosshairGroup.raise(); // Moves the crosshairs to the top
+  }
 }
 
 export function exitPlot() {

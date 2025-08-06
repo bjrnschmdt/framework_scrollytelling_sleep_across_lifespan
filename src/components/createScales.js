@@ -17,7 +17,7 @@ const {
 export function createScales({ w, h }) {
   const xScaleSVG = d3
     .scaleLinear()
-    .domain([ageMin, ageMax])
+    .domain([ageMin, ageMax - 1]) // Adjusted to match the data, bin 95–96 equals 95
     .rangeRound([margin.left, w - margin.right])
     .clamp(false);
 

@@ -47,6 +47,9 @@ export function setupIntersectionObserver({
           }
           setDisabled(false);
           set(estimateInput, 0);
+          for (const input of estimateInput.querySelectorAll("input")) {
+            input.disabled = false;
+          }
         }
       }
     });
@@ -55,7 +58,14 @@ export function setupIntersectionObserver({
   // Configure the observer
   const observerOptions = {
     root: null, // Uses the viewport as the root
-    rootMargin: `0% 0% -${100 - relativeHeight * 100}% 0%`,
+    /* rootMargin: `0% 0% -${100 - relativeHeight * 100}% 0%`, */
+    /* rootMargin: `0px -${window.innerHeight / 4}px -${
+      window.innerHeight / 4
+    }px 0px`, */
+    /* rootMargin: `-${(window.innerHeight / 100) * 10}px 0px -${
+      (window.innerHeight / 100) * 10
+    }px 0px`, */
+    rootMargin: "0px",
     // threshold: 0.5, // Uncomment if you want a specific threshold
   };
 

@@ -1,5 +1,9 @@
 import * as d3 from "npm:d3";
 import { precalculateHeights, calculateCX } from "./plotDot.js";
+import { settings } from "./settings.js";
+import { ScrollInteraction } from "./scrollInteraction.js";
+
+const { ageMin, ageMax } = settings;
 
 // Functions
 export function set(input, value) {
@@ -164,4 +168,80 @@ export function createDebouncedLogger(callback, delay) {
       callback(data);
     }, delay);
   };
+}
+
+export function debounce(func, delay) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+/**
+ * Computes the new x-domain and total width but does not modify the original scale.
+ * @param {Object} xScale - D3 scale object for x-axis.
+ * @param {Object} stepProps - Current scrollytelling step properties.
+ * @param {number} width - New chart width.
+ * @param {number} margin - Margin settings.
+ * @returns {Object} - Returns { totalWidth }
+ */
+export function updateXDomain(xScale, stepProps, width, margin) {
+  const absoluteDomain = stepProps.xDomain[1] - stepProps.xDomain[0];
+  const domainWithOffset = ageMin + absoluteDomain;
+  const newDomain = [ageMin, domainWithOffset];
+
+  // Create a copy of xScale to perform calculations
+  const tempScale = xScale.copy();
+  tempScale.domain(newDomain).range([margin.left, width - margin.right]);
+  const totalWidth = tempScale(ageMax - 1) + margin.right;
+
+  // Return values without mutating the original xScale
+  return { totalWidth };
+}
+
+export function programmaticScroll({
+  targetDomainLeft,
+  element,
+  xScale,
+  duration,
+}) {
+  const targetScroll = xScale(targetDomainLeft);
+
+  d3.transition()
+    .duration(duration)
+    .tween("scrollTween", function () {
+      const interpolator = d3.interpolateNumber(
+        element.scrollLeft,
+        targetScroll
+      );
+      return function (t) {
+        /* console.log("tween", interpolator(t)); */
+        element.scrollLeft = interpolator(t);
+      };
+    });
+}
+
+/**
+ * Utility function to round a value to the nearest step.
+ * @param {number} value - The value to round.
+ * @param {number} step - The step size for rounding.
+ * @returns {number} - The rounded value.
+ */
+export function roundToStep(value, step) {
+  return Math.round(value / step) * step;
+}
+
+const DEBUG = {
+  general: false,
+  scroll: false,
+  update: false,
+  inputs: false,
+  analytics: false,
+  ScrollInteraction: false,
+};
+
+// Usage: debugLog("general", "This is a general debug message.");
+export function debugLog(flag, ...args) {
+  if (DEBUG[flag]) console.log(`[${flag.toUpperCase()}]`, ...args);
 }

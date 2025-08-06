@@ -1,4 +1,5 @@
 // logger.js
+import { debugLog } from "./helperFunctions.js";
 
 // Helper function to initialize the logging system
 export function initializeLogger() {
@@ -8,7 +9,7 @@ export function initializeLogger() {
 // Log a generic event
 export function logEvent(eventName, tags = {}) {
   try {
-    console.log("Log event", eventName, tags);
+    debugLog("analytics", "Log event", eventName, tags);
     window["optimizely"] = window["optimizely"] || [];
     window["optimizely"].push({
       type: "event",
@@ -23,7 +24,7 @@ export function logEvent(eventName, tags = {}) {
 // Specific loggers for known events
 export function logSectionVisible(step) {
   logEvent("kielscn_schlafdauer_sctn_visible", {
-    section: parseInt(step, 10),
+    sctn: parseInt(step, 10),
   });
 }
 
@@ -35,17 +36,17 @@ export function logInput(parameterName, value) {
 
 export function logBtnEstimate({ estimateValue, trueValue, age, sleepTime }) {
   logEvent("kielscn_schlafdauer_btn_estimate", {
-    age_value: age,
-    sleepTime_value: sleepTime,
-    estimate_value: estimateValue,
-    true_value: trueValue,
+    age,
+    sleepTime,
+    estimate: estimateValue,
+    trueValue: trueValue,
   });
 }
 
 // Used in pointerInteraction.js
 export function logInteraction(event) {
   logEvent("kielscn_schlafdauer_input_custom", {
-    age_value: event.age,
-    sleepTime_value: event.sleepTime,
+    age: event.age,
+    sleepTime: event.sleepTime,
   });
 }

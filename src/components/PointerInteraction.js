@@ -1,18 +1,8 @@
 // pointerInteraction.js
 import * as d3 from "npm:d3";
 
-import { createDebouncedLogger, set } from "./helperFunctions.js";
+import { createDebouncedLogger, set, roundToStep } from "./helperFunctions.js";
 import { logInteraction } from "./logger.js";
-
-/**
- * Utility function to round a value to the nearest step.
- * @param {number} value - The value to round.
- * @param {number} step - The step size for rounding.
- * @returns {number} - The rounded value.
- */
-function roundToStep(value, step) {
-  return Math.round(value / step) * step;
-}
 
 /**
  * PointerInteraction handles pointer-based interactivity (mouse/touch) for an SVG element.
@@ -94,17 +84,18 @@ export class PointerInteraction {
     this.svg.style("cursor", locked ? "not-allowed" : "crosshair");
   }
 
+  setDimensions(newWidth, newHeight) {
+    this.w = newWidth;
+    this.h = newHeight;
+  }
+
   /**
    * Handles pointer movement, calculates position and value, and triggers updates if values change.
    * @param {Event} event - The pointer event.
    */
   pointerMoved(event) {
     // Ignore invalid events or if interaction is not allowed
-    if (
-      !this.isValidEvent(event) ||
-      this.isPlotLocked ||
-      !this.isExplorable()
-    ) {
+    if (!this.isValidEvent(event) || this.isPlotLocked || !this.isExplorable) {
       return;
     }
 
@@ -141,6 +132,9 @@ export class PointerInteraction {
    * Toggles the lock state of the plot when the pointer is clicked.
    */
   pointerClicked() {
+    if (!this.isExplorable) {
+      return;
+    }
     this.isPlotLocked = !this.isPlotLocked; // Toggle lock state
     this.updateInteractionState(this.isPlotLocked);
   }
@@ -158,9 +152,8 @@ export class PointerInteraction {
    * Attaches pointer event listeners to the SVG element.
    */
   attachEventListeners() {
-    this.svg
-      .on("pointerenter pointermove", this.pointerMoved.bind(this))
-      .on("click", this.pointerClicked.bind(this))
-      .on("touchstart", (event) => event.preventDefault()); // Prevent default touch behaviors
+    this.svg.on("pointerenter pointermove", this.pointerMoved.bind(this));
+    this.svg.on("click", this.pointerClicked.bind(this));
+    /* .on("touchstart", (event) => event.preventDefault()); */ // Prevent default touch behaviors
   }
 }
