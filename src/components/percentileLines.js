@@ -18,14 +18,14 @@ const getStrokeProperties = (percentileKey, showPercentiles) => {
   let strokeWidth = lineWidths.regular;
 
   if (mostProminent.includes(percentileKey) && showPercentiles.includes("A")) {
-    strokeOpacity = 0.4;
+    strokeOpacity = 0.5;
     strokeWidth = lineWidths.regular;
   } else if (
     lessProminent.includes(percentileKey) &&
     percentileKey % 5 === 0 &&
     showPercentiles.includes("B")
   ) {
-    strokeOpacity = 0.4;
+    strokeOpacity = 0.5;
     strokeWidth = lineWidths.thin;
   } else if (showPercentiles.includes("C")) {
     strokeOpacity = 0.2;
