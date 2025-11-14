@@ -469,34 +469,6 @@ const isDisabledPercentageC = Mutable(false);
 const setDisabledPercentageC = (x) => (isDisabledPercentageC.value = x);
 ```
 
-```js
-const controls = [
-  {
-    setDisabled: setDisabledPercentageA,
-    feedback: feedbackInputPercentageA,
-    estimate: estimateInputPercentageA,
-  },
-  /* {
-    setDisabled: setDisabledVolumina,
-    feedback: feedbackInputVolumina,
-    estimate: estimateInputVolumina,
-  },
-  {
-    setDisabled: setDisabledQuantity,
-    feedback: feedbackInputQuantity,
-    estimate: estimateInputQuantity,
-  }, */
-];
-
-for (const { setDisabled, feedback, estimate } of controls) {
-  setDisabled(false);
-  feedback.style.display = "none";
-  for (const input of estimate.querySelectorAll("input")) {
-    input.disabled = false;
-  }
-}
-```
-
 <!-- ********************************************************* -->
 <!-- ********************************************************* -->
 <!-- ********************************************************* -->
@@ -610,7 +582,6 @@ const btnEstimatePercentageA = (value) => {
   for (const input of certaintyPercentageA.querySelectorAll("input")) {
     input.disabled = true;
   }
-  console.log(estimateValuePercentageA);
   logBtnEstimatePercentageA({
     estimateValuePercentageA,
     trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
