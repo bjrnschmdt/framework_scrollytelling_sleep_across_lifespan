@@ -1,5 +1,5 @@
 // logger.js
-import { debugLog } from "./helperFunctions.js";
+import { debugLog, toCamelCase } from "./helperFunctions.js";
 
 // Helper function to initialize the logging system
 export function initializeLogger() {
@@ -29,8 +29,9 @@ export function logSectionVisible(step) {
 }
 
 export function logInput(parameterName, value) {
+  const camelCaseName = toCamelCase(parameterName);
   logEvent(`kielscn_schlafdauer_input_${parameterName}`, {
-    [parameterName]: value,
+    [camelCaseName]: value,
   });
 }
 
@@ -39,6 +40,36 @@ export function logBtnEstimate({ estimateValue, trueValue, age, sleepTime }) {
     age,
     sleepTime,
     estimate: estimateValue,
+    trueValue: trueValue,
+  });
+}
+
+export function logBtnEstimatePercentageA({
+  estimateValuePercentageA,
+  trueValue,
+}) {
+  logEvent("kielscn_schlafdauer_btn_estimate_percentage_a", {
+    estimatePercentage: estimateValuePercentageA,
+    trueValue: trueValue,
+  });
+}
+
+export function logBtnEstimatePercentageB({
+  estimateValuePercentageB,
+  trueValue,
+}) {
+  logEvent("kielscn_schlafdauer_btn_estimate_percentage_b", {
+    estimatePercentage: estimateValuePercentageB,
+    trueValue: trueValue,
+  });
+}
+
+export function logBtnEstimatePercentageC({
+  estimateValuePercentageC,
+  trueValue,
+}) {
+  logEvent("kielscn_schlafdauer_btn_estimate_percentage_c", {
+    estimatePercentage: estimateValuePercentageC,
     trueValue: trueValue,
   });
 }

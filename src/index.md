@@ -50,6 +50,9 @@ import {
   logSectionVisible,
   logInput,
   logBtnEstimate,
+  logBtnEstimatePercentageA,
+  logBtnEstimatePercentageB,
+  logBtnEstimatePercentageC,
 } from "./components/logger.js";
 ```
 
@@ -194,6 +197,18 @@ const debouncedLoggers = {
     500
   ),
   estimate: createDebouncedLogger((value) => logInput("estimate", value), 500),
+  estimatePercentageA: createDebouncedLogger(
+    (value) => logInput("estimate_percentage_a", value),
+    500
+  ),
+  estimatePercentageB: createDebouncedLogger(
+    (value) => logInput("estimate_percentage_b", value),
+    500
+  ),
+  estimatePercentageC: createDebouncedLogger(
+    (value) => logInput("estimate_percentage_c", value),
+    500
+  ),
 };
 ```
 
@@ -354,67 +369,34 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 8,
     height: height,
-    age: chartValue.age,
-    sleepTime: chartValue.sleepTime,
-    isExplorable: true,
+    age: 20,
+    sleepTime: 6.5,
     variant,
-    xDomain: isEnhanced
-      ? baseStep.xDomain
-      : [chartValue.age - 5.5, chartValue.age + 5.5],
+    xDomain: isEnhanced ? baseStep.xDomain : [20 - 5.5, 20 + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
-    triggerSource: "scroll",
   },
   9: {
     ...baseStep,
-    scrollStep: 9,
+    scrollStep: 8,
     height: height,
-    age: chartValue.age,
-    sleepTime: chartValue.sleepTime,
-    isExplorable: true,
+    age: 30,
+    sleepTime: 6,
     variant,
-    xDomain: isEnhanced
-      ? baseStep.xDomain
-      : [chartValue.age - 5.5, chartValue.age + 5.5],
+    xDomain: isEnhanced ? baseStep.xDomain : [20 - 5.5, 20 + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
-    triggerSource: "scroll",
   },
   10: {
     ...baseStep,
-    scrollStep: 11,
+    scrollStep: 8,
     height: height,
+    age: 40,
+    sleepTime: 5.5,
     variant,
-    xDomain: [5, 10.5],
+    xDomain: isEnhanced ? baseStep.xDomain : [20 - 5.5, 20 + 5.5],
     xResolution: d3.ticks(5, 95, 90),
-    ticks: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 90),
-  },
-  11: {
-    ...baseStep,
-    scrollStep: 12,
-    height: height,
-    variant,
-    xDomain: [10.5, 17.5],
-    xResolution: d3.ticks(5, 95, 90),
-    ticks: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 90),
-  },
-  12: {
-    ...baseStep,
-    scrollStep: 13,
-    height: height,
-    variant,
-    xDomain: isEnhanced ? [17.5, 67.5] : [17.5, 67.5],
-    xResolution: d3.ticks(5, 95, 90),
-    ticks: d3.ticks(5, 95, 18),
-  },
-  13: {
-    ...baseStep,
-    scrollStep: 14,
-    height: height,
-    variant,
-    xDomain: isEnhanced ? [64, 94] : [62.5, 92.5],
-    xResolution: d3.ticks(5, 95, 90),
-    ticks: d3.ticks(5, 95, 18),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
 };
 ```
@@ -473,6 +455,277 @@ const answerValue = Generators.input(answerInput);
 ```
 
 ```js
+const isDisabledPercentageA = Mutable(false);
+const setDisabledPercentageA = (x) => (isDisabledPercentageA.value = x);
+```
+
+```js
+const isDisabledPercentageB = Mutable(false);
+const setDisabledPercentageB = (x) => (isDisabledPercentageB.value = x);
+```
+
+```js
+const isDisabledPercentageC = Mutable(false);
+const setDisabledPercentageC = (x) => (isDisabledPercentageC.value = x);
+```
+
+```js
+const controls = [
+  {
+    setDisabled: setDisabledPercentageA,
+    feedback: feedbackInputPercentageA,
+    estimate: estimateInputPercentageA,
+  },
+  /* {
+    setDisabled: setDisabledVolumina,
+    feedback: feedbackInputVolumina,
+    estimate: estimateInputVolumina,
+  },
+  {
+    setDisabled: setDisabledQuantity,
+    feedback: feedbackInputQuantity,
+    estimate: estimateInputQuantity,
+  }, */
+];
+
+for (const { setDisabled, feedback, estimate } of controls) {
+  setDisabled(false);
+  feedback.style.display = "none";
+  for (const input of estimate.querySelectorAll("input")) {
+    input.disabled = false;
+  }
+}
+```
+
+<!-- ********************************************************* -->
+<!-- ********************************************************* -->
+<!-- ********************************************************* -->
+
+```js
+debouncedLoggers.estimatePercentageA(estimateValuePercentageA);
+```
+
+```js
+debouncedLoggers.estimatePercentageB(estimateValuePercentageB);
+```
+
+```js
+debouncedLoggers.estimatePercentageC(estimateValuePercentageC);
+```
+
+```js
+const estimateInputPercentageA = Inputs.range([0, 100], {
+  label: "Schätzung in %",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
+const estimateValuePercentageA = Generators.input(estimateInputPercentageA);
+```
+
+```js
+const estimateInputPercentageB = Inputs.range([0, 100], {
+  label: "Schätzung in %",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
+const estimateValuePercentageB = Generators.input(estimateInputPercentageB);
+```
+
+```js
+const estimateInputPercentageC = Inputs.range([0, 100], {
+  label: "Schätzung in %",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
+const estimateValuePercentageC = Generators.input(estimateInputPercentageC);
+```
+
+```js
+const certaintyPercentageA = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_percentage_a"
+);
+```
+
+```js
+const certaintyPercentageB = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_percentage_b"
+);
+```
+
+```js
+const certaintyPercentageC = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_percentage_c"
+);
+```
+
+```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerPercentageInputA = Inputs.button("Auflösung anzeigen", {
+  value: null,
+  reduce: (value) => btnEstimatePercentageA(value),
+  disabled: isDisabledPercentageA,
+});
+const answerPercentileValueA = Generators.input(answerPercentageInputA);
+```
+
+```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerPercentageInputB = Inputs.button("Auflösung anzeigen", {
+  value: null,
+  reduce: (value) => btnEstimatePercentageB(value),
+  disabled: isDisabledPercentageB,
+});
+const answerPercentileValueB = Generators.input(answerPercentageInputB);
+```
+
+```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerPercentageInputC = Inputs.button("Auflösung anzeigen", {
+  value: null,
+  reduce: (value) => btnEstimatePercentageC(value),
+  disabled: isDisabledPercentageC,
+});
+const answerPercentileValueC = Generators.input(answerPercentageInputC);
+```
+
+```js
+const btnEstimatePercentageA = (value) => {
+  setDisabledPercentageA(true); // not needed anymore because button stays disabled after first click
+  feedbackInputPercentageA.style.display = "block";
+  for (const input of estimateInputPercentageA.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyPercentageA.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  console.log(estimateValuePercentageA);
+  logBtnEstimatePercentageA({
+    estimateValuePercentageA,
+    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
+  });
+  return value + 1;
+};
+```
+
+```js
+const btnEstimatePercentageB = (value) => {
+  setDisabledPercentageB(true); // not needed anymore because button stays disabled after first click
+  feedbackInputPercentageB.style.display = "block";
+  for (const input of estimateInputPercentageB.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyPercentageB.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  logBtnEstimatePercentageB({
+    estimateValuePercentageB,
+    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
+  });
+  return value + 1;
+};
+```
+
+```js
+const btnEstimatePercentageC = (value) => {
+  setDisabledPercentageC(true); // not needed anymore because button stays disabled after first click
+  feedbackInputPercentageC.style.display = "block";
+  for (const input of estimateInputPercentageC.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyPercentageC.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  logBtnEstimatePercentageC({
+    estimateValuePercentageC,
+    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
+  });
+  return value + 1;
+};
+```
+
+```js
+const feedbackInputPercentageA = html`<div
+  id="answerPercentileA"
+  style="display: none;"
+></div>`;
+const feedbackValuePercentileA = Generators.input(feedbackInputPercentageA);
+```
+
+```js
+const feedbackInputPercentageB = html`<div
+  id="answerPercentileB"
+  style="display: none;"
+></div>`;
+const feedbackValuePercentileB = Generators.input(feedbackInputPercentageB);
+```
+
+```js
+const feedbackInputPercentageC = html`<div
+  id="answerPercentileC"
+  style="display: none;"
+></div>`;
+const feedbackValuePercentileC = Generators.input(feedbackInputPercentageC);
+```
+
+```js
+feedbackInputPercentageA.innerHTML = ""; // Clear existing content
+d3.select(feedbackInputPercentageA).selectAll("*").remove();
+const estimated = estimateValuePercentageA;
+const answerValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
+const isClose = Math.abs(estimated - answerValue) <= 5;
+
+d3.select(feedbackInputPercentageA)
+  .append("p")
+  .attr("class", isClose ? "tip" : "warning")
+  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
+  .text(`Die richtige Antwort ist ${answerValue}.`);
+```
+
+```js
+feedbackInputPercentageB.innerHTML = ""; // Clear existing content
+d3.select(feedbackInputPercentageB).selectAll("*").remove();
+const estimated = estimateValuePercentageB;
+const answerValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
+const isClose = Math.abs(estimated - answerValue) <= 5;
+
+d3.select(feedbackInputPercentageB)
+  .append("p")
+  .attr("class", isClose ? "tip" : "warning")
+  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
+  .text(`Die richtige Antwort ist ${answerValue}.`);
+```
+
+```js
+feedbackInputPercentageC.innerHTML = ""; // Clear existing content
+d3.select(feedbackInputPercentageC).selectAll("*").remove();
+const estimated = estimateValuePercentageC;
+const answerValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
+const isClose = Math.abs(estimated - answerValue) <= 5;
+
+d3.select(feedbackInputPercentageC)
+  .append("p")
+  .attr("class", isClose ? "tip" : "warning")
+  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
+  .text(`Die richtige Antwort ist ${answerValue}.`);
+```
+
+<!-- ********************************************************* -->
+<!-- ********************************************************* -->
+<!-- ********************************************************* -->
+
+```js
 const scrollTo = Inputs.button("Nochmal versuchen", {
   reduce: () => {
     logEvent("kielscn_schlafdauer_btn_retry");
@@ -516,15 +769,21 @@ const interestValue = Generators.input(interestInput);
 ``` -->
 
 ```js
-function createSemanticDifferentialInput(label, logKey) {
+function createSemanticDifferentialInput(
+  question,
+  extremeLeft,
+  extremeRight,
+  logKey
+) {
   const form = html`<form
     style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 10px; margin-bottom: 25px; max-width: 100%;"
   >
+    <h2 style="font-weight: 500;">${question}</h2>
     <div
       style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: no-wrap; justify-content: flex-start; width: 100%;"
     >
       <span style="align-self: flex-end; text-align: left; white-space: normal;"
-        >stimme gar<wbr /> nicht zu</span
+        >${extremeLeft}</span
       >
       <div style="display: flex; gap: 5px; justify-content: center;">
         ${Array.from({ length: 5 }, (_, i) => {
@@ -544,13 +803,13 @@ function createSemanticDifferentialInput(label, logKey) {
       </div>
       <span
         style="align-self: flex-end; text-align: right; white-space: normal;"
-        >stimme<wbr /> voll&nbsp;zu</span
+        >${extremeRight}</span
       >
     </div>
   </form>`;
 
   form.onchange = () => {
-    form.value = form.querySelector("input:checked").value;
+    form.value = parseInt(form.querySelector("input:checked").value);
     logInput(logKey, form.value);
   };
 
@@ -1172,14 +1431,6 @@ const stepContent = {
     desktop: `<p>Karin ist 31&nbsp;Jahre alt und liegt mit einer Schlafdauer von 7&nbsp;Stunden im 50.&nbsp;Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p>`,
     mobile: `<p>Karin ist 31&nbsp;Jahre alt und liegt mit einer Schlafdauer von 7&nbsp;Stunden im 50.&nbsp;Perzentil: Die eine Hälfte der 31-Jährigen schläft mehr, die andere weniger.</p><p>Damit es besser erkennbar ist, haben wir näher herangezoomt. Die x-Achse unten hat sich also verändert und zeigt jeweils nur den Altersbereich an, um den es gerade geht.</p>`,
   },
-  8: {
-    desktop: `<p>Bewegen Sie den Mauszeiger in die Grafik, um sie frei zu erkunden. Ein Klick fixiert die Ansicht, ein weiterer Klick löst sie wieder. Wenn Sie genug erkundet haben, scrollen Sie einfach weiter.</p>`,
-    mobile: `<p>Sie können die Grafik nun frei erkunden. Scrollen Sie nach oben und unten, um die Schlafdauer zu verändern. Wischen Sie nach links oder rechts, um andere Altersbereiche anzuzeigen. Wenn Sie genug erkundet haben, scrollen Sie wie gehabt weiter nach unten.</p>`,
-  },
-  9: {
-    desktop: `<p>Sehen wir uns jetzt noch einige Altersgruppen genauer an. Dafür zoomen wir näher heran:</p>`,
-    mobile: `<p>Sehen wir uns jetzt noch einige Altersgruppen genauer an:</p>`,
-  },
 };
 
 function appendStepContent(step) {
@@ -1206,7 +1457,7 @@ function appendStepContent(step) {
 }
 
 // Update all steps
-[4, 8, 9].forEach(appendStepContent);
+[4].forEach(appendStepContent);
 ```
 
 # So viel schlafen andere in Ihrem Alter
@@ -1236,11 +1487,18 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <!-- Description Variant -->
 </div>
 <div class="scroll-section card" data-step="7">
-  <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}
+  <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}</p>
 </div>
 <div class="scroll-section card" data-step="8">
+<p>Was würden Sie schätzen, wie viel Prozent der 20-Jährigen schlafen kürzer als Sie?${estimateInputPercentageA}${certaintyPercentageA}${answerPercentageInputA}${feedbackInputPercentageA}</p>
 </div>
 <div class="scroll-section card" data-step="9">
+<p>Was würden Sie schätzen, wie viel Prozent der 30-Jährigen schlafen kürzer als Sie?${estimateInputPercentageB}${certaintyPercentageB}${answerPercentageInputB}${feedbackInputPercentageB}</p>
+</div>
+<div class="scroll-section card" data-step="10">
+<p>Was würden Sie schätzen, wie viel Prozent der 40-Jährigen schlafen kürzer als Sie?${estimateInputPercentageC}${certaintyPercentageC}${answerPercentageInputC}${feedbackInputPercentageC}</p>
+</div>
+<div class="scroll-section card" data-step="11">
   <p>Was trifft für Sie zu?</p>
   <h2>Die Gestaltung der Grafik ist ansprechend.</h2>${aestheticsForm}<h2>Das Thema interessiert mich.</h2>${interestForm}
   <!-- <p>Sehen wir uns jetzt noch einige Altersgruppen genauer an. Dafür zoomen wir näher heran:</p> -->

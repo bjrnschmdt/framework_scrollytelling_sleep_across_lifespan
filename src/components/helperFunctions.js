@@ -5,6 +5,11 @@ import { ScrollInteraction } from "./scrollInteraction.js";
 
 const { ageMin, ageMax } = settings;
 
+// Helper to convert snake_case to camelCase
+export function toCamelCase(str) {
+  return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+}
+
 // Functions
 export function set(input, value) {
   input.value = value;
@@ -237,7 +242,7 @@ const DEBUG = {
   scroll: false,
   update: false,
   inputs: false,
-  analytics: false,
+  analytics: true,
   ScrollInteraction: false,
 };
 
