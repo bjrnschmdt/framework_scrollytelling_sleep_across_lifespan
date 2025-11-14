@@ -334,7 +334,6 @@ const scrollyProps = {
     height: height,
     age: ageValue,
     sleepTime: sleepTimeValue,
-    showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
     xResolution: d3.ticks(5, 95, 90),
@@ -346,7 +345,6 @@ const scrollyProps = {
     height: height,
     age: ageValue,
     sleepTime: sleepTimeValue,
-    showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
     xResolution: d3.ticks(5, 95, 90),
@@ -358,7 +356,6 @@ const scrollyProps = {
     height: height,
     age: chartValue.age,
     sleepTime: chartValue.sleepTime,
-    showPercentiles: ["C"],
     isExplorable: true,
     variant,
     xDomain: isEnhanced
@@ -374,7 +371,6 @@ const scrollyProps = {
     height: height,
     age: chartValue.age,
     sleepTime: chartValue.sleepTime,
-    showPercentiles: ["C"],
     isExplorable: true,
     variant,
     xDomain: isEnhanced
@@ -384,22 +380,10 @@ const scrollyProps = {
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
     triggerSource: "scroll",
   },
-  /*   10: {
-    ...baseStep,
-    scrollStep: 10,
-    height: height,
-    showPointcloud: true,
-    showPercentiles: ["C"],
-    variant,
-    xDomain: [5, 10.5],
-    xResolution: d3.ticks(5, 95, 90),
-    ticks: isEnhanced ? d3.ticks(5, 95, 90) : d3.ticks(5, 95, 90),
-  }, */
   10: {
     ...baseStep,
     scrollStep: 11,
     height: height,
-    showPercentiles: ["C"],
     variant,
     xDomain: [5, 10.5],
     xResolution: d3.ticks(5, 95, 90),
@@ -409,7 +393,6 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 12,
     height: height,
-    showPercentiles: ["C"],
     variant,
     xDomain: [10.5, 17.5],
     xResolution: d3.ticks(5, 95, 90),
@@ -419,7 +402,6 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 13,
     height: height,
-    showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? [17.5, 67.5] : [17.5, 67.5],
     xResolution: d3.ticks(5, 95, 90),
@@ -429,7 +411,6 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 14,
     height: height,
-    showPercentiles: ["C"],
     variant,
     xDomain: isEnhanced ? [64, 94] : [62.5, 92.5],
     xResolution: d3.ticks(5, 95, 90),
@@ -1252,7 +1233,7 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <p class="disclaimer">Die auf dieser Seite erhobenen Daten werden in vollständig anonymisierter Form für wissenschaftliche Zwecke durch das Kiel Science Communication Network verwendet. Es ist kein Rückschluss auf Ihre Person möglich.</p>
 </div>
 <div class="scroll-section card" data-step="6">
-  <p>Die Figuren zeigen, wie lange Menschen in einem bestimmten Alter schlafen. Jede Figur steht für einen Anteil der Menschen in dieser Altersgruppe. Je höher oder tiefer eine Figur auf der Grafik ist, desto länger oder kürzer schlafen diese Menschen. Je mehr Figuren nebeneinanderstehen, desto mehr Menschen schlafen die Stundenanzahl, die links auf dieser Höhe angegeben ist.</p>
+  <!-- Description Variant -->
 </div>
 <div class="scroll-section card" data-step="7">
   <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}
@@ -1263,22 +1244,6 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <p>Was trifft für Sie zu?</p>
   <h2>Die Gestaltung der Grafik ist ansprechend.</h2>${aestheticsForm}<h2>Das Thema interessiert mich.</h2>${interestForm}
   <!-- <p>Sehen wir uns jetzt noch einige Altersgruppen genauer an. Dafür zoomen wir näher heran:</p> -->
-</div>
-<div class="scroll-section card" data-step="10">
-  <h2>Altersgruppe bis 10&nbsp;Jahre</h2>
-  <p>Um die vielen neuen Eindrücke und das Gelernte zu verarbeiten, braucht das Gehirn in den ersten Lebensjahren besonders viel Schlaf. Bis zum Jugendalter ist die durchschnittliche Schlafdauer daher am höchsten. Sie streut auch vergleichsweise wenig – die Perzentillinien liegen nah beieinander.</p>
-</div>
-<div class="scroll-section card" data-step="11">
-  <h2>11–17&nbsp;Jahre</h2>
-  <p>Während der Pubertät fällt die Schlafdauer dramatisch ab; gleichzeitig nimmt die Streuung zu. Da sich in dieser Phase die innere Uhr meist auf spätere Bettzeiten einstellt, die Schule aber in der Regel früh beginnt, bekommen Jugendliche oft weniger Schlaf, als es Fachleute empfehlen.</p>
-</div>
-<div class="scroll-section card" data-step="12">
-  <h2>18–65&nbsp;Jahre</h2>
-  <p>Im Erwachsenenalter stabilisiert sich die Schlafzeit und liegt im Mittel bei 7&nbsp;Stunden. Dies ist auch die Lebensphase, in der die meisten Menschen einer festen Arbeit nachgehen und damit einen geregelten Tagesablauf haben. Man kann also nicht sagen, ob die Stabilisierung auf biologische Faktoren (das Ende der Pubertät) zurückgeht oder eher auf die Lebensumstände.</p>
-</div>
-<div class="scroll-section card" data-step="13">
-  <h2>Über 66&nbsp;Jahre</h2>
-  <p>Im Rentenalter ändert sich zwar die mittlere Schlafdauer von 7&nbsp;Stunden nicht, dafür aber die Streuung: Die Perzentillinien driften erst weiter auseinander, um im späteren Verlauf wieder zusammenzurücken. Wie Studien gezeigt haben, sinkt mit dem Alter zudem die Schlafeffizienz. Die Menschen verbringen deutlich mehr Zeit im Bett, als sie tatsächlich schlafen.</p>
 </div>
 </section>
 
