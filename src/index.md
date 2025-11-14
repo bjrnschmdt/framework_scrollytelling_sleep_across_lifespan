@@ -213,74 +213,6 @@ const debouncedLoggers = {
 ```
 
 ```js
-const createPercentageDisabledState = () => {
-  const state = Mutable(false);
-  const setDisabled = (value) => (state.value = value);
-  return { state, setDisabled };
-};
-
-const createEstimatePercentageInput = () =>
-  Inputs.range([0, 100], {
-    label: "Schätzung in %",
-    step: 1,
-    value: 0,
-    placeholder: "in %",
-  });
-
-const createCertaintyInput = (id) =>
-  createSemanticDifferentialInput(
-    "Wie sicher sind Sie sich mit Ihrer Antwort?",
-    "gar nicht sicher",
-    "sehr sicher",
-    id
-  );
-
-const createFeedbackContainer = (id) =>
-  html`<div id="${id}" style="display: none;"></div>`;
-
-const toggleInputGroup = (element, disabled) => {
-  for (const input of element.querySelectorAll("input")) {
-    input.disabled = disabled;
-  }
-};
-
-const createEstimateButtonReducer = ({
-  setDisabled,
-  feedbackInput,
-  estimateInput,
-  certaintyInput,
-  logHandler,
-  estimateValue,
-  valueKey,
-}) => {
-  return (value) => {
-    setDisabled(true);
-    feedbackInput.style.display = "block";
-    toggleInputGroup(estimateInput, true);
-    toggleInputGroup(certaintyInput, true);
-    logHandler({
-      [valueKey]: estimateValue,
-      trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
-    });
-    return value + 1;
-  };
-};
-
-const updatePercentageFeedback = (element, estimate) => {
-  element.innerHTML = "";
-  d3.select(element).selectAll("*").remove();
-  const answerValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
-  const isClose = Math.abs(estimate - answerValue) <= 5;
-
-  d3.select(element)
-    .append("p")
-    .attr("class", isClose ? "tip" : "warning")
-    .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
-    .text(`Die richtige Antwort ist ${answerValue}.`);
-};
-```
-
-```js
 debouncedLoggers.age(ageValue);
 ```
 
@@ -523,19 +455,51 @@ const answerValue = Generators.input(answerInput);
 ```
 
 ```js
-const { state: isDisabledPercentageA, setDisabled: setDisabledPercentageA } =
-  createPercentageDisabledState();
+const isDisabledPercentageA = Mutable(false);
+const setDisabledPercentageA = (x) => (isDisabledPercentageA.value = x);
 ```
 
 ```js
-const { state: isDisabledPercentageB, setDisabled: setDisabledPercentageB } =
-  createPercentageDisabledState();
+const isDisabledPercentageB = Mutable(false);
+const setDisabledPercentageB = (x) => (isDisabledPercentageB.value = x);
 ```
 
 ```js
-const { state: isDisabledPercentageC, setDisabled: setDisabledPercentageC } =
-  createPercentageDisabledState();
+const isDisabledPercentageC = Mutable(false);
+const setDisabledPercentageC = (x) => (isDisabledPercentageC.value = x);
 ```
+
+```js
+const controls = [
+  {
+    setDisabled: setDisabledPercentageA,
+    feedback: feedbackInputPercentageA,
+    estimate: estimateInputPercentageA,
+  },
+  /* {
+    setDisabled: setDisabledVolumina,
+    feedback: feedbackInputVolumina,
+    estimate: estimateInputVolumina,
+  },
+  {
+    setDisabled: setDisabledQuantity,
+    feedback: feedbackInputQuantity,
+    estimate: estimateInputQuantity,
+  }, */
+];
+
+for (const { setDisabled, feedback, estimate } of controls) {
+  setDisabled(false);
+  feedback.style.display = "none";
+  for (const input of estimate.querySelectorAll("input")) {
+    input.disabled = false;
+  }
+}
+```
+
+<!-- ********************************************************* -->
+<!-- ********************************************************* -->
+<!-- ********************************************************* -->
 
 ```js
 debouncedLoggers.estimatePercentageA(estimateValuePercentageA);
@@ -550,30 +514,60 @@ debouncedLoggers.estimatePercentageC(estimateValuePercentageC);
 ```
 
 ```js
-const estimateInputPercentageA = createEstimatePercentageInput();
+const estimateInputPercentageA = Inputs.range([0, 100], {
+  label: "Schätzung in %",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
 const estimateValuePercentageA = Generators.input(estimateInputPercentageA);
 ```
 
 ```js
-const estimateInputPercentageB = createEstimatePercentageInput();
+const estimateInputPercentageB = Inputs.range([0, 100], {
+  label: "Schätzung in %",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
 const estimateValuePercentageB = Generators.input(estimateInputPercentageB);
 ```
 
 ```js
-const estimateInputPercentageC = createEstimatePercentageInput();
+const estimateInputPercentageC = Inputs.range([0, 100], {
+  label: "Schätzung in %",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
 const estimateValuePercentageC = Generators.input(estimateInputPercentageC);
 ```
 
 ```js
-const certaintyPercentageA = createCertaintyInput("certainty_percentage_a");
+const certaintyPercentageA = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_percentage_a"
+);
 ```
 
 ```js
-const certaintyPercentageB = createCertaintyInput("certainty_percentage_b");
+const certaintyPercentageB = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_percentage_b"
+);
 ```
 
 ```js
-const certaintyPercentageC = createCertaintyInput("certainty_percentage_c");
+const certaintyPercentageC = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_percentage_c"
+);
 ```
 
 ```js
@@ -607,101 +601,124 @@ const answerPercentileValueC = Generators.input(answerPercentageInputC);
 ```
 
 ```js
-const btnEstimatePercentageA = createEstimateButtonReducer({
-  setDisabled: setDisabledPercentageA,
-  feedbackInput: feedbackInputPercentageA,
-  estimateInput: estimateInputPercentageA,
-  certaintyInput: certaintyPercentageA,
-  logHandler: logBtnEstimatePercentageA,
-  estimateValue: estimateValuePercentageA,
-  valueKey: "estimateValuePercentageA",
-});
+const btnEstimatePercentageA = (value) => {
+  setDisabledPercentageA(true); // not needed anymore because button stays disabled after first click
+  feedbackInputPercentageA.style.display = "block";
+  for (const input of estimateInputPercentageA.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyPercentageA.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  console.log(estimateValuePercentageA);
+  logBtnEstimatePercentageA({
+    estimateValuePercentageA,
+    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
+  });
+  return value + 1;
+};
 ```
 
 ```js
-const btnEstimatePercentageB = createEstimateButtonReducer({
-  setDisabled: setDisabledPercentageB,
-  feedbackInput: feedbackInputPercentageB,
-  estimateInput: estimateInputPercentageB,
-  certaintyInput: certaintyPercentageB,
-  logHandler: logBtnEstimatePercentageB,
-  estimateValue: estimateValuePercentageB,
-  valueKey: "estimateValuePercentageB",
-});
+const btnEstimatePercentageB = (value) => {
+  setDisabledPercentageB(true); // not needed anymore because button stays disabled after first click
+  feedbackInputPercentageB.style.display = "block";
+  for (const input of estimateInputPercentageB.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyPercentageB.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  logBtnEstimatePercentageB({
+    estimateValuePercentageB,
+    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
+  });
+  return value + 1;
+};
 ```
 
 ```js
-const btnEstimatePercentageC = createEstimateButtonReducer({
-  setDisabled: setDisabledPercentageC,
-  feedbackInput: feedbackInputPercentageC,
-  estimateInput: estimateInputPercentageC,
-  certaintyInput: certaintyPercentageC,
-  logHandler: logBtnEstimatePercentageC,
-  estimateValue: estimateValuePercentageC,
-  valueKey: "estimateValuePercentageC",
-});
+const btnEstimatePercentageC = (value) => {
+  setDisabledPercentageC(true); // not needed anymore because button stays disabled after first click
+  feedbackInputPercentageC.style.display = "block";
+  for (const input of estimateInputPercentageC.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyPercentageC.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  logBtnEstimatePercentageC({
+    estimateValuePercentageC,
+    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
+  });
+  return value + 1;
+};
 ```
 
 ```js
-const feedbackInputPercentageA = createFeedbackContainer("answerPercentileA");
+const feedbackInputPercentageA = html`<div
+  id="answerPercentileA"
+  style="display: none;"
+></div>`;
 const feedbackValuePercentileA = Generators.input(feedbackInputPercentageA);
 ```
 
 ```js
-const feedbackInputPercentageB = createFeedbackContainer("answerPercentileB");
+const feedbackInputPercentageB = html`<div
+  id="answerPercentileB"
+  style="display: none;"
+></div>`;
 const feedbackValuePercentileB = Generators.input(feedbackInputPercentageB);
 ```
 
 ```js
-const feedbackInputPercentageC = createFeedbackContainer("answerPercentileC");
+const feedbackInputPercentageC = html`<div
+  id="answerPercentileC"
+  style="display: none;"
+></div>`;
 const feedbackValuePercentileC = Generators.input(feedbackInputPercentageC);
 ```
 
 ```js
-const controls = [
-  {
-    setDisabled: setDisabledPercentageA,
-    feedback: feedbackInputPercentageA,
-    inputs: [estimateInputPercentageA, certaintyPercentageA],
-  },
-  {
-    setDisabled: setDisabledPercentageB,
-    feedback: feedbackInputPercentageB,
-    inputs: [estimateInputPercentageB, certaintyPercentageB],
-  },
-  {
-    setDisabled: setDisabledPercentageC,
-    feedback: feedbackInputPercentageC,
-    inputs: [estimateInputPercentageC, certaintyPercentageC],
-  },
-];
+feedbackInputPercentageA.innerHTML = ""; // Clear existing content
+d3.select(feedbackInputPercentageA).selectAll("*").remove();
+const estimated = estimateValuePercentageA;
+const answerValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
+const isClose = Math.abs(estimated - answerValue) <= 5;
 
-for (const { setDisabled, feedback, inputs } of controls) {
-  setDisabled(false);
-  feedback.style.display = "none";
-  for (const element of inputs) {
-    toggleInputGroup(element, false);
-  }
-}
+d3.select(feedbackInputPercentageA)
+  .append("p")
+  .attr("class", isClose ? "tip" : "warning")
+  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
+  .text(`Die richtige Antwort ist ${answerValue}.`);
 ```
 
 ```js
-for (const { element, estimate } of [
-  {
-    element: feedbackInputPercentageA,
-    estimate: estimateValuePercentageA,
-  },
-  {
-    element: feedbackInputPercentageB,
-    estimate: estimateValuePercentageB,
-  },
-  {
-    element: feedbackInputPercentageC,
-    estimate: estimateValuePercentageC,
-  },
-]) {
-  updatePercentageFeedback(element, estimate);
-}
+feedbackInputPercentageB.innerHTML = ""; // Clear existing content
+d3.select(feedbackInputPercentageB).selectAll("*").remove();
+const estimated = estimateValuePercentageB;
+const answerValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
+const isClose = Math.abs(estimated - answerValue) <= 5;
+
+d3.select(feedbackInputPercentageB)
+  .append("p")
+  .attr("class", isClose ? "tip" : "warning")
+  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
+  .text(`Die richtige Antwort ist ${answerValue}.`);
+```
+
+```js
+feedbackInputPercentageC.innerHTML = ""; // Clear existing content
+d3.select(feedbackInputPercentageC).selectAll("*").remove();
+const estimated = estimateValuePercentageC;
+const answerValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
+const isClose = Math.abs(estimated - answerValue) <= 5;
+
+d3.select(feedbackInputPercentageC)
+  .append("p")
+  .attr("class", isClose ? "tip" : "warning")
+  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
+  .text(`Die richtige Antwort ist ${answerValue}.`);
 ```
 
 <!-- ********************************************************* -->
