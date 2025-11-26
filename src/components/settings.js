@@ -1,6 +1,24 @@
 import * as d3 from "npm:d3";
 import { Generators } from "npm:@observablehq/stdlib";
 
+const estimateSleepAge = {
+  A: {
+    age: 32,
+    sleepTime: 7,
+    p: 0.5,
+  },
+  B: {
+    age: 48,
+    sleepTime: 6.5,
+    p: 0.75,
+  },
+  C: {
+    age: 64,
+    sleepTime: 6,
+    p: 0.9,
+  },
+};
+
 const relativeHeight = 0.6;
 
 const margin = {
@@ -92,4 +110,5 @@ export const settings = {
   casesData,
   hopCount: 5,
   hopDuration: 400,
+  estimateSleepAge,
 };

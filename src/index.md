@@ -53,6 +53,7 @@ import {
   logBtnEstimatePercentageA,
   logBtnEstimatePercentageB,
   logBtnEstimatePercentageC,
+  logBtnEstimateSleepA,
 } from "./components/logger.js";
 ```
 
@@ -86,6 +87,7 @@ const {
   relativeHeight,
   hopCount,
   hopDuration,
+  estimateSleepAge,
 } = settings;
 ```
 
@@ -209,6 +211,18 @@ const debouncedLoggers = {
     (value) => logInput("estimate_percentage_c", value),
     500
   ),
+  estimateSleepA: createDebouncedLogger(
+    (value) => logInput("estimate_sleep_a", value),
+    500
+  ),
+  estimateSleepB: createDebouncedLogger(
+    (value) => logInput("estimate_sleep_b", value),
+    500
+  ),
+  estimateSleepC: createDebouncedLogger(
+    (value) => logInput("estimate_sleep_c", value),
+    500
+  ),
 };
 ```
 
@@ -223,14 +237,6 @@ debouncedLoggers.sleepTime(sleepTimeValue);
 ```js
 debouncedLoggers.estimate(estimateValue);
 ```
-
-<!-- ```js
-logInput("aesthetics", aestheticsValue);
-``` -->
-
-<!-- ```js
-logInput("interest", interestValue);
-``` -->
 
 <!-- Scrollytelling -->
 
@@ -378,23 +384,36 @@ const scrollyProps = {
   },
   9: {
     ...baseStep,
-    scrollStep: 8,
+    scrollStep: 9,
     height: height,
     age: 30,
     sleepTime: 6,
     variant,
-    xDomain: isEnhanced ? baseStep.xDomain : [20 - 5.5, 20 + 5.5],
+    xDomain: isEnhanced ? baseStep.xDomain : [30 - 5.5, 30 + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
   10: {
     ...baseStep,
-    scrollStep: 8,
+    scrollStep: 10,
     height: height,
     age: 40,
     sleepTime: 5.5,
     variant,
-    xDomain: isEnhanced ? baseStep.xDomain : [20 - 5.5, 20 + 5.5],
+    xDomain: isEnhanced ? baseStep.xDomain : [40 - 5.5, 40 + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
+  },
+  11: {
+    ...baseStep,
+    scrollStep: 11,
+    height: height,
+    age: estimateSleepAge.A.age,
+    sleepTime: estimateValueSleepA,
+    variant,
+    xDomain: isEnhanced
+      ? baseStep.xDomain
+      : [estimateSleepAge.A.age - 5.5, estimateSleepAge.A.age + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
@@ -452,21 +471,6 @@ const answerInput = Inputs.button("Auflösung anzeigen", {
   disabled: isDisabled,
 });
 const answerValue = Generators.input(answerInput);
-```
-
-```js
-const isDisabledPercentageA = Mutable(false);
-const setDisabledPercentageA = (x) => (isDisabledPercentageA.value = x);
-```
-
-```js
-const isDisabledPercentageB = Mutable(false);
-const setDisabledPercentageB = (x) => (isDisabledPercentageB.value = x);
-```
-
-```js
-const isDisabledPercentageC = Mutable(false);
-const setDisabledPercentageC = (x) => (isDisabledPercentageC.value = x);
 ```
 
 <!-- ********************************************************* -->
@@ -570,6 +574,21 @@ const answerPercentageInputC = Inputs.button("Auflösung anzeigen", {
   disabled: isDisabledPercentageC,
 });
 const answerPercentileValueC = Generators.input(answerPercentageInputC);
+```
+
+```js
+const isDisabledPercentageA = Mutable(false);
+const setDisabledPercentageA = (x) => (isDisabledPercentageA.value = x);
+```
+
+```js
+const isDisabledPercentageB = Mutable(false);
+const setDisabledPercentageB = (x) => (isDisabledPercentageB.value = x);
+```
+
+```js
+const isDisabledPercentageC = Mutable(false);
+const setDisabledPercentageC = (x) => (isDisabledPercentageC.value = x);
 ```
 
 ```js
@@ -690,6 +709,105 @@ d3.select(feedbackInputPercentageC)
   .attr("class", isClose ? "tip" : "warning")
   .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
   .text(`Die richtige Antwort ist ${answerValue}.`);
+```
+
+<!-- ********************************************************* -->
+
+```js
+debouncedLoggers.estimateSleepA(estimateValueSleepA);
+```
+
+<!-- ```js
+debouncedLoggers.estimateSleepB(estimateValueSleepB);
+```
+
+```js
+debouncedLoggers.estimateSleepC(estimateValueSleepC);
+``` -->
+
+```js
+console.log("", dataSet.get(estimateSleepAge.A.age).box[0].quartiles[1]);
+```
+
+```js
+const estimateInputSleepA = Inputs.range([sleepMin, sleepMax], {
+  step: 0.25,
+  label: "Schlafdauer in Stunden",
+  value: dataSet.get(estimateSleepAge.A.age).box[0].quartiles[1],
+});
+const estimateValueSleepA = Generators.input(estimateInputSleepA);
+```
+
+```js
+const certaintySleepA = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_sleep_a"
+);
+```
+
+```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerSleepInputA = Inputs.button("Auflösung anzeigen", {
+  value: null,
+  reduce: (value) => btnEstimateSleepA(value),
+  disabled: isDisabledSleepA,
+});
+const answerSleepValueA = Generators.input(answerSleepInputA);
+```
+
+```js
+const isDisabledSleepA = Mutable(false);
+const setDisabledSleepA = (x) => (isDisabledSleepA.value = x);
+```
+
+```js
+const btnEstimateSleepA = (value) => {
+  setDisabledSleepA(true); // not needed anymore because button stays disabled after first click
+  feedbackInputSleepA.style.display = "block";
+  for (const input of estimateInputSleepA.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintySleepA.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  logBtnEstimateSleepA({
+    estimateValueSleepA,
+    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
+  });
+  return value + 1;
+};
+```
+
+```js
+const feedbackInputSleepA = html`<div
+  id="answerPercentileA"
+  style="display: none;"
+></div>`;
+const feedbackValueSleepA = Generators.input(feedbackInputSleepA);
+```
+
+```js
+feedbackInputSleepA.innerHTML = ""; // Clear existing content
+d3.select(feedbackInputSleepA).selectAll("*").remove();
+const estimated = Math.round(getTrueValue(dataSet, stepProps) * 100);
+const answerValue = Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100);
+const isClose = Math.abs(estimated - answerValue) <= 5;
+console.log(
+  "estimated",
+  estimated,
+  "answerValue",
+  answerValue,
+  " isClose",
+  isClose
+);
+
+d3.select(feedbackInputSleepA)
+  .append("p")
+  .attr("class", isClose ? "tip" : "warning")
+  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
+  .text(`Die richtige Antwort ist ${estimateSleepAge.A.sleepTime} Stunden.`);
 ```
 
 <!-- ********************************************************* -->
@@ -1470,9 +1588,18 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
 <p>Was würden Sie schätzen, wie viel Prozent der 40-Jährigen schlafen kürzer als Sie?${estimateInputPercentageC}${certaintyPercentageC}${answerPercentageInputC}${feedbackInputPercentageC}</p>
 </div>
 <div class="scroll-section card" data-step="11">
-  <p>Was trifft für Sie zu?</p>
-  <h2>Die Gestaltung der Grafik ist ansprechend.</h2>${aestheticsForm}<h2>Das Thema interessiert mich.</h2>${interestForm}
-  <!-- <p>Sehen wir uns jetzt noch einige Altersgruppen genauer an. Dafür zoomen wir näher heran:</p> -->
+
+<!-- prettier-ignore -->
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+
+${estimateInputSleepA}
+
+---
+
+${certaintySleepA}
+${answerSleepInputA}
+${feedbackInputSleepA}
+
 </div>
 </section>
 

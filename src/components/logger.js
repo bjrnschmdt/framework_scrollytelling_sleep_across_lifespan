@@ -74,6 +74,13 @@ export function logBtnEstimatePercentageC({
   });
 }
 
+export function logBtnEstimateSleepA({ estimateValueSleepA, trueValue }) {
+  logEvent("kielscn_schlafdauer_btn_estimate_sleep_a", {
+    estimateSleepA: estimateValueSleepA,
+    trueValue: trueValue,
+  });
+}
+
 // Used in pointerInteraction.js
 export function logInteraction(event) {
   logEvent("kielscn_schlafdauer_input_custom", {
