@@ -88,7 +88,7 @@ export function updatePlot({
       (update) =>
         update
           .transition("transform")
-          .duration(100)
+          .duration(600)
           .ease(d3.easeCubic)
           .attr("transform", `translate(${xScaleSVG(data.ageRange.start)}, 0)`)
     );
