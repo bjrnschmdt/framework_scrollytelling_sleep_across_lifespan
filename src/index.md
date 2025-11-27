@@ -445,6 +445,11 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
+  14: {
+    ...baseStep,
+    scrollStep: 14,
+    height: height,
+  },
 };
 ```
 
@@ -1091,6 +1096,84 @@ function createSemanticDifferentialInput(
   form.value = undefined; // Default value
   return form;
 }
+
+function createShuffledSemanticDifferentialScale({
+  id,
+  question,
+  items,
+  scalePoints = 7,
+}) {
+  const shuffledItems = [...items];
+  for (let i = shuffledItems.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledItems[i], shuffledItems[j]] = [shuffledItems[j], shuffledItems[i]];
+  }
+
+  const form = html`<form
+    style="display: flex; flex-direction: column; gap: 12px; margin: 10px 0 25px 0;"
+  >
+    <h2 style="font-weight: 500; margin: 0;">${question}</h2>
+    <div
+      style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: nowrap; width: 100%;"
+    >
+      <span style="flex: 1 1 140px;">&nbsp;</span>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        ${Array.from({ length: scalePoints }, (_, i) => {
+          return html`<span
+            style="display: inline-block; width: 26px; text-align: center; font-size: 0.9rem;"
+            >${i + 1}</span
+          >`;
+        })}
+      </div>
+      <span style="flex: 1 1 140px;">&nbsp;</span>
+    </div>
+    ${shuffledItems.map((item) => {
+      return html`<div
+        style="display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; width: 100%;"
+      >
+        <span style="flex: 1 1 140px; text-align: left;">${item.left}</span>
+        <div
+          style="display: flex; gap: 10px; justify-content: center; flex: 0 0 auto;"
+        >
+          ${Array.from({ length: scalePoints }, (_, i) => {
+            const value = i + 1;
+            const input = html`<input
+              type="radio"
+              name="${id}_${item.id}"
+              value="${value}"
+              aria-label="${item.left} bis ${item.right}: ${value}"
+              style="margin: 0; width: 20px; height: 20px;"
+            />`;
+            input.addEventListener("change", () => {
+              updateFormValue();
+              logInput(`${id}_${item.id}`, value);
+              if (Object.values(form.value).every((v) => v !== null)) {
+                logEvent(`kielscn_schlafdauer_input_${id}_complete`, {
+                  ...form.value,
+                });
+              }
+            });
+            return input;
+          })}
+        </div>
+        <span style="flex: 1 1 140px; text-align: right;">${item.right}</span>
+      </div>`;
+    })}
+  </form>`;
+
+  const updateFormValue = () => {
+    form.value = shuffledItems.reduce((acc, item) => {
+      const selected = form.querySelector(
+        `input[name="${id}_${item.id}"]:checked`
+      );
+      acc[item.id] = selected ? parseInt(selected.value, 10) : null;
+      return acc;
+    }, {});
+  };
+
+  updateFormValue();
+  return form;
+}
 ```
 
 ```js
@@ -1102,6 +1185,42 @@ const interestForm = createSemanticDifferentialInput(
   "Das Thema interessiert mich.",
   "interest"
 );
+const stimulationScale = createShuffledSemanticDifferentialScale({
+  id: "skala_stimulation",
+  question: "Die Beschäftigung mit dem Artikel empfinde ich als:",
+  items: [
+    { id: "langweilig_spannend", left: "langweilig", right: "spannend" },
+    {
+      id: "uninteressant_interessant",
+      left: "uninteressant",
+      right: "interessant",
+    },
+    {
+      id: "einschlaefernd_aktivierend",
+      left: "einschläfernd",
+      right: "aktivierend",
+    },
+    { id: "minderwertig_wertvoll", left: "minderwertig", right: "wertvoll" },
+  ],
+});
+const visualAestheticsScale = createShuffledSemanticDifferentialScale({
+  id: "skala_visual_aesthetics",
+  question: "Die visuelle Gestaltung des Artikels empfinde ich als:",
+  items: [
+    { id: "haesslich_schoen", left: "hässlich", right: "schön" },
+    {
+      id: "unaesthetisch_aesthetisch",
+      left: "unästhetisch",
+      right: "ästhetisch",
+    },
+    { id: "stillos_stilvoll", left: "stillos", right: "stilvoll" },
+    {
+      id: "nicht_ansprechend_ansprechend",
+      left: "nicht ansprechend",
+      right: "ansprechend",
+    },
+  ],
+});
 ```
 
 ```js
@@ -1815,6 +1934,14 @@ ${answerSleepInputC}
 ${feedbackInputSleepC}
 
 </div>
+
+<div class="scroll-section card" data-step="14">
+  <h2>Ihr Eindruck</h2>
+  <p>Wie haben Sie den Artikel erlebt? Bitte bewerten Sie die folgenden Skalen.</p>
+  ${stimulationScale}
+  ${visualAestheticsScale}
+</div>
+
 </section>
 
 <div class="outro card">
