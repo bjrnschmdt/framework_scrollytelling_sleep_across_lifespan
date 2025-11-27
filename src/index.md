@@ -54,6 +54,8 @@ import {
   logBtnEstimatePercentageB,
   logBtnEstimatePercentageC,
   logBtnEstimateSleepA,
+  logBtnEstimateSleepB,
+  logBtnEstimateSleepC,
 } from "./components/logger.js";
 ```
 
@@ -417,6 +419,32 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
+  12: {
+    ...baseStep,
+    scrollStep: 12,
+    height: height,
+    age: estimateSleepAge.B.age,
+    sleepTime: estimateValueSleepB,
+    variant,
+    xDomain: isEnhanced
+      ? baseStep.xDomain
+      : [estimateSleepAge.B.age - 5.5, estimateSleepAge.B.age + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
+  },
+  13: {
+    ...baseStep,
+    scrollStep: 13,
+    height: height,
+    age: estimateSleepAge.C.age,
+    sleepTime: estimateValueSleepC,
+    variant,
+    xDomain: isEnhanced
+      ? baseStep.xDomain
+      : [estimateSleepAge.C.age - 5.5, estimateSleepAge.C.age + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
+  },
 };
 ```
 
@@ -717,16 +745,12 @@ d3.select(feedbackInputPercentageC)
 debouncedLoggers.estimateSleepA(estimateValueSleepA);
 ```
 
-<!-- ```js
+```js
 debouncedLoggers.estimateSleepB(estimateValueSleepB);
 ```
 
 ```js
 debouncedLoggers.estimateSleepC(estimateValueSleepC);
-``` -->
-
-```js
-console.log("", dataSet.get(estimateSleepAge.A.age).box[0].quartiles[1]);
 ```
 
 ```js
@@ -739,11 +763,47 @@ const estimateValueSleepA = Generators.input(estimateInputSleepA);
 ```
 
 ```js
+const estimateInputSleepB = Inputs.range([sleepMin, sleepMax], {
+  step: 0.25,
+  label: "Schlafdauer in Stunden",
+  value: dataSet.get(estimateSleepAge.B.age).box[0].quartiles[1],
+});
+const estimateValueSleepB = Generators.input(estimateInputSleepB);
+```
+
+```js
+const estimateInputSleepC = Inputs.range([sleepMin, sleepMax], {
+  step: 0.25,
+  label: "Schlafdauer in Stunden",
+  value: dataSet.get(estimateSleepAge.C.age).box[0].quartiles[1],
+});
+const estimateValueSleepC = Generators.input(estimateInputSleepC);
+```
+
+```js
 const certaintySleepA = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
   "certainty_sleep_a"
+);
+```
+
+```js
+const certaintySleepB = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_sleep_b"
+);
+```
+
+```js
+const certaintySleepC = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_sleep_c"
 );
 ```
 
@@ -758,8 +818,38 @@ const answerSleepValueA = Generators.input(answerSleepInputA);
 ```
 
 ```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerSleepInputB = Inputs.button("Auflösung anzeigen", {
+  value: null,
+  reduce: (value) => btnEstimateSleepB(value),
+  disabled: isDisabledSleepB,
+});
+const answerSleepValueB = Generators.input(answerSleepInputB);
+```
+
+```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerSleepInputC = Inputs.button("Auflösung anzeigen", {
+  value: null,
+  reduce: (value) => btnEstimateSleepC(value),
+  disabled: isDisabledSleepC,
+});
+const answerSleepValueC = Generators.input(answerSleepInputC);
+```
+
+```js
 const isDisabledSleepA = Mutable(false);
 const setDisabledSleepA = (x) => (isDisabledSleepA.value = x);
+```
+
+```js
+const isDisabledSleepB = Mutable(false);
+const setDisabledSleepB = (x) => (isDisabledSleepB.value = x);
+```
+
+```js
+const isDisabledSleepC = Mutable(false);
+const setDisabledSleepC = (x) => (isDisabledSleepC.value = x);
 ```
 
 ```js
@@ -774,7 +864,43 @@ const btnEstimateSleepA = (value) => {
   }
   logBtnEstimateSleepA({
     estimateValueSleepA,
-    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
+    trueValue: estimateSleepAge.A.sleepTime,
+  });
+  return value + 1;
+};
+```
+
+```js
+const btnEstimateSleepB = (value) => {
+  setDisabledSleepB(true); // not needed anymore because button stays disabled after first click
+  feedbackInputSleepB.style.display = "block";
+  for (const input of estimateInputSleepB.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintySleepB.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  logBtnEstimateSleepB({
+    estimateValueSleepB,
+    trueValue: estimateSleepAge.B.sleepTime,
+  });
+  return value + 1;
+};
+```
+
+```js
+const btnEstimateSleepC = (value) => {
+  setDisabledSleepC(true); // not needed anymore because button stays disabled after first click
+  feedbackInputSleepC.style.display = "block";
+  for (const input of estimateInputSleepC.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintySleepC.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  logBtnEstimateSleepC({
+    estimateValueSleepC,
+    trueValue: estimateSleepAge.C.sleepTime,
   });
   return value + 1;
 };
@@ -789,25 +915,85 @@ const feedbackValueSleepA = Generators.input(feedbackInputSleepA);
 ```
 
 ```js
+const feedbackInputSleepB = html`<div
+  id="answerPercentileB"
+  style="display: none;"
+></div>`;
+const feedbackValueSleepB = Generators.input(feedbackInputSleepB);
+```
+
+```js
+const feedbackInputSleepC = html`<div
+  id="answerPercentileC"
+  style="display: none;"
+></div>`;
+const feedbackValueSleepC = Generators.input(feedbackInputSleepC);
+```
+
+```js
 feedbackInputSleepA.innerHTML = ""; // Clear existing content
 d3.select(feedbackInputSleepA).selectAll("*").remove();
 const estimated = Math.round(getTrueValue(dataSet, stepProps) * 100);
 const answerValue = Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100);
 const isClose = Math.abs(estimated - answerValue) <= 5;
-console.log(
+/* console.log(
   "estimated",
   estimated,
   "answerValue",
   answerValue,
   " isClose",
   isClose
-);
+); */
 
 d3.select(feedbackInputSleepA)
   .append("p")
   .attr("class", isClose ? "tip" : "warning")
   .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
   .text(`Die richtige Antwort ist ${estimateSleepAge.A.sleepTime} Stunden.`);
+```
+
+```js
+feedbackInputSleepB.innerHTML = ""; // Clear existing content
+d3.select(feedbackInputSleepB).selectAll("*").remove();
+const estimated = Math.round(getTrueValue(dataSet, stepProps) * 100);
+const answerValue = Math.round(getTrueValue(dataSet, estimateSleepAge.B) * 100);
+const isClose = Math.abs(estimated - answerValue) <= 5;
+/* console.log(
+  "estimated",
+  estimated,
+  "answerValue",
+  answerValue,
+  " isClose",
+  isClose
+); */
+
+d3.select(feedbackInputSleepB)
+  .append("p")
+  .attr("class", isClose ? "tip" : "warning")
+  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
+  .text(`Die richtige Antwort ist ${estimateSleepAge.B.sleepTime} Stunden.`);
+```
+
+```js
+feedbackInputSleepC.innerHTML = ""; // Clear existing content
+d3.select(feedbackInputSleepC).selectAll("*").remove();
+const estimated = Math.round(getTrueValue(dataSet, stepProps) * 100);
+const answerValue = Math.round(getTrueValue(dataSet, estimateSleepAge.C) * 100);
+const isClose = Math.abs(estimated - answerValue) <= 5;
+/* console.log(
+  "estimated",
+  estimated,
+  "answerValue",
+  answerValue,
+  " isClose",
+  isClose
+); */
+
+d3.select(feedbackInputSleepC)
+  .append("p")
+  .attr("class", isClose ? "tip" : "warning")
+  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
+  .text(`Die richtige Antwort ist ${estimateSleepAge.C.sleepTime} Stunden.`);
 ```
 
 <!-- ********************************************************* -->
@@ -1599,6 +1785,34 @@ ${estimateInputSleepA}
 ${certaintySleepA}
 ${answerSleepInputA}
 ${feedbackInputSleepA}
+
+</div>
+<div class="scroll-section card" data-step="12">
+
+<!-- prettier-ignore -->
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+
+${estimateInputSleepB}
+
+---
+
+${certaintySleepB}
+${answerSleepInputB}
+${feedbackInputSleepB}
+
+</div>
+<div class="scroll-section card" data-step="13">
+
+<!-- prettier-ignore -->
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+
+${estimateInputSleepC}
+
+---
+
+${certaintySleepC}
+${answerSleepInputC}
+${feedbackInputSleepC}
 
 </div>
 </section>

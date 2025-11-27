@@ -50,7 +50,7 @@ export function logBtnEstimatePercentageA({
 }) {
   logEvent("kielscn_schlafdauer_btn_estimate_percentage_a", {
     estimatePercentageA: estimateValuePercentageA,
-    trueValue: trueValue,
+    trueValuePercentageA: trueValue,
   });
 }
 
@@ -60,7 +60,7 @@ export function logBtnEstimatePercentageB({
 }) {
   logEvent("kielscn_schlafdauer_btn_estimate_percentage_b", {
     estimatePercentageB: estimateValuePercentageB,
-    trueValue: trueValue,
+    trueValuePercentageB: trueValue,
   });
 }
 
@@ -70,14 +70,28 @@ export function logBtnEstimatePercentageC({
 }) {
   logEvent("kielscn_schlafdauer_btn_estimate_percentage_c", {
     estimatePercentageC: estimateValuePercentageC,
-    trueValue: trueValue,
+    trueValuePercentageC: trueValue,
   });
 }
 
 export function logBtnEstimateSleepA({ estimateValueSleepA, trueValue }) {
   logEvent("kielscn_schlafdauer_btn_estimate_sleep_a", {
     estimateSleepA: estimateValueSleepA,
-    trueValue: trueValue,
+    trueValueSleepA: trueValue,
+  });
+}
+
+export function logBtnEstimateSleepB({ estimateValueSleepB, trueValue }) {
+  logEvent("kielscn_schlafdauer_btn_estimate_sleep_b", {
+    estimateSleepB: estimateValueSleepB,
+    trueValueSleepB: trueValue,
+  });
+}
+
+export function logBtnEstimateSleepC({ estimateValueSleepC, trueValue }) {
+  logEvent("kielscn_schlafdauer_btn_estimate_sleep_c", {
+    estimateSleepC: estimateValueSleepC,
+    trueValueSleepC: trueValue,
   });
 }
 
