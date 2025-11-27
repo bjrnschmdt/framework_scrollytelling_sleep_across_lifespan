@@ -138,6 +138,18 @@ export function getTrueValue(dataSet, stepProps) {
   return trueValue;
 }
 
+export function getTrueSleepDuration(dataSet, stepProps) {
+  const age = stepProps.age;
+  const sleepTime = stepProps.sleepTime;
+
+  // Use optional chaining and fallback values
+  const trueValue =
+    dataSet.get(age)?.estimatesPlotData?.find((d) => d.sleeptime === sleepTime)
+      ?.nearestPValue ?? null;
+
+  return trueValue;
+}
+
 // probability density function
 
 export function epanechnikov(bandwidth) {
