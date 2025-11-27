@@ -1103,10 +1103,12 @@ function createShuffledSemanticDifferentialScale({
   items,
   scalePoints = 7,
 }) {
-  const labelMinWidth = 130;
-  const gridTemplate = `minmax(${labelMinWidth}px, 1fr) repeat(${scalePoints}, minmax(28px, 1fr)) minmax(${labelMinWidth}px, 1fr)`;
-  const columnGap = 10;
-  const extremeFontSize = "clamp(0.78rem, 1.4vw + 0.2rem, 1rem)";
+  const labelWidth = 120;
+  const labelFlex = "1 1 0";
+  const extremeFontSize = "clamp(0.8rem, 1.4vw, 1rem)";
+  const radioSize = "clamp(16px, 2.2vw, 20px)";
+  const radioGap = 6;
+  const rowGap = 12;
   const shuffledItems = [...items];
   for (let i = shuffledItems.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -1118,52 +1120,67 @@ function createShuffledSemanticDifferentialScale({
   >
     <h2 style="font-weight: 500;">${question}</h2>
     <div
-      style="display: grid; grid-template-columns: ${gridTemplate}; align-items: end; gap: ${columnGap}px; width: 100%;"
+      style="display: flex; align-items: flex-end; gap: ${rowGap}px; width: 100%;"
     >
-      <span style="text-align: left; white-space: normal;">&nbsp;</span>
-      ${Array.from({ length: scalePoints }, (_, i) => {
-        return html`<div
-          style="display: flex; flex-direction: column; align-items: center; gap: 4px;"
-        >
-          <span style="font-size: 0.9rem;">${i + 1}</span>
-        </div>`;
-      })}
-      <span style="text-align: right; white-space: normal;">&nbsp;</span>
+      <span
+        style="align-self: flex-end; text-align: left; white-space: normal; min-width: ${labelWidth}px; flex: ${labelFlex};"
+        >&nbsp;</span
+      >
+      <div
+        style="display: flex; gap: ${radioGap}px; justify-content: center; flex: 0 0 auto;"
+      >
+        ${Array.from({ length: scalePoints }, (_, i) => {
+          return html`<div
+            style="display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 0 0 ${radioSize};"
+          >
+            <span style="font-size: 0.9rem;">${i + 1}</span>
+          </div>`;
+        })}
+      </div>
+      <span
+        style="align-self: flex-end; text-align: right; white-space: normal; min-width: ${labelWidth}px; flex: ${labelFlex};"
+        >&nbsp;</span
+      >
     </div>
     ${shuffledItems.map((item) => {
       return html`<div
-        style="display: grid; grid-template-columns: ${gridTemplate}; align-items: center; gap: ${columnGap}px; width: 100%;"
+        style="display: flex; align-items: center; gap: ${rowGap}px; width: 100%;"
       >
         <span
-          style="text-align: left; white-space: normal; font-size: ${extremeFontSize}; padding-right: 6px; line-height: 1.2; word-break: break-word;"
+          style="align-self: center; text-align: left; white-space: normal; font-size: ${extremeFontSize}; padding-right: 6px; line-height: 1.2; word-break: break-word; min-width: ${labelWidth}px; flex: ${labelFlex};"
           >${item.left}</span
         >
-        ${Array.from({ length: scalePoints }, (_, i) => {
-          const value = i + 1;
-          const input = html`<div
-            style="display: flex; flex-direction: column; align-items: center; gap: 4px;"
-          >
-            <input
-              type="radio"
-              name="${id}_${item.id}"
-              value="${value}"
-              aria-label="${item.left} bis ${item.right}: ${value}"
-              style="margin: 0;"
-            />
-          </div>`;
-          input.querySelector("input").addEventListener("change", () => {
-            updateFormValue();
-            logInput(`${id}_${item.id}`, value);
-            if (Object.values(form.value).every((v) => v !== null)) {
-              logEvent(`kielscn_schlafdauer_input_${id}_complete`, {
-                ...form.value,
-              });
-            }
-          });
-          return input;
-        })}
+        <div
+          style="display: flex; gap: ${radioGap}px; justify-content: center; flex: 0 0 auto;"
+        >
+          ${Array.from({ length: scalePoints }, (_, i) => {
+            const value = i + 1;
+            const input = html`<div
+              style="display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 0 0 ${radioSize};"
+            >
+              <input
+                type="radio"
+                name="${id}_${item.id}"
+                value="${value}"
+                aria-label="${item.left} bis ${item.right}: ${value}"
+                style="margin: 0; width: ${radioSize}; height: ${radioSize};"
+              />
+            </div>`;
+            input.querySelector("input").addEventListener("change", () => {
+              updateFormValue();
+              logInput(`${id}_${item.id}`, value);
+              if (Object.values(form.value).every((v) => v !== null) && !form.completionLogged) {
+                form.completionLogged = true;
+                logEvent(`kielscn_schlafdauer_input_${id}_complete`, {
+                  ...form.value,
+                });
+              }
+            });
+            return input;
+          })}
+        </div>
         <span
-          style="text-align: right; white-space: normal; font-size: ${extremeFontSize}; padding-left: 6px; line-height: 1.2; word-break: break-word;"
+          style="align-self: center; text-align: right; white-space: normal; font-size: ${extremeFontSize}; padding-left: 6px; line-height: 1.2; word-break: break-word; min-width: ${labelWidth}px; flex: ${labelFlex};"
           >${item.right}</span
         >
       </div>`;
