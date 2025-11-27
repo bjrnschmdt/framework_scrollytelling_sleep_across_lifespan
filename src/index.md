@@ -240,6 +240,10 @@ debouncedLoggers.sleepTime(sleepTimeValue);
 debouncedLoggers.estimate(estimateValue);
 ```
 
+```js
+logInput("education", educationValue);
+```
+
 <!-- Scrollytelling -->
 
 ```js
@@ -504,6 +508,25 @@ const answerInput = Inputs.button("Auflösung anzeigen", {
   disabled: isDisabled,
 });
 const answerValue = Generators.input(answerInput);
+```
+
+```js
+const educationInput = Inputs.select(
+  new Map([
+    ["Kein Schulabschluss", 0],
+    ["Hauptschulabschluss", 1],
+    ["Realschulabschluss", 2],
+    ["Abitur", 3],
+    ["Bachelor/Diplom (FH)", 4],
+    ["Master/Magister/Diplom (Univ.)", 5],
+    ["Promotion", 6],
+  ]),
+  {
+    label: "Höchster Bildungsabschluss",
+    value: 2,
+  }
+);
+const educationValue = Generators.input(educationInput);
 ```
 
 <!-- ********************************************************* -->
@@ -1096,7 +1119,9 @@ function createSemanticDifferentialInput(
   form.value = undefined; // Default value
   return form;
 }
+```
 
+```js
 function createShuffledSemanticDifferentialScale({
   id,
   question,
@@ -1194,12 +1219,32 @@ function createShuffledSemanticDifferentialScale({
 ```js
 const aestheticsForm = createSemanticDifferentialInput(
   "Die Gestaltung der Grafik ist ansprechend.",
+  "stimme gar nicht zu",
+  "stimme voll zu",
   "aesthetic"
 );
+
 const interestForm = createSemanticDifferentialInput(
   "Das Thema interessiert mich.",
+  "stimme gar nicht zu",
+  "stimme voll zu",
   "interest"
 );
+
+const familiarityForm = createSemanticDifferentialInput(
+  "Die folgende Visualisierung ist mir bekannt.",
+  "stimme gar nicht zu",
+  "stimme voll zu",
+  "familiarity"
+);
+
+const manipulationCheck = createSemanticDifferentialInput(
+  "Wählen Sie hier bitte die Antwort zwei.",
+  "stimme gar nicht zu",
+  "stimme voll zu",
+  "manipulation_check"
+);
+
 const stimulationScale = createShuffledSemanticDifferentialScale({
   id: "skala_stimulation",
   question: "Die Beschäftigung mit dem Artikel empfinde ich als:",
@@ -1951,10 +1996,37 @@ ${feedbackInputSleepC}
 </div>
 
 <div class="scroll-section card" data-step="14">
-  <h2>Ihr Eindruck</h2>
-  <p>Wie haben Sie den Artikel erlebt? Bitte bewerten Sie die folgenden Skalen.</p>
-  ${stimulationScale}
-  ${visualAestheticsScale}
+
+## **Wie haben Sie den Artikel erlebt?**
+
+---
+
+${stimulationScale}
+
+---
+
+${visualAestheticsScale}
+
+---
+
+## **Was trifft für Sie zu?**
+
+---
+
+${aestheticsForm}
+
+---
+
+${manipulationCheck}
+
+---
+
+${interestForm}
+
+---
+
+${educationInput}
+
 </div>
 
 </section>
