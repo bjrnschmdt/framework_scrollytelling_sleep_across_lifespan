@@ -1291,7 +1291,8 @@ function createBntQuestion({
   max,
   step = 1,
   defaultValue = 0,
-  onInput,
+  correctAnswer,
+  onSubmit,
 }) {
   const wrapper = document.createElement("div");
   wrapper.className = "bnt-question";
@@ -1307,19 +1308,45 @@ function createBntQuestion({
   valueLabel.className = "bnt-answer-value";
   valueLabel.textContent = `Antwort: ${defaultValue}`;
 
+  const submitBtn = document.createElement("button");
+  submitBtn.type = "button";
+  submitBtn.textContent = "Antwort bestätigen";
+  submitBtn.className = "bnt-submit";
+
+  const feedback = document.createElement("p");
+  feedback.className = "bnt-feedback";
+  feedback.style.display = "none";
+
   slider.addEventListener("input", () => {
     const numericValue = Number(slider.value);
     valueLabel.textContent = `Antwort: ${numericValue}`;
-    onInput(id, numericValue);
   });
 
-  wrapper.append(question, slider, valueLabel);
+  submitBtn.addEventListener("click", () => {
+    const numericValue = Number(slider.value);
+    const isCorrect = numericValue === correctAnswer;
+    slider.disabled = true;
+    submitBtn.disabled = true;
+    feedback.style.display = "block";
+    feedback.textContent = isCorrect
+      ? "Richtig!"
+      : `Falsch. Die richtige Antwort ist ${correctAnswer}.`;
+    feedback.className = `bnt-feedback ${isCorrect ? "tip" : "warning"}`;
+    onSubmit(id, numericValue, isCorrect);
+  });
+
+  wrapper.append(question, slider, valueLabel, submitBtn, feedback);
 
   return {
     node: wrapper,
     reset() {
       slider.value = defaultValue;
       valueLabel.textContent = `Antwort: ${defaultValue}`;
+      slider.disabled = false;
+      submitBtn.disabled = false;
+      feedback.style.display = "none";
+      feedback.textContent = "";
+      feedback.className = "bnt-feedback";
     },
   };
 }
@@ -1357,15 +1384,28 @@ function createBntAdaptiveTest() {
     q2b: null,
     q3: null,
   };
+  const locked = {
+    q1: false,
+    q2a: false,
+    q2b: false,
+    q3: false,
+  };
   let lastScore = null;
 
-  const handleInput = (id, value) => {
+  const handleSubmit = (id, value, isCorrect) => {
     state[id] = value;
+    locked[id] = true;
     logInput(`bnt_${id}`, value);
+    logEvent("kielscn_schlafdauer_bnt_submit", {
+      question: id,
+      value,
+      correct: isCorrect,
+    });
+
     if (id === "q1") {
       resetBranch(["q2a", "q2b", "q3"]);
       q3Container.innerHTML = "";
-      if (value === correctAnswers.q1) {
+      if (isCorrect) {
         showFollowUp("q2b");
       } else {
         showFollowUp("q2a");
@@ -1373,7 +1413,7 @@ function createBntAdaptiveTest() {
     }
 
     if (id === "q2b") {
-      if (isCorrect("q2b")) {
+      if (isCorrect) {
         resetBranch(["q3"]);
         q3Container.innerHTML = "";
       } else {
@@ -1393,7 +1433,8 @@ function createBntAdaptiveTest() {
       max: 100,
       step: 1,
       defaultValue: 0,
-      onInput: handleInput,
+      correctAnswer: correctAnswers.q1,
+      onSubmit: handleSubmit,
     }),
     q2a: createBntQuestion({
       id: "q2a",
@@ -1403,7 +1444,8 @@ function createBntAdaptiveTest() {
       max: 50,
       step: 1,
       defaultValue: 0,
-      onInput: handleInput,
+      correctAnswer: correctAnswers.q2a,
+      onSubmit: handleSubmit,
     }),
     q2b: createBntQuestion({
       id: "q2b",
@@ -1413,7 +1455,8 @@ function createBntAdaptiveTest() {
       max: 70,
       step: 1,
       defaultValue: 0,
-      onInput: handleInput,
+      correctAnswer: correctAnswers.q2b,
+      onSubmit: handleSubmit,
     }),
     q3: createBntQuestion({
       id: "q3",
@@ -1423,7 +1466,8 @@ function createBntAdaptiveTest() {
       max: 100,
       step: 1,
       defaultValue: 0,
-      onInput: handleInput,
+      correctAnswer: correctAnswers.q3,
+      onSubmit: handleSubmit,
     }),
   };
 
@@ -1444,6 +1488,7 @@ function createBntAdaptiveTest() {
   function resetBranch(keys) {
     keys.forEach((key) => {
       state[key] = null;
+      locked[key] = false;
       questions[key].reset();
     });
     scoreDisplay.style.display = "none";
@@ -1455,17 +1500,17 @@ function createBntAdaptiveTest() {
   }
 
   function calculateScore() {
-    if (state.q1 === null) return null;
+    if (!locked.q1) return null;
 
     if (!isCorrect("q1")) {
-      if (state.q2a === null) return null;
+      if (!locked.q2a) return null;
       return isCorrect("q2a") ? 2 : 1;
     }
 
-    if (state.q2b === null) return null;
+    if (!locked.q2b) return null;
     if (isCorrect("q2b")) return 4;
 
-    if (state.q3 === null) return null;
+    if (!locked.q3) return null;
     return isCorrect("q3") ? 4 : 3;
   }
 
@@ -2338,6 +2383,10 @@ ${bntAdaptiveTest}
 .bnt-answer-value {
   font-size: 0.95rem;
   color: #b8b8b8;
+}
+
+.bnt-submit {
+  margin-top: 0.75rem;
 }
 
 .bnt-score {
