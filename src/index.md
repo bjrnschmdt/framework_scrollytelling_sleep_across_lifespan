@@ -1284,6 +1284,218 @@ const visualAestheticsScale = createShuffledSemanticDifferentialScale({
 ```
 
 ```js
+function createBntQuestion({
+  id,
+  prompt,
+  min,
+  max,
+  step = 1,
+  defaultValue = 0,
+  onInput,
+}) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "bnt-question";
+
+  const question = document.createElement("p");
+  question.textContent = prompt;
+
+  const slider = Inputs.range([min, max], { step, value: defaultValue });
+  slider.style.width = "100%";
+  slider.style.marginTop = "8px";
+
+  const valueLabel = document.createElement("div");
+  valueLabel.className = "bnt-answer-value";
+  valueLabel.textContent = `Antwort: ${defaultValue}`;
+
+  slider.addEventListener("input", () => {
+    const numericValue = Number(slider.value);
+    valueLabel.textContent = `Antwort: ${numericValue}`;
+    onInput(id, numericValue);
+  });
+
+  wrapper.append(question, slider, valueLabel);
+
+  return {
+    node: wrapper,
+    reset() {
+      slider.value = defaultValue;
+      valueLabel.textContent = `Antwort: ${defaultValue}`;
+    },
+  };
+}
+```
+
+```js
+function createBntAdaptiveTest() {
+  const container = document.createElement("div");
+  container.className = "scroll-section card bnt-container";
+
+  const title = document.createElement("h2");
+  title.textContent = "Berlin Numeracy Test – Adaptiv";
+  const intro = document.createElement("p");
+  intro.textContent =
+    "Beantworten Sie die folgenden Aufgaben. Die nächsten Fragen werden abhängig von Ihren Antworten eingeblendet.";
+
+  const followUpContainer = document.createElement("div");
+  followUpContainer.className = "bnt-follow-up";
+  const q3Container = document.createElement("div");
+  q3Container.className = "bnt-follow-up";
+
+  const scoreDisplay = document.createElement("p");
+  scoreDisplay.className = "bnt-score";
+  scoreDisplay.style.display = "none";
+
+  const correctAnswers = {
+    q1: 25,
+    q2a: 30,
+    q2b: 20,
+    q3: 50,
+  };
+  const state = {
+    q1: null,
+    q2a: null,
+    q2b: null,
+    q3: null,
+  };
+  let lastScore = null;
+
+  const handleInput = (id, value) => {
+    state[id] = value;
+    logInput(`bnt_${id}`, value);
+    if (id === "q1") {
+      resetBranch(["q2a", "q2b", "q3"]);
+      q3Container.innerHTML = "";
+      if (value === correctAnswers.q1) {
+        showFollowUp("q2b");
+      } else {
+        showFollowUp("q2a");
+      }
+    }
+
+    if (id === "q2b") {
+      if (isCorrect("q2b")) {
+        resetBranch(["q3"]);
+        q3Container.innerHTML = "";
+      } else {
+        showQ3();
+      }
+    }
+
+    updateScore();
+  };
+
+  const questions = {
+    q1: createBntQuestion({
+      id: "q1",
+      prompt:
+        "Von 1.000 Leuten in einer Kleinstadt sind 500 Mitglied im Gesangsverein. Von diesen 500 Mitgliedern im Gesangsverein sind 100 Männer. Von den 500 Einwohnern, die nicht im Gesangsverein sind, sind 300 Männer. Wie groß ist die Wahrscheinlichkeit, dass ein zufällig ausgewählter Mann ein Mitglied des Gesangsvereins ist? Bitte geben sie die Wahrscheinlichkeit in Prozent an.",
+      min: 0,
+      max: 100,
+      step: 1,
+      defaultValue: 0,
+      onInput: handleInput,
+    }),
+    q2a: createBntQuestion({
+      id: "q2a",
+      prompt:
+        "Stellen Sie sich vor, wir werfen einen fünfseitigen Würfel 50 mal. Bei wie vielen dieser 50 Würfe würde dieser fünfseitige Würfel erwartungsgemäß eine ungerade Zahl zeigen (1, 3 oder 5)?",
+      min: 0,
+      max: 50,
+      step: 1,
+      defaultValue: 0,
+      onInput: handleInput,
+    }),
+    q2b: createBntQuestion({
+      id: "q2b",
+      prompt:
+        "Stellen Sie sich vor, wir werfen einen gezinkten Würfel (6 Seiten). Die Wahrscheinlichkeit, dass der Würfel eine 6 zeigt, ist doppelt so hoch wie die Wahrscheinlichkeit jeder der anderen Zahlen. Von 70 Würfen, bei wie vielen dieser 70 Würfe würde dieser Würfel erwartungsgemäß eine 6 zeigen?",
+      min: 0,
+      max: 70,
+      step: 1,
+      defaultValue: 0,
+      onInput: handleInput,
+    }),
+    q3: createBntQuestion({
+      id: "q3",
+      prompt:
+        "In einem Wald sind 20% der Pilze rot, 50% braun und 30% weiß. Ein roter Pilz ist mit einer Wahrscheinlichkeit von 20% giftig. Ein Pilz, der nicht rot ist, ist er mit einer Wahrscheinlichkeit von 5% giftig. Wie hoch ist die Wahrscheinlichkeit, dass ein zufällig ausgewählter Pilz giftig ist?",
+      min: 0,
+      max: 100,
+      step: 1,
+      defaultValue: 0,
+      onInput: handleInput,
+    }),
+  };
+
+  container.append(title, intro, questions.q1.node, followUpContainer, q3Container, scoreDisplay);
+
+  function showFollowUp(questionKey) {
+    followUpContainer.innerHTML = "";
+    followUpContainer.appendChild(questions[questionKey].node);
+  }
+
+  function showQ3() {
+    if (!q3Container.contains(questions.q3.node)) {
+      q3Container.innerHTML = "";
+      q3Container.appendChild(questions.q3.node);
+    }
+  }
+
+  function resetBranch(keys) {
+    keys.forEach((key) => {
+      state[key] = null;
+      questions[key].reset();
+    });
+    scoreDisplay.style.display = "none";
+    scoreDisplay.textContent = "";
+  }
+
+  function isCorrect(key) {
+    return state[key] !== null && state[key] === correctAnswers[key];
+  }
+
+  function calculateScore() {
+    if (state.q1 === null) return null;
+
+    if (!isCorrect("q1")) {
+      if (state.q2a === null) return null;
+      return isCorrect("q2a") ? 2 : 1;
+    }
+
+    if (state.q2b === null) return null;
+    if (isCorrect("q2b")) return 4;
+
+    if (state.q3 === null) return null;
+    return isCorrect("q3") ? 4 : 3;
+  }
+
+  function updateScore() {
+    const score = calculateScore();
+    if (score === null) {
+      scoreDisplay.style.display = "none";
+      scoreDisplay.textContent = "";
+      return;
+    }
+
+    scoreDisplay.style.display = "block";
+    scoreDisplay.textContent = `Ihr BNT-A-Score: ${score} von 4`;
+
+    if (score !== lastScore) {
+      logInput("bnt_score", score);
+      logEvent("kielscn_schlafdauer_bnt_score", { score });
+      lastScore = score;
+    }
+  }
+
+  return container;
+}
+```
+
+```js
+const bntAdaptiveTest = createBntAdaptiveTest();
+```
+
+```js
 const shareBtn = Inputs.button("Teilen Sie diesen Artikel", {
   reduce: () => {
     if (navigator.share) {
@@ -2028,6 +2240,7 @@ ${interestForm}
 ${educationInput}
 
 </div>
+${bntAdaptiveTest}
 
 </section>
 
@@ -2106,6 +2319,30 @@ ${educationInput}
 .disclaimer {
   font-size: 0.8rem;
   color: #888;
+}
+
+.bnt-container {
+  margin: 0 auto 100svh;
+}
+
+.bnt-follow-up {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bnt-question {
+  margin-top: 1rem;
+}
+
+.bnt-answer-value {
+  font-size: 0.95rem;
+  color: #b8b8b8;
+}
+
+.bnt-score {
+  font-weight: 600;
+  margin-top: 1rem;
 }
 
 </style>
