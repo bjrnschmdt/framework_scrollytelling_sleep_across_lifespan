@@ -1349,20 +1349,10 @@ function createBntAdaptiveTest() {
   const container = document.createElement("div");
   container.className = "scroll-section card bnt-container";
 
-  const title = document.createElement("h2");
-  title.textContent = "Berlin Numeracy Test – Adaptiv";
-  const intro = document.createElement("p");
-  intro.textContent =
-    "Beantworten Sie die folgenden Aufgaben. Die nächsten Fragen werden abhängig von Ihren Antworten eingeblendet.";
-
   const followUpContainer = document.createElement("div");
   followUpContainer.className = "bnt-follow-up";
   const q3Container = document.createElement("div");
   q3Container.className = "bnt-follow-up";
-
-  const scoreDisplay = document.createElement("p");
-  scoreDisplay.className = "bnt-score";
-  scoreDisplay.style.display = "none";
 
   const correctAnswers = {
     q1: 25,
@@ -1468,12 +1458,9 @@ function createBntAdaptiveTest() {
   };
 
   container.append(
-    title,
-    intro,
     questions.q1.node,
     followUpContainer,
-    q3Container,
-    scoreDisplay
+    q3Container
   );
 
   function showFollowUp(questionKey) {
@@ -1494,8 +1481,6 @@ function createBntAdaptiveTest() {
       locked[key] = false;
       questions[key].reset();
     });
-    scoreDisplay.style.display = "none";
-    scoreDisplay.textContent = "";
   }
 
   function isCorrect(key) {
@@ -1519,16 +1504,7 @@ function createBntAdaptiveTest() {
 
   function updateScore() {
     const score = calculateScore();
-    if (score === null) {
-      scoreDisplay.style.display = "none";
-      scoreDisplay.textContent = "";
-      return;
-    }
-
-    scoreDisplay.style.display = "block";
-    scoreDisplay.textContent = `Ihr BNT-A-Score: ${score} von 4`;
-
-    if (score !== lastScore) {
+    if (score !== null && score !== lastScore) {
       logInput("bnt_score", score);
       logEvent("kielscn_schlafdauer_bnt_score", { score });
       lastScore = score;
