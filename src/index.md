@@ -1314,8 +1314,10 @@ function createBntQuestion({
     reduce: (value) => {
       const numericValue = Number(slider.value);
       const isCorrect = numericValue === correctAnswer;
-      slider.disabled = true;
-      submitBtn.disabled = true;
+      for (const input of slider.querySelectorAll("input")) {
+        input.disabled = true;
+      }
+      submitBtn.querySelector("button").disabled = true;
       feedback.style.display = "block";
       feedback.textContent = isCorrect
         ? "Richtig!"
