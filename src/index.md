@@ -1377,8 +1377,7 @@ function createBntAdaptiveTest() {
   const handleSubmit = (id, value, isCorrect) => {
     state[id] = value;
     locked[id] = true;
-    logInput(`bnt_${id}`, value);
-    logEvent("kielscn_schlafdauer_bnt_submit", {
+    logEvent(`kielscn_schlafdauer_bnt_submit_${id}`, {
       question: id,
       value,
       correct: isCorrect,
@@ -1457,11 +1456,7 @@ function createBntAdaptiveTest() {
     }),
   };
 
-  container.append(
-    questions.q1.node,
-    followUpContainer,
-    q3Container
-  );
+  container.append(questions.q1.node, followUpContainer, q3Container);
 
   function showFollowUp(questionKey) {
     followUpContainer.innerHTML = "";
@@ -1505,7 +1500,6 @@ function createBntAdaptiveTest() {
   function updateScore() {
     const score = calculateScore();
     if (score !== null && score !== lastScore) {
-      logInput("bnt_score", score);
       logEvent("kielscn_schlafdauer_bnt_score", { score });
       lastScore = score;
     }
