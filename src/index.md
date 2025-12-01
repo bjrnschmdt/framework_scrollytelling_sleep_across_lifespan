@@ -1320,9 +1320,10 @@ function createBntQuestion({
       submitBtn.querySelector("button").disabled = true;
       feedback.style.display = "block";
       feedback.textContent = isCorrect
-        ? "Richtig!"
-        : `Falsch. Die richtige Antwort ist ${correctAnswer}.`;
+        ? "Gut gemacht!"
+        : `Die richtige Antwort ist ${correctAnswer}.`;
       feedback.className = `bnt-feedback ${isCorrect ? "tip" : "warning"}`;
+      feedback.setAttribute("label", isCorrect ? "Richtig!" : "Falsch.");
       onSubmit(id, numericValue, isCorrect);
       return value + 1;
     },
