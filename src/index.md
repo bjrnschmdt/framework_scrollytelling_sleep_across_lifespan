@@ -1287,6 +1287,7 @@ const visualAestheticsScale = createShuffledSemanticDifferentialScale({
 function createBntQuestion({
   id,
   prompt,
+  label,
   min,
   max,
   step = 1,
@@ -1300,48 +1301,37 @@ function createBntQuestion({
   const question = document.createElement("p");
   question.textContent = prompt;
 
-  const slider = Inputs.range([min, max], { step, value: defaultValue });
-  slider.style.width = "100%";
-  slider.style.marginTop = "8px";
-
-  const valueLabel = document.createElement("div");
-  valueLabel.className = "bnt-answer-value";
-  valueLabel.textContent = `Antwort: ${defaultValue}`;
-
-  const submitBtn = document.createElement("button");
-  submitBtn.type = "button";
-  submitBtn.textContent = "Antwort bestätigen";
-  submitBtn.className = "bnt-submit";
+  const slider = Inputs.range([min, max], { step, value: defaultValue, label });
+  const sliderValue = Generators.input(slider);
 
   const feedback = document.createElement("p");
   feedback.className = "bnt-feedback";
   feedback.style.display = "none";
 
-  slider.addEventListener("input", () => {
-    const numericValue = Number(slider.value);
-    valueLabel.textContent = `Antwort: ${numericValue}`;
+  const submitBtn = Inputs.button("Antwort bestätigen", {
+    value: 0,
+    disabled: false,
+    reduce: (value) => {
+      const numericValue = Number(slider.value);
+      const isCorrect = numericValue === correctAnswer;
+      slider.disabled = true;
+      submitBtn.disabled = true;
+      feedback.style.display = "block";
+      feedback.textContent = isCorrect
+        ? "Richtig!"
+        : `Falsch. Die richtige Antwort ist ${correctAnswer}.`;
+      feedback.className = `bnt-feedback ${isCorrect ? "tip" : "warning"}`;
+      onSubmit(id, numericValue, isCorrect);
+      return value + 1;
+    },
   });
 
-  submitBtn.addEventListener("click", () => {
-    const numericValue = Number(slider.value);
-    const isCorrect = numericValue === correctAnswer;
-    slider.disabled = true;
-    submitBtn.disabled = true;
-    feedback.style.display = "block";
-    feedback.textContent = isCorrect
-      ? "Richtig!"
-      : `Falsch. Die richtige Antwort ist ${correctAnswer}.`;
-    feedback.className = `bnt-feedback ${isCorrect ? "tip" : "warning"}`;
-    onSubmit(id, numericValue, isCorrect);
-  });
-
-  wrapper.append(question, slider, valueLabel, submitBtn, feedback);
+  wrapper.append(question, slider, submitBtn, feedback);
 
   return {
     node: wrapper,
     reset() {
       slider.value = defaultValue;
-      valueLabel.textContent = `Antwort: ${defaultValue}`;
       slider.disabled = false;
       submitBtn.disabled = false;
       feedback.style.display = "none";
@@ -1429,6 +1419,7 @@ function createBntAdaptiveTest() {
       id: "q1",
       prompt:
         "Von 1.000 Leuten in einer Kleinstadt sind 500 Mitglied im Gesangsverein. Von diesen 500 Mitgliedern im Gesangsverein sind 100 Männer. Von den 500 Einwohnern, die nicht im Gesangsverein sind, sind 300 Männer. Wie groß ist die Wahrscheinlichkeit, dass ein zufällig ausgewählter Mann ein Mitglied des Gesangsvereins ist? Bitte geben sie die Wahrscheinlichkeit in Prozent an.",
+      label: "Antwort in Prozent",
       min: 0,
       max: 100,
       step: 1,
@@ -1440,6 +1431,7 @@ function createBntAdaptiveTest() {
       id: "q2a",
       prompt:
         "Stellen Sie sich vor, wir werfen einen fünfseitigen Würfel 50 mal. Bei wie vielen dieser 50 Würfe würde dieser fünfseitige Würfel erwartungsgemäß eine ungerade Zahl zeigen (1, 3 oder 5)?",
+      label: "Anzahl der Würfe",
       min: 0,
       max: 50,
       step: 1,
@@ -1451,6 +1443,7 @@ function createBntAdaptiveTest() {
       id: "q2b",
       prompt:
         "Stellen Sie sich vor, wir werfen einen gezinkten Würfel (6 Seiten). Die Wahrscheinlichkeit, dass der Würfel eine 6 zeigt, ist doppelt so hoch wie die Wahrscheinlichkeit jeder der anderen Zahlen. Von 70 Würfen, bei wie vielen dieser 70 Würfe würde dieser Würfel erwartungsgemäß eine 6 zeigen?",
+      label: "Anzahl der Würfe",
       min: 0,
       max: 70,
       step: 1,
@@ -1462,6 +1455,7 @@ function createBntAdaptiveTest() {
       id: "q3",
       prompt:
         "In einem Wald sind 20% der Pilze rot, 50% braun und 30% weiß. Ein roter Pilz ist mit einer Wahrscheinlichkeit von 20% giftig. Ein Pilz, der nicht rot ist, ist er mit einer Wahrscheinlichkeit von 5% giftig. Wie hoch ist die Wahrscheinlichkeit, dass ein zufällig ausgewählter Pilz giftig ist?",
+      label: "Antwort in Prozent",
       min: 0,
       max: 100,
       step: 1,
@@ -1471,7 +1465,14 @@ function createBntAdaptiveTest() {
     }),
   };
 
-  container.append(title, intro, questions.q1.node, followUpContainer, q3Container, scoreDisplay);
+  container.append(
+    title,
+    intro,
+    questions.q1.node,
+    followUpContainer,
+    q3Container,
+    scoreDisplay
+  );
 
   function showFollowUp(questionKey) {
     followUpContainer.innerHTML = "";
