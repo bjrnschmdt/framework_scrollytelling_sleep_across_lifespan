@@ -502,7 +502,7 @@ const estimateValue = Generators.input(estimateInput);
 
 ```js
 // This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerInput = Inputs.button("Auflösung anzeigen", {
+const answerInput = Inputs.button("Antwort absenden", {
   value: null,
   reduce: (value) => btnEstimate(value),
   disabled: isDisabled,
@@ -2234,7 +2234,6 @@ setupIntersectionObserver({
 ```js
 const btnEstimate = (value) => {
   setDisabled(true);
-  feedbackInput.style.display = "block";
   for (const input of estimateInput.querySelectorAll("input")) {
     input.disabled = true;
   }
@@ -2249,27 +2248,6 @@ const btnEstimate = (value) => {
 ```
 
 <!-- HTML -->
-
-```js
-const feedbackInput = html`<div id="answer" style="display: none;"></div>`;
-const feedbackValue = Generators.input(feedbackInput);
-```
-
-```js
-feedbackInput.innerHTML = ""; // Clear existing content
-
-const trueValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
-const estimated = estimateValue;
-
-const message = document.createElement("p");
-message.textContent =
-  Math.abs(estimated - trueValue) <= 5
-    ? `Super, die richtige Lösung ist ${trueValue}%. Wenn Sie wollen, versuchen Sie es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer.`
-    : `Die richtige Antwort ist ${trueValue}%. Wenn Sie wollen, versuchen Sie es gerne nochmal mit einem anderen Alter oder einer anderen Schlafdauer.`;
-
-feedbackInput.appendChild(message);
-feedbackInput.appendChild(scrollTo); // Append the button as an element
-```
 
 ```js
 // Get the div where the visualization description will be displayed
@@ -2363,7 +2341,7 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <!-- Description Variant -->
 </div>
 <div class="scroll-section card" data-step="7">
-  <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}</p>
+  <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}</p>
 </div>
 <div class="scroll-section card" data-step="8">
 <p>Was würden Sie schätzen, wie viel Prozent der 20-Jährigen schlafen kürzer als Sie?${estimateInputPercentageA}${certaintyPercentageA}${answerPercentageInputA}</p>
