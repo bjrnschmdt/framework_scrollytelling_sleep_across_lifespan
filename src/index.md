@@ -1515,6 +1515,235 @@ const bntAdaptiveTest = createBntAdaptiveTest();
 ```
 
 ```js
+const miniVlatImageUrls = {
+  mv1: await FileAttachment("./data/TreeMap.png").url(),
+  mv2: await FileAttachment("./data/Stacked100.png").url(),
+  mv3: await FileAttachment("./data/Histogram.png").url(),
+  mv4: await FileAttachment("./data/Choropleth.png").url(),
+  mv5: await FileAttachment("./data/PieChart.png").url(),
+  mv6: await FileAttachment("./data/BubbleChart.png").url(),
+  mv7: await FileAttachment("./data/StackedBar.png").url(),
+  mv8: await FileAttachment("./data/LineChart.png").url(),
+  mv9: await FileAttachment("./data/BarChart.png").url(),
+  mv10: await FileAttachment("./data/AreaChart.png").url(),
+  mv11: await FileAttachment("./data/StackedArea.png").url(),
+  mv12: await FileAttachment("./data/Scatterplot.png").url(),
+};
+```
+
+```js
+function createMiniVlatQuiz() {
+  const questions = [
+    {
+      id: "mv1",
+      image: miniVlatImageUrls.mv1,
+      alt: "Treemap, Kategorien Search/Portal, Software, Retail, Social Network, Computer",
+      prompt: "eBay ist in der Kategorie „Software“ eingeordnet.",
+      options: ["Wahr", "Falsch"],
+      correct: "Falsch",
+    },
+    {
+      id: "mv2",
+      image: miniVlatImageUrls.mv2,
+      alt: "Gestapelte Balken mit Anteilen an Gold-, Silber- und Bronzemedaillen für mehrere Länder",
+      prompt: "Welches Land hat den niedrigsten Anteil an Goldmedaillen?",
+      options: ["USA", "Großbritannien", "Japan", "Australien"],
+      correct: "Großbritannien",
+    },
+    {
+      id: "mv3",
+      image: miniVlatImageUrls.mv3,
+      alt: "Histogramm der Fahrstrecke und KundInnen",
+      prompt: "Welche Entfernung sind die Kundinnen und Kunden am meisten gefahren?",
+      options: ["60–70 km", "30–40 km", "20–30 km", "50–60 km"],
+      correct: "30–40 km",
+    },
+    {
+      id: "mv4",
+      image: miniVlatImageUrls.mv4,
+      alt: "Choropleth-Karte USA mit Arbeitslosenquoten 2020",
+      prompt:
+        "Im Jahr 2020 war die Arbeitslosenquote in Washington (WA) höher als in Wisconsin (WI).",
+      options: ["Wahr", "Falsch"],
+      correct: "Wahr",
+    },
+    {
+      id: "mv5",
+      image: miniVlatImageUrls.mv5,
+      alt: "Kreisdiagramm der weltweiten Smartphone-Marktanteile 2021",
+      prompt:
+        "Wie hoch ist ungefähr der weltweite Smartphone-Marktanteil von Samsung?",
+      options: ["17,6 %", "25,3 %", "10,9 %", "35,2 %"],
+      correct: "17,6 %",
+    },
+    {
+      id: "mv6",
+      image: miniVlatImageUrls.mv6,
+      alt: "Blasendiagramm Metro-Systeme mit Länge, Stationen und Fahrgästen",
+      prompt: "Welche Stadt hat die größte Anzahl an U-Bahn-Stationen?",
+      options: ["Peking", "Shanghai", "London", "Seoul"],
+      correct: "Shanghai",
+    },
+    {
+      id: "mv7",
+      image: miniVlatImageUrls.mv7,
+      alt: "Gestapelte Balken zu Zimmerservice-Kosten in Städten",
+      prompt: "Wie viel kosten Erdnüsse in Seoul?",
+      options: ["5,2 $", "6,1 $", "7,5 $", "4,5 $"],
+      correct: "6,1 $",
+    },
+    {
+      id: "mv8",
+      image: miniVlatImageUrls.mv8,
+      alt: "Liniendiagramm Ölpreis 2020 nach Monaten",
+      prompt: "Wie hoch war der Preis für ein Barrel Öl im Februar 2020?",
+      options: ["50,54 $", "47,02 $", "42,34 $", "43,48 $"],
+      correct: "50,54 $",
+    },
+    {
+      id: "mv9",
+      image: miniVlatImageUrls.mv9,
+      alt: "Balkendiagramm Internetgeschwindigkeit 2021 für Länder",
+      prompt: "Wie hoch ist die durchschnittliche Internetgeschwindigkeit in Japan?",
+      options: ["42,30 Mbit/s", "40,51 Mbit/s", "35,25 Mbit/s", "16,16 Mbit/s"],
+      correct: "40,51 Mbit/s",
+    },
+    {
+      id: "mv10",
+      image: miniVlatImageUrls.mv10,
+      alt: "Flächendiagramm Robusta-Kaffeepreise über die Zeit",
+      prompt:
+        "Wie hoch war der durchschnittliche Preis für ein Pfund Kaffee im Oktober 2019?",
+      options: ["0,71 $", "0,90 $", "0,80 $", "0,63 $"],
+      correct: "0,71 $",
+    },
+    {
+      id: "mv11",
+      image: miniVlatImageUrls.mv11,
+      alt: "Gestapeltes Flächendiagramm beliebter Mädchennamen im Vereinigten Königreich",
+      prompt:
+        "Wie war das Verhältnis von Mädchen mit dem Namen „Isla“ zu Mädchen mit dem Namen „Amelia“ im Jahr 2012 im Vereinigten Königreich?",
+      options: ["1 zu 1", "1 zu 2", "1 zu 3", "1 zu 4"],
+      correct: "1 zu 2",
+    },
+    {
+      id: "mv12",
+      image: miniVlatImageUrls.mv12,
+      alt: "Scatterplot Körpergröße und Gewicht von 85 Personen",
+      prompt:
+        "Es besteht ein negativer Zusammenhang zwischen der Körpergröße und dem Gewicht der 85 Männer.",
+      options: ["Wahr", "Falsch"],
+      correct: "Falsch",
+    },
+  ];
+
+  const container = document.createElement("div");
+  container.className = "scroll-section card minivlat";
+
+  const header = document.createElement("div");
+  header.className = "minivlat-header";
+  const intro = document.createElement("div");
+  const introLead = document.createElement("p");
+  introLead.textContent =
+    "Dieser Test misst deine Fähigkeit, Diagramme zu lesen und zu interpretieren.";
+  const introList = document.createElement("ol");
+  [
+    "Der Test besteht aus 12 Fragen.",
+    "Für jede richtige Antwort bekommst du +1 Punkt; für falsche Antworten gibt es keinen Punktabzug.",
+    "Das Quiz dauert etwa 5 Minuten (bis zu 25 Sekunden pro Frage).",
+    "Wenn du dir bei einer Antwort unsicher bist, überspringe die Frage.",
+  ].forEach((text) => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    introList.appendChild(li);
+  });
+  intro.append(introLead, introList);
+  header.append(intro);
+
+  const questionsWrap = document.createElement("div");
+  questionsWrap.className = "minivlat-questions";
+
+  let correctCount = 0;
+  let answeredCount = 0;
+  let completionLogged = false;
+
+  const updateScore = () => {
+    if (answeredCount === questions.length && !completionLogged) {
+      completionLogged = true;
+      logEvent("kielscn_schlafdauer_minivlat_complete", {
+        score: correctCount,
+        total: questions.length,
+      });
+    }
+  };
+
+  questions.forEach((q, i) => {
+    const block = document.createElement("div");
+    block.className = "minivlat-question";
+
+    const qTitle = document.createElement("h3");
+    qTitle.textContent = `Frage ${i + 1}`;
+    const prompt = document.createElement("p");
+    prompt.textContent = q.prompt;
+
+    const img = new Image();
+    img.src = q.image;
+    img.alt = q.alt;
+    img.loading = "lazy";
+
+  const form = document.createElement("div");
+  form.className = "minivlat-options";
+
+    let answered = false;
+
+    q.options.forEach((opt) => {
+      const label = document.createElement("label");
+      label.className = "minivlat-option";
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = q.id;
+      input.value = opt;
+      input.addEventListener("change", () => {
+        if (answered) return;
+        answered = true;
+        answeredCount += 1;
+        const isCorrect = input.value === q.correct;
+        if (isCorrect) correctCount += 1;
+        logEvent("kielscn_schlafdauer_minivlat_answer", {
+          id: q.id,
+          choice: input.value,
+          correct: isCorrect,
+          skipped: false,
+        });
+        for (const el of form.querySelectorAll("input")) {
+          el.disabled = true;
+          if (el.value === input.value) {
+            el.checked = true;
+          }
+        }
+        updateScore();
+      });
+      label.append(input, document.createTextNode(opt));
+      form.appendChild(label);
+    });
+
+    block.append(qTitle, img, prompt, form);
+    questionsWrap.appendChild(block);
+  });
+
+  const divider = document.createElement("div");
+  divider.className = "minivlat-divider";
+
+  container.append(header, divider, questionsWrap);
+  return container;
+}
+```
+
+```js
+const miniVlatTest = createMiniVlatQuiz();
+```
+
+```js
 const shareBtn = Inputs.button("Teilen Sie diesen Artikel", {
   reduce: () => {
     if (navigator.share) {
@@ -2260,6 +2489,7 @@ ${educationInput}
 
 </div>
 ${bntAdaptiveTest}
+${miniVlatTest}
 
 </section>
 
@@ -2357,6 +2587,67 @@ ${bntAdaptiveTest}
 .bnt-answer-value {
   font-size: 0.95rem;
   color: #b8b8b8;
+}
+
+.minivlat {
+  margin: 0 auto 100svh;
+}
+
+.minivlat-header h2 {
+  margin-bottom: 0.25rem;
+}
+
+.minivlat-header p {
+  margin-top: 0;
+  font-size: 0.95rem;
+}
+
+.minivlat-header ol {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.minivlat-divider {
+  height: 1px;
+  background: #333;
+  margin: 1rem 0 1.5rem;
+}
+
+.minivlat-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.minivlat-question img {
+  width: 100%;
+  height: auto;
+  margin: 0.5rem 0;
+  border: 1px solid #333;
+  border-radius: 6px;
+}
+
+.minivlat-question {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #333;
+}
+
+.minivlat-question:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.minivlat-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.minivlat-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
 }
 
 .bnt-submit {
