@@ -604,7 +604,7 @@ const certaintyPercentageC = createSemanticDifferentialInput(
 
 ```js
 // This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerPercentageInputA = Inputs.button("Auflösung anzeigen", {
+const answerPercentageInputA = Inputs.button("Antwort absenden", {
   value: null,
   reduce: (value) => btnEstimatePercentageA(value),
   disabled: isDisabledPercentageA,
@@ -614,7 +614,7 @@ const answerPercentileValueA = Generators.input(answerPercentageInputA);
 
 ```js
 // This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerPercentageInputB = Inputs.button("Auflösung anzeigen", {
+const answerPercentageInputB = Inputs.button("Antwort absenden", {
   value: null,
   reduce: (value) => btnEstimatePercentageB(value),
   disabled: isDisabledPercentageB,
@@ -624,7 +624,7 @@ const answerPercentileValueB = Generators.input(answerPercentageInputB);
 
 ```js
 // This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerPercentageInputC = Inputs.button("Auflösung anzeigen", {
+const answerPercentageInputC = Inputs.button("Antwort absenden", {
   value: null,
   reduce: (value) => btnEstimatePercentageC(value),
   disabled: isDisabledPercentageC,
@@ -650,7 +650,6 @@ const setDisabledPercentageC = (x) => (isDisabledPercentageC.value = x);
 ```js
 const btnEstimatePercentageA = (value) => {
   setDisabledPercentageA(true); // not needed anymore because button stays disabled after first click
-  feedbackInputPercentageA.style.display = "block";
   for (const input of estimateInputPercentageA.querySelectorAll("input")) {
     input.disabled = true;
   }
@@ -668,7 +667,6 @@ const btnEstimatePercentageA = (value) => {
 ```js
 const btnEstimatePercentageB = (value) => {
   setDisabledPercentageB(true); // not needed anymore because button stays disabled after first click
-  feedbackInputPercentageB.style.display = "block";
   for (const input of estimateInputPercentageB.querySelectorAll("input")) {
     input.disabled = true;
   }
@@ -686,7 +684,6 @@ const btnEstimatePercentageB = (value) => {
 ```js
 const btnEstimatePercentageC = (value) => {
   setDisabledPercentageC(true); // not needed anymore because button stays disabled after first click
-  feedbackInputPercentageC.style.display = "block";
   for (const input of estimateInputPercentageC.querySelectorAll("input")) {
     input.disabled = true;
   }
@@ -699,72 +696,6 @@ const btnEstimatePercentageC = (value) => {
   });
   return value + 1;
 };
-```
-
-```js
-const feedbackInputPercentageA = html`<div
-  id="answerPercentileA"
-  style="display: none;"
-></div>`;
-const feedbackValuePercentileA = Generators.input(feedbackInputPercentageA);
-```
-
-```js
-const feedbackInputPercentageB = html`<div
-  id="answerPercentileB"
-  style="display: none;"
-></div>`;
-const feedbackValuePercentileB = Generators.input(feedbackInputPercentageB);
-```
-
-```js
-const feedbackInputPercentageC = html`<div
-  id="answerPercentileC"
-  style="display: none;"
-></div>`;
-const feedbackValuePercentileC = Generators.input(feedbackInputPercentageC);
-```
-
-```js
-feedbackInputPercentageA.innerHTML = ""; // Clear existing content
-d3.select(feedbackInputPercentageA).selectAll("*").remove();
-const estimated = estimateValuePercentageA;
-const answerValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
-const isClose = Math.abs(estimated - answerValue) <= 5;
-
-d3.select(feedbackInputPercentageA)
-  .append("p")
-  .attr("class", isClose ? "tip" : "warning")
-  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
-  .text(`Die richtige Antwort ist ${answerValue}.`);
-```
-
-```js
-feedbackInputPercentageB.innerHTML = ""; // Clear existing content
-d3.select(feedbackInputPercentageB).selectAll("*").remove();
-const estimated = estimateValuePercentageB;
-const answerValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
-const isClose = Math.abs(estimated - answerValue) <= 5;
-
-d3.select(feedbackInputPercentageB)
-  .append("p")
-  .attr("class", isClose ? "tip" : "warning")
-  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
-  .text(`Die richtige Antwort ist ${answerValue}.`);
-```
-
-```js
-feedbackInputPercentageC.innerHTML = ""; // Clear existing content
-d3.select(feedbackInputPercentageC).selectAll("*").remove();
-const estimated = estimateValuePercentageC;
-const answerValue = Math.round(getTrueValue(dataSet, stepProps) * 100);
-const isClose = Math.abs(estimated - answerValue) <= 5;
-
-d3.select(feedbackInputPercentageC)
-  .append("p")
-  .attr("class", isClose ? "tip" : "warning")
-  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
-  .text(`Die richtige Antwort ist ${answerValue}.`);
 ```
 
 <!-- ********************************************************* -->
@@ -837,7 +768,7 @@ const certaintySleepC = createSemanticDifferentialInput(
 
 ```js
 // This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerSleepInputA = Inputs.button("Auflösung anzeigen", {
+const answerSleepInputA = Inputs.button("Antwort absenden", {
   value: null,
   reduce: (value) => btnEstimateSleepA(value),
   disabled: isDisabledSleepA,
@@ -847,7 +778,7 @@ const answerSleepValueA = Generators.input(answerSleepInputA);
 
 ```js
 // This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerSleepInputB = Inputs.button("Auflösung anzeigen", {
+const answerSleepInputB = Inputs.button("Antwort absenden", {
   value: null,
   reduce: (value) => btnEstimateSleepB(value),
   disabled: isDisabledSleepB,
@@ -857,7 +788,7 @@ const answerSleepValueB = Generators.input(answerSleepInputB);
 
 ```js
 // This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerSleepInputC = Inputs.button("Auflösung anzeigen", {
+const answerSleepInputC = Inputs.button("Antwort absenden", {
   value: null,
   reduce: (value) => btnEstimateSleepC(value),
   disabled: isDisabledSleepC,
@@ -883,7 +814,6 @@ const setDisabledSleepC = (x) => (isDisabledSleepC.value = x);
 ```js
 const btnEstimateSleepA = (value) => {
   setDisabledSleepA(true); // not needed anymore because button stays disabled after first click
-  feedbackInputSleepA.style.display = "block";
   for (const input of estimateInputSleepA.querySelectorAll("input")) {
     input.disabled = true;
   }
@@ -901,7 +831,6 @@ const btnEstimateSleepA = (value) => {
 ```js
 const btnEstimateSleepB = (value) => {
   setDisabledSleepB(true); // not needed anymore because button stays disabled after first click
-  feedbackInputSleepB.style.display = "block";
   for (const input of estimateInputSleepB.querySelectorAll("input")) {
     input.disabled = true;
   }
@@ -919,7 +848,6 @@ const btnEstimateSleepB = (value) => {
 ```js
 const btnEstimateSleepC = (value) => {
   setDisabledSleepC(true); // not needed anymore because button stays disabled after first click
-  feedbackInputSleepC.style.display = "block";
   for (const input of estimateInputSleepC.querySelectorAll("input")) {
     input.disabled = true;
   }
@@ -932,96 +860,6 @@ const btnEstimateSleepC = (value) => {
   });
   return value + 1;
 };
-```
-
-```js
-const feedbackInputSleepA = html`<div
-  id="answerPercentileA"
-  style="display: none;"
-></div>`;
-const feedbackValueSleepA = Generators.input(feedbackInputSleepA);
-```
-
-```js
-const feedbackInputSleepB = html`<div
-  id="answerPercentileB"
-  style="display: none;"
-></div>`;
-const feedbackValueSleepB = Generators.input(feedbackInputSleepB);
-```
-
-```js
-const feedbackInputSleepC = html`<div
-  id="answerPercentileC"
-  style="display: none;"
-></div>`;
-const feedbackValueSleepC = Generators.input(feedbackInputSleepC);
-```
-
-```js
-feedbackInputSleepA.innerHTML = ""; // Clear existing content
-d3.select(feedbackInputSleepA).selectAll("*").remove();
-const estimated = Math.round(getTrueValue(dataSet, stepProps) * 100);
-const answerValue = Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100);
-const isClose = Math.abs(estimated - answerValue) <= 5;
-/* console.log(
-  "estimated",
-  estimated,
-  "answerValue",
-  answerValue,
-  " isClose",
-  isClose
-); */
-
-d3.select(feedbackInputSleepA)
-  .append("p")
-  .attr("class", isClose ? "tip" : "warning")
-  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
-  .text(`Die richtige Antwort ist ${estimateSleepAge.A.sleepTime} Stunden.`);
-```
-
-```js
-feedbackInputSleepB.innerHTML = ""; // Clear existing content
-d3.select(feedbackInputSleepB).selectAll("*").remove();
-const estimated = Math.round(getTrueValue(dataSet, stepProps) * 100);
-const answerValue = Math.round(getTrueValue(dataSet, estimateSleepAge.B) * 100);
-const isClose = Math.abs(estimated - answerValue) <= 5;
-/* console.log(
-  "estimated",
-  estimated,
-  "answerValue",
-  answerValue,
-  " isClose",
-  isClose
-); */
-
-d3.select(feedbackInputSleepB)
-  .append("p")
-  .attr("class", isClose ? "tip" : "warning")
-  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
-  .text(`Die richtige Antwort ist ${estimateSleepAge.B.sleepTime} Stunden.`);
-```
-
-```js
-feedbackInputSleepC.innerHTML = ""; // Clear existing content
-d3.select(feedbackInputSleepC).selectAll("*").remove();
-const estimated = Math.round(getTrueValue(dataSet, stepProps) * 100);
-const answerValue = Math.round(getTrueValue(dataSet, estimateSleepAge.C) * 100);
-const isClose = Math.abs(estimated - answerValue) <= 5;
-/* console.log(
-  "estimated",
-  estimated,
-  "answerValue",
-  answerValue,
-  " isClose",
-  isClose
-); */
-
-d3.select(feedbackInputSleepC)
-  .append("p")
-  .attr("class", isClose ? "tip" : "warning")
-  .attr("label", isClose ? "Gut gemacht" : "Fast richtig")
-  .text(`Die richtige Antwort ist ${estimateSleepAge.C.sleepTime} Stunden.`);
 ```
 
 <!-- ********************************************************* -->
@@ -2528,13 +2366,13 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}${feedbackInput}</p>
 </div>
 <div class="scroll-section card" data-step="8">
-<p>Was würden Sie schätzen, wie viel Prozent der 20-Jährigen schlafen kürzer als Sie?${estimateInputPercentageA}${certaintyPercentageA}${answerPercentageInputA}${feedbackInputPercentageA}</p>
+<p>Was würden Sie schätzen, wie viel Prozent der 20-Jährigen schlafen kürzer als Sie?${estimateInputPercentageA}${certaintyPercentageA}${answerPercentageInputA}</p>
 </div>
 <div class="scroll-section card" data-step="9">
-<p>Was würden Sie schätzen, wie viel Prozent der 30-Jährigen schlafen kürzer als Sie?${estimateInputPercentageB}${certaintyPercentageB}${answerPercentageInputB}${feedbackInputPercentageB}</p>
+<p>Was würden Sie schätzen, wie viel Prozent der 30-Jährigen schlafen kürzer als Sie?${estimateInputPercentageB}${certaintyPercentageB}${answerPercentageInputB}</p>
 </div>
 <div class="scroll-section card" data-step="10">
-<p>Was würden Sie schätzen, wie viel Prozent der 40-Jährigen schlafen kürzer als Sie?${estimateInputPercentageC}${certaintyPercentageC}${answerPercentageInputC}${feedbackInputPercentageC}</p>
+<p>Was würden Sie schätzen, wie viel Prozent der 40-Jährigen schlafen kürzer als Sie?${estimateInputPercentageC}${certaintyPercentageC}${answerPercentageInputC}</p>
 </div>
 <div class="scroll-section card" data-step="11">
 
@@ -2547,7 +2385,6 @@ ${estimateInputSleepA}
 
 ${certaintySleepA}
 ${answerSleepInputA}
-${feedbackInputSleepA}
 
 </div>
 <div class="scroll-section card" data-step="12">
@@ -2561,7 +2398,6 @@ ${estimateInputSleepB}
 
 ${certaintySleepB}
 ${answerSleepInputB}
-${feedbackInputSleepB}
 
 </div>
 <div class="scroll-section card" data-step="13">
@@ -2575,7 +2411,6 @@ ${estimateInputSleepC}
 
 ${certaintySleepC}
 ${answerSleepInputC}
-${feedbackInputSleepC}
 
 </div>
 
