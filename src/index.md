@@ -1348,7 +1348,7 @@ function createBntQuestion({
 ```js
 function createBntAdaptiveTest() {
   const container = document.createElement("div");
-  container.className = "scroll-section card bnt-container";
+  container.className = "card bnt-container";
 
   const followUpContainer = document.createElement("div");
   followUpContainer.className = "bnt-follow-up";
@@ -1554,7 +1554,8 @@ function createMiniVlatQuiz() {
       id: "mv3",
       image: miniVlatImageUrls.mv3,
       alt: "Histogramm der Fahrstrecke und KundInnen",
-      prompt: "Welche Entfernung sind die Kundinnen und Kunden am meisten gefahren?",
+      prompt:
+        "Welche Entfernung sind die Kundinnen und Kunden am meisten gefahren?",
       options: ["60–70 km", "30–40 km", "20–30 km", "50–60 km"],
       correct: "30–40 km",
     },
@@ -1604,7 +1605,8 @@ function createMiniVlatQuiz() {
       id: "mv9",
       image: miniVlatImageUrls.mv9,
       alt: "Balkendiagramm Internetgeschwindigkeit 2021 für Länder",
-      prompt: "Wie hoch ist die durchschnittliche Internetgeschwindigkeit in Japan?",
+      prompt:
+        "Wie hoch ist die durchschnittliche Internetgeschwindigkeit in Japan?",
       options: ["42,30 Mbit/s", "40,51 Mbit/s", "35,25 Mbit/s", "16,16 Mbit/s"],
       correct: "40,51 Mbit/s",
     },
@@ -1638,7 +1640,7 @@ function createMiniVlatQuiz() {
   ];
 
   const container = document.createElement("div");
-  container.className = "scroll-section card minivlat";
+  container.className = "card minivlat";
 
   const header = document.createElement("div");
   header.className = "minivlat-header";
@@ -1691,8 +1693,8 @@ function createMiniVlatQuiz() {
     img.alt = q.alt;
     img.loading = "lazy";
 
-  const form = document.createElement("div");
-  form.className = "minivlat-options";
+    const form = document.createElement("div");
+    form.className = "minivlat-options";
 
     let answered = false;
 
@@ -2455,7 +2457,8 @@ ${feedbackInputSleepC}
 
 </div>
 
-<div class="scroll-section card" data-step="14">
+</section>
+<div class="bnt-container card" data-step="14">
 
 ## **Wie haben Sie den Artikel erlebt?**
 
@@ -2490,17 +2493,14 @@ ${educationInput}
 </div>
 ${bntAdaptiveTest}
 ${miniVlatTest}
-
-</section>
-
-<div class="outro card">
+<!-- <div class="outro card">
   <h2>Hinter den Daten</h2>
   <p>Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen. Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig. Dieses Phänomen ist nur eins von vielen, mit denen sich die Schlafforschung befasst. Auf unseren Themenseiten finden Sie zahlreiche Artikel zu den Themen <a href="https://www.spektrum.de/thema/schlaf/1295691">Schlaf</a> und <a href="https://www.spektrum.de/thema/traeumen/1356995">Träumen</a>.</p>
   <p>Methodischer Hintergrund: Die Basis für die Grafik sind die Daten <a href="https://www.nature.com/articles/s41562-020-00965-x">dieser</a> Metaanalyse von Kocevska et al. Eine Metaanalyse fügt die Ergebnisse von vielen einzelnen Studien zusammen und gewinnt dadurch an Aussagekraft. Aus den statistischen Kennwerten haben wir eine realistische Verteilung nachgebildet und daraus die Perzentile berechnet.</p>
   <p>Die Grafik wurde erstellt vom Kiel Science Communication Network (KielSCN).</p>
   <p>Texte: Stephan Reiche/KielSCN, Anna von Hopffgarten/Spektrum der Wissenschaft und Carolin Wagener/Spektrum der Wissenschaft</br>Grafikdesign und Umsetzung: Björn Döge/KielSCN</p>
   ${shareBtn} 
-</div>
+</div> -->
 
 <!-- CSS -->
 
@@ -2571,7 +2571,7 @@ ${miniVlatTest}
 }
 
 .bnt-container {
-  margin: 0 auto 100svh;
+  margin: 10svh auto 20svh;
 }
 
 .bnt-follow-up {
@@ -2590,7 +2590,9 @@ ${miniVlatTest}
 }
 
 .minivlat {
-  margin: 0 auto 100svh;
+  margin: 10svh auto 20svh;
+  position: relative;
+  z-index: 4;
 }
 
 .minivlat-header h2 {
