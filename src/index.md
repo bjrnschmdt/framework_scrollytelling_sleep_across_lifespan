@@ -1742,7 +1742,130 @@ function createMiniVlatQuiz() {
 ```
 
 ```js
+function createFollowupQuestionsCard() {
+  const questions = [
+    {
+      id: "delayed_recognition",
+      question:
+        "Kannten Sie den Artikel doch und es ist Ihnen erst später aufgefallen?",
+      options: ["Ja", "Nein"],
+    },
+    {
+      id: "data_use_honesty",
+      question:
+        "Seien Sie bitte ehrlich: Sollten wir Ihre Angaben in diesem Fragebogen für unsere Analysen verwenden?",
+      options: ["Ja", "Nein"],
+    },
+    {
+      id: "carefulness",
+      question: "Wie sorgfältig haben Sie diese Studie bearbeitet?",
+      options: [
+        "Gar nicht sorgfältig",
+        "wenig sorgfältig",
+        "eher sorgfältig",
+        "sehr sorgfältig",
+      ],
+    },
+  ];
+
+  const container = document.createElement("div");
+  container.className = "card followup-card";
+
+  const heading = document.createElement("h2");
+  heading.textContent = "Noch ein paar Fragen";
+
+  const intro = document.createElement("p");
+  intro.textContent =
+    "Bitte beantworten Sie die folgenden Fragen. Ihre Antworten helfen uns, die Studie besser auszuwerten.";
+
+  const questionsWrap = document.createElement("div");
+  questionsWrap.className = "followup-questions";
+
+  const answered = new Set();
+  let completionLogged = false;
+
+  const checkCompletion = () => {
+    if (!completionLogged && answered.size === questions.length) {
+      completionLogged = true;
+      logEvent("kielscn_schlafdauer_followup_complete", {
+        answered: Array.from(answered),
+      });
+    }
+  };
+
+  questions.forEach((q) => {
+    const block = document.createElement("div");
+    block.className = "followup-question";
+
+    const prompt = document.createElement("p");
+    prompt.textContent = q.question;
+
+    const optionsWrap = document.createElement("div");
+    optionsWrap.className = "followup-options";
+
+    q.options.forEach((opt) => {
+      const label = document.createElement("label");
+      label.className = "followup-option";
+
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = `followup_${q.id}`;
+      input.value = opt;
+
+      input.addEventListener("change", () => {
+        answered.add(q.id);
+        logInput(`followup_${q.id}`, opt);
+        logEvent("kielscn_schlafdauer_followup_answer", {
+          id: q.id,
+          choice: opt,
+        });
+        checkCompletion();
+      });
+
+      label.append(input, document.createTextNode(opt));
+      optionsWrap.appendChild(label);
+    });
+
+    block.append(prompt, optionsWrap);
+    questionsWrap.appendChild(block);
+  });
+
+  const feedbackWrap = document.createElement("div");
+  feedbackWrap.className = "followup-feedback";
+
+  const feedbackLabel = document.createElement("p");
+  feedbackLabel.textContent =
+    "Vielen Dank für Ihre Teilnahme! Möchten Sie uns noch etwas mitteilen?";
+
+  const feedbackInput = document.createElement("textarea");
+  feedbackInput.rows = 3;
+  feedbackInput.placeholder = "Ihre Nachricht (optional)";
+
+  const submit = document.createElement("button");
+  submit.type = "button";
+  submit.className = "followup-submit";
+  submit.textContent = "Antwort senden";
+
+  submit.addEventListener("click", () => {
+    const text = feedbackInput.value.trim();
+    logInput("followup_feedback", text);
+    logEvent("kielscn_schlafdauer_followup_feedback_submitted", {
+      hasText: text.length > 0,
+    });
+    feedbackInput.disabled = true;
+    submit.disabled = true;
+  });
+
+  feedbackWrap.append(feedbackLabel, feedbackInput, submit);
+
+  container.append(heading, intro, questionsWrap, feedbackWrap);
+  return container;
+}
+```
+
+```js
 const miniVlatTest = createMiniVlatQuiz();
+const followupQuestionsCard = createFollowupQuestionsCard();
 ```
 
 ```js
@@ -2493,6 +2616,7 @@ ${educationInput}
 </div>
 ${bntAdaptiveTest}
 ${miniVlatTest}
+${followupQuestionsCard}
 <!-- <div class="outro card">
   <h2>Hinter den Daten</h2>
   <p>Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen. Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig. Dieses Phänomen ist nur eins von vielen, mit denen sich die Schlafforschung befasst. Auf unseren Themenseiten finden Sie zahlreiche Artikel zu den Themen <a href="https://www.spektrum.de/thema/schlaf/1295691">Schlaf</a> und <a href="https://www.spektrum.de/thema/traeumen/1356995">Träumen</a>.</p>
@@ -2659,6 +2783,73 @@ ${miniVlatTest}
 .bnt-score {
   font-weight: 600;
   margin-top: 1rem;
+}
+
+.followup-card {
+  margin: 10svh auto 20svh;
+}
+
+.followup-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.followup-question {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.followup-question:last-child {
+  border-bottom: none;
+  padding-bottom: 0.5rem;
+}
+
+.followup-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.followup-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+}
+
+.followup-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.followup-feedback textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.65rem;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #0e0e0e;
+  color: #eee;
+  resize: vertical;
+}
+
+.followup-submit {
+  align-self: flex-start;
+  padding: 0.55rem 1.25rem;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+}
+
+.followup-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 </style>
