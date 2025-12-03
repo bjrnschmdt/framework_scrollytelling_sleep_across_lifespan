@@ -1,0 +1,210 @@
+import { settings } from "./settings.js";
+import * as Plot from "npm:@observablehq/plot";
+import { format } from "npm:d3-format";
+import { interpolateLab } from "npm:d3-interpolate";
+import {
+  toTurtle,
+  resolveCssColor,
+  pickNthByGroup,
+  pickForwardWindowByGroup,
+  createAnimatedPlot,
+} from "./helperFunctions.js";
+
+const { colors, personPath, hopCount, hopDuration } = settings;
+
+const themeBackgroundAlt = resolveCssColor("--theme-background-alt");
+console.log("themeBackgroundAlt:", themeBackgroundAlt);
+const themeForeground = resolveCssColor("--theme-foreground");
+
+// Person symbol for plots
+const personSymbol = toTurtle(personPath, {
+  scaleFn: (area) => Math.sqrt(area) / 20,
+});
+
+// Common plot config helpers
+const defaultY = (yDomain) => ({
+  domain: yDomain,
+  grid: true,
+  label: "Schlafdauer (Stunden)",
+});
+
+const sexLabels = { Female: "weiblich", Male: "männlich" };
+const formatSex = (value) => sexLabels[value] ?? value;
+
+const defaultFx = { label: null, tickFormat: formatSex };
+
+function dotPlot(
+  data,
+  { width = 600, height = 400, yDomain, xMax = 10, qradius = 3 } = {}
+) {
+  // ...existing code...
+  return Plot.plot({
+    height,
+    width,
+    y: defaultY(yDomain),
+    x: { domain: [-0.5, xMax - 0.5], axis: null },
+    fx: defaultFx,
+    marks: [
+      Plot.dotY(
+        data,
+        Plot.stackX({
+          offset: "center",
+          fx: "group",
+          y: "x",
+          r: qradius,
+          stroke: "none",
+          fill: themeForeground,
+          symbol: { draw: personSymbol },
+        })
+      ),
+    ],
+  });
+}
+
+function hopPlot(
+  data,
+  {
+    width = 600,
+    height = 400,
+    yDomain,
+    qradius = 3,
+    animate = false,
+    duration = hopDuration,
+    frameIndex = 0,
+  } = {}
+) {
+  const renderFrame = (index) =>
+    Plot.plot({
+      width,
+      height,
+      y: defaultY(yDomain),
+      fx: defaultFx,
+      marks: [
+        Plot.dotY(animate ? pickNthByGroup(data, index) : data, {
+          fx: "group",
+          y: "q",
+          r: qradius,
+          stroke: "none",
+          fill: themeForeground,
+          symbol: { draw: personSymbol },
+        }),
+      ],
+    });
+
+  return animate
+    ? createAnimatedPlot({ duration, renderFrame, fixedHeight: height })
+    : renderFrame(frameIndex);
+}
+
+function hopTracedPlot(
+  data,
+  {
+    width = 600,
+    height = 400,
+    yDomain,
+    qradius = 3,
+    animate = false,
+    duration = hopDuration,
+    frameIndex = 0,
+    window = hopCount,
+  } = {}
+) {
+  const renderFrame = (index) =>
+    Plot.plot({
+      width,
+      height,
+      y: defaultY(yDomain),
+      fx: defaultFx,
+      color: {
+        range: [themeBackgroundAlt, themeForeground],
+      },
+      marks: [
+        Plot.dotY(
+          animate ? pickForwardWindowByGroup(data, index, window) : data,
+          {
+            fx: "group",
+            y: "q",
+            r: qradius,
+            stroke: "none",
+            fill: (d) => (1 / hopCount) * (d.order ?? 0),
+            symbol: { draw: personSymbol },
+          }
+        ),
+      ],
+    });
+
+  return animate
+    ? createAnimatedPlot({ duration, renderFrame, fixedHeight: height })
+    : renderFrame(frameIndex);
+}
+
+function percentilePlot(data, { width = 600, height = 400, yDomain } = {}) {
+  // ...existing code...
+  return Plot.plot({
+    width,
+    height,
+    x: { axis: null },
+    y: defaultY(yDomain),
+    fx: defaultFx,
+    marks: [
+      Plot.dotY(data, {
+        fx: "group",
+        x: 0,
+        y: "q",
+        fill: colors.wmv,
+      }),
+      Plot.textY(data, {
+        fx: "group",
+        x: 0,
+        y: "q",
+        dx: 20,
+        text: (d) => format(".0%")(d.p),
+      }),
+    ],
+  });
+}
+
+function boxPlot(data, { width = 600, height = 400, yDomain } = {}) {
+  // ...existing code...
+  return Plot.plot({
+    width,
+    height,
+    x: { axis: null },
+    y: defaultY(yDomain),
+    fx: defaultFx,
+    marks: [
+      Plot.ruleX(data, {
+        fx: "group",
+        x: 0,
+        y1: "whisker_low",
+        y2: "q1",
+        stroke: colors.wmv,
+        marker: "tick",
+      }),
+      Plot.ruleX(data, {
+        fx: "group",
+        x: 0,
+        y1: "q3",
+        y2: "whisker_high",
+        stroke: colors.wmv,
+        marker: "tick",
+      }),
+      Plot.barY(data, {
+        fx: "group",
+        x: 0,
+        y1: "q1",
+        y2: "q3",
+        fill: interpolateLab(themeBackgroundAlt, themeForeground)(0.2),
+        stroke: themeForeground,
+      }),
+      Plot.tickY(data, {
+        fx: "group",
+        x: 0,
+        y: "median",
+        stroke: colors.wmv,
+      }),
+    ],
+  });
+}
+// Export all plot functions as named exports
+export { dotPlot, hopPlot, hopTracedPlot, percentilePlot, boxPlot };

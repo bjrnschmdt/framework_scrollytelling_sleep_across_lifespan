@@ -61,6 +61,8 @@ const fontFamily = "Open Sans";
 const fontSize = "13px";
 const iconPath =
   "M400-80v-280h-80v-240q0-33 23.5-56.5T400-680h160q33 0 56.5 23.5T640-600v240h-80v280H400Zm80-640q-33 0-56.5-23.5T400-800q0-33 23.5-56.5T480-880q33 0 56.5 23.5T560-800q0 33-23.5 56.5T480-720Z";
+const personPath =
+  "M 0 -9.5 A 2.4 2.5 0 0 0 -2.4 -7 A 2.4 2.5 0 0 0 0 -4.5 A 2.4 2.5 0 0 0 2.4 -7 A 2.4 2.5 0 0 0 0 -9.5 z M -2.8 -4.2 C -3.7 -4.2 -4.3 -3.6 -4.3 -2.7 L -4.3 1.8 C -4.3 2.6 -3.7 3.3 -2.8 3.3 L -2.8 3.3 L -2.8 8.7 C -2.8 9.2 -2.4 9.6 -1.9 9.6 L 1.9 9.6 C 2.4 9.6 2.8 9.2 2.8 8.7 L 2.8 3.3 L 2.8 3.3 C 3.7 3.3 4.3 2.6 4.3 1.8 L 4.3 -2.7 C 4.3 -3.6 3.7 -4.2 2.8 -4.2 L -2.8 -4.2 Z";
 
 const qstep = 540 / 20 / 60;
 
@@ -104,6 +106,7 @@ export const settings = {
   fontSize,
   lineWidths,
   iconPath,
+  personPath,
   colors,
   startTime,
   endTime,
@@ -111,4 +114,6 @@ export const settings = {
   hopCount: 5,
   hopDuration: 400,
   estimateSleepAge,
+  qstepComp: 0.25,
+  qheightComp: 400,
 };

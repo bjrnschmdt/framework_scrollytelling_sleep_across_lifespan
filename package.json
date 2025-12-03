@@ -13,7 +13,8 @@
     "d3-dsv": "^3.0.1",
     "d3-interpolate-path": "^2.3.0",
     "d3-time-format": "^4.1.0",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "path-data": "^0.0.2"
   },
   "devDependencies": {
     "rimraf": "^5.0.5"

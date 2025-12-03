@@ -17,6 +17,7 @@ import {
 } from "./components/helperFunctions.js";
 import isMobile from "./components/isMobile.js";
 import { dataSet, simulatedData } from "./components/data.js";
+import { generateDistributions } from "./components/generateGroupComparisons.js";
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
 import {
@@ -57,6 +58,13 @@ import {
   logBtnEstimateSleepB,
   logBtnEstimateSleepC,
 } from "./components/logger.js";
+import {
+  dotPlot,
+  hopPlot,
+  hopTracedPlot,
+  percentilePlot,
+  boxPlot,
+} from "./components/plotComparison.js";
 ```
 
 <!-- ```js
@@ -90,6 +98,8 @@ const {
   hopCount,
   hopDuration,
   estimateSleepAge,
+  qstepComp,
+  qheightComp,
 } = settings;
 ```
 
@@ -2314,6 +2324,93 @@ function appendStepContent(step) {
 [4].forEach(appendStepContent);
 ```
 
+```js
+const comparisons = {
+  comparisonA: { muGroupA: 7, sigmaGroupA: 0.5, muGroupB: 6, sigmaGroupB: 0.4 },
+  comparisonB: {
+    muGroupA: 7.5,
+    sigmaGroupA: 0.45,
+    muGroupB: 5.5,
+    sigmaGroupB: 0.5,
+  },
+};
+```
+
+```js
+const plotData = generateDistributions(comparisons);
+```
+
+<!-- Hop Data -->
+
+```js
+const hopDomain = d3.extent(plotData.comparisonA.hop, (d) => d.q);
+```
+
+<!-- Quantile Dot Plot Data -->
+
+```js
+const qradius = (0.5 * qheightComp * qstepComp) / (qdomain[1] - qdomain[0]);
+```
+
+```js
+const qdomain = d3.extent(plotData.comparisonA.quantileDot, (d) => d.x);
+```
+
+```js
+const qxmax = d3.least(
+  d3.rollups(
+    plotData.comparisonA.quantileDot.map((d) => d.x),
+    (v) => v.length,
+    (d) => d
+  ),
+  ([, length]) => -length
+)[1];
+```
+
+```js
+const plots = {
+  dot: (width) =>
+    dotPlot(plotData.comparisonA.quantileDot, {
+      width,
+      height: qheightComp,
+      yDomain: qdomain,
+      xMax: qxmax,
+      qradius,
+    }),
+  hop: (width) =>
+    hopPlot(plotData.comparisonA.hop, {
+      width,
+      height: qheightComp,
+      yDomain: hopDomain,
+      qradius,
+      animate: true,
+      duration: hopDuration,
+    }),
+  hop_traced: (width) =>
+    hopTracedPlot(plotData.comparisonA.hop, {
+      width,
+      height: qheightComp,
+      yDomain: hopDomain,
+      qradius,
+      animate: true,
+      duration: hopDuration,
+      window: hopCount,
+    }),
+  percentile: (width) =>
+    percentilePlot(plotData.comparisonA.percentile, {
+      width,
+      height: qheightComp,
+      yDomain: hopDomain,
+    }),
+  box: (width) =>
+    boxPlot(plotData.comparisonA.box, {
+      width,
+      height: qheightComp,
+      /* yDomain: hopDomain, */
+    }),
+};
+```
+
 # So viel schlafen andere in Ihrem Alter
 
 Finden Sie es mit unserer interaktiven Grafik heraus! Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so lange schlafen wie Sie? Und wie sieht es mit der Schlafdauer in der Gesamtbevölkerung aus?
@@ -2391,9 +2488,16 @@ ${certaintySleepC}
 ${answerSleepInputC}
 
 </div>
+<div class="scroll-section card" data-step="14">
+Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
+
+${(variant === "all" ? Object.keys(plots) : [variant])
+.map(k => resize((width) => plots[k](width)))}
+
+</div>
 
 </section>
-<div class="bnt-container card" data-step="14">
+<div class="bnt-container card">
 
 ## **Wie haben Sie den Artikel erlebt?**
 

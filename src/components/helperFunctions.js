@@ -2,6 +2,9 @@ import * as d3 from "npm:d3";
 import { precalculateHeights, calculateCX } from "./plotDot.js";
 import { settings } from "./settings.js";
 import { ScrollInteraction } from "./scrollInteraction.js";
+import { parse } from "npm:path-data";
+import { color as d3color } from "npm:d3-color";
+import { interpolateRgb } from "npm:d3-interpolate";
 
 const { ageMin, ageMax } = settings;
 
@@ -249,12 +252,234 @@ export function roundToStep(value, step) {
   return Math.round(value / step) * step;
 }
 
+export function toTurtle(svgPath, options = {}) {
+  const { scaleFn = (area) => Math.sqrt(area) / 16 } = options;
+  const type = { M: "moveTo", L: "lineTo", C: "bezierCurveTo", Z: "closePath" };
+  const segs = parse(svgPath, { normalize: true });
+  const cmds = segs.map(
+    (s) => (ctx, len) => ctx[type[s.type]](...s.values.map((d) => d * len))
+  );
+  return (ctx, area) => cmds.forEach((fn) => fn(ctx, scaleFn(area)));
+}
+
+/**
+ * Resolves a CSS color string to a hex value.
+ * If already hex, returns as-is. If color-mix(), parses and mixes.
+ * @param {string} colorStr - CSS color string (hex, rgb, color-mix, etc)
+ * @returns {string} Hex color string (e.g. #e9e7e5)
+ */
+export function resolveCssColor(colorStr) {
+  const hexRegex = /^#([0-9a-fA-F]{3,8})$/;
+  const input = (colorStr ?? "").trim();
+  if (hexRegex.test(input)) {
+    return input;
+  }
+  const cssVar = getCssVar(colorStr);
+  const resolved = cssVar || input;
+  if (hexRegex.test(resolved)) {
+    return resolved;
+  }
+  if (resolved.trim().startsWith("color-mix(")) {
+    try {
+      return colorMixToHex(resolved);
+    } catch (e) {
+      // fallback: return original string if parsing fails
+      return resolved;
+    }
+  }
+  // Optionally, handle rgb()/rgba() or named colors here if needed
+  return resolved;
+}
+
+export function colorMixToHex(input) {
+  const m = input.match(
+    /^color-mix\(\s*in\s+([a-z-]+)\s*,\s*(.*?)\s*,\s*(.*?)\s*\)$/i
+  );
+  if (!m) throw new Error("Invalid color-mix() string");
+  const space = m[1].toLowerCase();
+  if (space !== "srgb")
+    throw new Error('Only "in srgb" supported with d3-interpolate');
+
+  const [c1tok, c2tok] = splitTopLevelByComma(m[2] + "," + m[3]); // ensure exactly 2 tokens
+  console.log("colorMixToHex:", { input, c1tok, c2tok });
+  const { color: c1, pct: p1 } = parseColorToken(c1tok);
+  console.log("colorMixToHex parsed c1:", { c1, p1 });
+  const { color: c2, pct: p2 } = parseColorToken(c2tok);
+  console.log("colorMixToHex parsed c2:", { c2, p2 });
+
+  // Resolve weights per CSS Color Module Level 5 rules
+  let w1, w2;
+  if (p1 == null && p2 == null) {
+    w1 = 50;
+    w2 = 50;
+  } else if (p1 != null && p2 == null) {
+    w1 = p1;
+    w2 = 100 - p1;
+  } else if (p1 == null && p2 != null) {
+    w1 = 100 - p2;
+    w2 = p2;
+  } else {
+    w1 = p1;
+    w2 = p2;
+  }
+
+  const t = w2 / (w1 + w2); // 0 → c1, 1 → c2
+  const mix = interpolateRgb(c1, c2); // sRGB interpolation
+  const rgb = mix(t);
+  const hex = d3color(rgb)?.formatHex();
+  console.log("colorMixToHex:", { input, c1, c2, w1, w2, t, rgb, hex });
+  if (!hex) throw new Error("Failed to compute color");
+  return hex; // e.g. "#e9e7e5"
+}
+
+/**
+ * @param {Object[]} rows  tidy rows
+ * @param {number} index   0 = first per group, 1 = second, ...
+ * @param {Object} [opts]
+ * @param {string} [opts.metricKey='metric']
+ * @param {string} [opts.sexKey='sex']
+ * @param {(a:Object,b:Object)=>number} [opts.comparator] // optional sort inside groups
+ * @returns {Object[]} one row per (metric,sex)
+ */
+export function pickNthByGroup(rows, index, opts = {}) {
+  const { groupKey = "group", comparator } = opts;
+  // group by group
+  const groups = new Map();
+  for (const r of rows) {
+    const k = `${r[groupKey]}`;
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(r);
+  }
+  // optionally sort within groups, then take N-th
+  const out = [];
+  for (const arr of groups.values()) {
+    if (comparator) arr.sort(comparator);
+    const m = arr.length;
+    if (m === 0) continue;
+    const idx = ((index % m) + m) % m; // safe modulo for negatives
+    const row = arr[idx];
+    if (row) out.push(row);
+  }
+  return out;
+}
+
+/**
+ * Forward window per (metric,sex): i, i+1, ..., i+(n-1), wrapping within group.
+ * Adds order: 0 = start, 1 = next, ...
+ *
+ * @param {Object[]} rows
+ * @param {number} i
+ * @param {number} n
+ * @param {Object} [opts]
+ * @param {string} [opts.metricKey='metric']
+ * @param {string} [opts.sexKey='sex']
+ * @param {(a:Object,b:Object)=>number} [opts.comparator]
+ * @returns {Object[]} n rows per group with .order
+ */
+export function pickForwardWindowByGroup(rows, i, n, opts = {}) {
+  const { groupKey = "group", comparator } = opts;
+  const mod = (x, m) => ((x % m) + m) % m;
+  // group by group
+  const groups = new Map();
+  for (const r of rows) {
+    const k = `${r[groupKey]}`;
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(r);
+  }
+  const out = [];
+  for (const arr0 of groups.values()) {
+    const arr = comparator ? [...arr0].sort(comparator) : arr0;
+    const m = arr.length;
+    if (!m) continue;
+    const start = mod(i, m);
+    for (let k = 0; k < n; k++) {
+      const idx = mod(start + k, m);
+      out.push({ ...arr[idx], order: k });
+    }
+  }
+  return out;
+}
+
+export function createAnimatedPlot({
+  duration = settings.hopDuration,
+  renderFrame,
+  initialFrame = 0,
+  fixedHeight,
+}) {
+  const container = document.createElement("div");
+  container.style.position = "relative";
+  container.style.width = "100%";
+  if (fixedHeight != null) {
+    container.style.minHeight = `${fixedHeight}px`;
+  }
+  let frameIndex = initialFrame;
+  let disposed = false;
+
+  const draw = () => {
+    if (disposed) return;
+    const frame = renderFrame(frameIndex);
+    if (frame) {
+      container.replaceChildren(frame);
+    }
+  };
+
+  draw();
+
+  const timer = setInterval(() => {
+    frameIndex += 1;
+    draw();
+  }, duration);
+
+  container[Symbol.dispose] = () => {
+    disposed = true;
+    clearInterval(timer);
+  };
+
+  return container;
+}
+
+function parseColorToken(token) {
+  // "<color> <percent>?" → { color, pct|null }
+  console.log("parseColorToken:", token);
+  const m = token.trim().match(/^(.+?)(?:\s+([0-9]*\.?[0-9]+)\s*%)?$/);
+  console.log("parseColorToken match:", m);
+  if (!m) throw new Error("Bad color token: " + token);
+  const color = m[1].trim();
+  console.log("parseColorToken color:", color);
+  const pct = m[2] != null ? parseFloat(m[2]) : null;
+  console.log("parseColorToken pct:", pct);
+  return { color, pct };
+}
+
+function splitTopLevelByComma(s) {
+  // splits into exactly two parts at the top-level comma
+  let depth = 0,
+    idx = -1;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (ch === "(") depth++;
+    else if (ch === ")") depth = Math.max(0, depth - 1);
+    else if (ch === "," && depth === 0) {
+      idx = i;
+      break;
+    }
+  }
+  if (idx === -1) throw new Error("Expected two comma-separated color tokens");
+  const a = s.slice(0, idx).trim();
+  const b = s.slice(idx + 1).trim();
+  return [a, b];
+}
+
+// Utility to get CSS variable value
+export const getCssVar = (name) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 const DEBUG = {
   general: false,
   scroll: false,
   update: false,
   inputs: false,
-  analytics: true,
+  analytics: false,
   ScrollInteraction: false,
 };
 
