@@ -301,11 +301,8 @@ export function colorMixToHex(input) {
     throw new Error('Only "in srgb" supported with d3-interpolate');
 
   const [c1tok, c2tok] = splitTopLevelByComma(m[2] + "," + m[3]); // ensure exactly 2 tokens
-  console.log("colorMixToHex:", { input, c1tok, c2tok });
   const { color: c1, pct: p1 } = parseColorToken(c1tok);
-  console.log("colorMixToHex parsed c1:", { c1, p1 });
   const { color: c2, pct: p2 } = parseColorToken(c2tok);
-  console.log("colorMixToHex parsed c2:", { c2, p2 });
 
   // Resolve weights per CSS Color Module Level 5 rules
   let w1, w2;
@@ -327,7 +324,6 @@ export function colorMixToHex(input) {
   const mix = interpolateRgb(c1, c2); // sRGB interpolation
   const rgb = mix(t);
   const hex = d3color(rgb)?.formatHex();
-  console.log("colorMixToHex:", { input, c1, c2, w1, w2, t, rgb, hex });
   if (!hex) throw new Error("Failed to compute color");
   return hex; // e.g. "#e9e7e5"
 }
@@ -440,14 +436,10 @@ export function createAnimatedPlot({
 
 function parseColorToken(token) {
   // "<color> <percent>?" → { color, pct|null }
-  console.log("parseColorToken:", token);
   const m = token.trim().match(/^(.+?)(?:\s+([0-9]*\.?[0-9]+)\s*%)?$/);
-  console.log("parseColorToken match:", m);
   if (!m) throw new Error("Bad color token: " + token);
   const color = m[1].trim();
-  console.log("parseColorToken color:", color);
   const pct = m[2] != null ? parseFloat(m[2]) : null;
-  console.log("parseColorToken pct:", pct);
   return { color, pct };
 }
 

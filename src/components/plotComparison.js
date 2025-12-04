@@ -13,7 +13,6 @@ import {
 const { colors, personPath, hopCount, hopDuration } = settings;
 
 const themeBackgroundAlt = resolveCssColor("--theme-background-alt");
-console.log("themeBackgroundAlt:", themeBackgroundAlt);
 const themeForeground = resolveCssColor("--theme-foreground");
 
 // Person symbol for plots
