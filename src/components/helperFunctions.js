@@ -396,44 +396,6 @@ export function pickForwardWindowByGroup(rows, i, n, opts = {}) {
   return out;
 }
 
-export function createAnimatedPlot({
-  duration = settings.hopDuration,
-  renderFrame,
-  initialFrame = 0,
-  fixedHeight,
-}) {
-  const container = document.createElement("div");
-  container.style.position = "relative";
-  container.style.width = "100%";
-  if (fixedHeight != null) {
-    container.style.minHeight = `${fixedHeight}px`;
-  }
-  let frameIndex = initialFrame;
-  let disposed = false;
-
-  const draw = () => {
-    if (disposed) return;
-    const frame = renderFrame(frameIndex);
-    if (frame) {
-      container.replaceChildren(frame);
-    }
-  };
-
-  draw();
-
-  const timer = setInterval(() => {
-    frameIndex += 1;
-    draw();
-  }, duration);
-
-  container[Symbol.dispose] = () => {
-    disposed = true;
-    clearInterval(timer);
-  };
-
-  return container;
-}
-
 function parseColorToken(token) {
   // "<color> <percent>?" → { color, pct|null }
   const m = token.trim().match(/^(.+?)(?:\s+([0-9]*\.?[0-9]+)\s*%)?$/);
@@ -466,16 +428,50 @@ function splitTopLevelByComma(s) {
 export const getCssVar = (name) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-const DEBUG = {
-  general: false,
-  scroll: false,
-  update: false,
-  inputs: false,
-  analytics: false,
-  ScrollInteraction: false,
-};
+export function cumulativeSuccessAtIndex(hopA, hopB, i, tie = "split") {
+  const n = Math.min(hopA.length, hopB.length);
+  if (n === 0)
+    return { aWins: 0, bWins: 0, comparisons: 0, aSuccess: 0, bSuccess: 0 };
+
+  let aWins = 0,
+    bWins = 0;
+  const comparisons = i + 1;
+
+  for (let k = 0; k < comparisons; k++) {
+    const idx = k % n; // wrap around
+    const av = hopA[idx].value,
+      bv = hopB[idx].value;
+
+    if (av > bv) aWins++;
+    else if (bv > av) bWins++;
+    else {
+      if (tie === "split") {
+        aWins += 0.5;
+        bWins += 0.5;
+      } else if (tie === "favorA") aWins++;
+      else if (tie === "favorB") bWins++;
+    }
+  }
+
+  return {
+    aWins,
+    bWins,
+    comparisons,
+    aSuccess: aWins / comparisons,
+    bSuccess: bWins / comparisons,
+  };
+}
 
 // Usage: debugLog("general", "This is a general debug message.");
 export function debugLog(flag, ...args) {
   if (DEBUG[flag]) console.log(`[${flag.toUpperCase()}]`, ...args);
 }
+
+const DEBUG = {
+  general: false,
+  scroll: false,
+  update: false,
+  inputs: false,
+  analytics: true,
+  ScrollInteraction: false,
+};

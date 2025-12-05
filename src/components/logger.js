@@ -95,6 +95,20 @@ export function logBtnEstimateSleepC({ estimateValueSleepC, trueValue }) {
   });
 }
 
+export function logBtnEstimateQuantity({
+  estimateValueQuantity,
+  trueValue,
+  hopIndex,
+  trueValueAtIndex,
+}) {
+  logEvent("kielscn_hirnentwicklung_btn_estimate_quantity", {
+    estimateQuantity: estimateValueQuantity,
+    trueValueQuantity: trueValue,
+    hopIndex: hopIndex,
+    trueValueAtIndex: trueValueAtIndex,
+  });
+}
+
 // Used in pointerInteraction.js
 export function logInteraction(event) {
   logEvent("kielscn_schlafdauer_input_custom", {

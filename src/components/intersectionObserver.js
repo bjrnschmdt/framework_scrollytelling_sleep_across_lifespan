@@ -53,6 +53,14 @@ export function setupIntersectionObserver({
         }
       }
     });
+
+    // If no section is currently visible, clear the scrolly step.
+    const anyVisible = Array.from(targets).some(
+      (target) => !target.classList.contains("inactive"),
+    );
+    if (!anyVisible) {
+      setScrollyStep(undefined);
+    }
   };
 
   // Configure the observer

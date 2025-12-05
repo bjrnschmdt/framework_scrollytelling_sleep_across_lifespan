@@ -14,10 +14,14 @@ import {
   updateXDomain,
   programmaticScroll,
   debugLog,
+  cumulativeSuccessAtIndex,
 } from "./components/helperFunctions.js";
 import isMobile from "./components/isMobile.js";
 import { dataSet, simulatedData } from "./components/data.js";
-import { generateDistributions } from "./components/generateGroupComparisons.js";
+import {
+  generateDistributions,
+  calculateAbsoluteSuccessRates,
+} from "./components/generateGroupComparisons.js";
 import { settings } from "./components/settings.js";
 import { createScales } from "./components/createScales.js";
 import {
@@ -57,6 +61,7 @@ import {
   logBtnEstimateSleepA,
   logBtnEstimateSleepB,
   logBtnEstimateSleepC,
+  logBtnEstimateQuantity,
 } from "./components/logger.js";
 import {
   dotPlot,
@@ -318,6 +323,7 @@ const baseStep = {
 
 ```js
 const scrollyProps = {
+  undefined: { ...baseStep, scrollStep: undefined, height: height },
   0: {
     ...baseStep,
     scrollStep: 0,
@@ -463,6 +469,7 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 14,
     height: height,
+    comparison: true,
   },
 };
 ```
@@ -868,6 +875,98 @@ const btnEstimateSleepC = (value) => {
     estimateValueSleepC,
     trueValue: estimateSleepAge.C.sleepTime,
   });
+  return value + 1;
+};
+```
+
+<!-- ********************************************************* -->
+<!-- ********************************************************* -->
+
+<!-- ```js
+const { aWins, bWins, totalComparisons, aSuccess, bSuccess } =
+  calculateAbsoluteSuccessRates(plotData.comparisonA.hop);
+console.log("Absolute Success Rates:", {
+  aWins,
+  bWins,
+  totalComparisons,
+  aSuccess,
+  bSuccess,
+});
+``` -->
+
+```js
+const isDisabledQuantity = Mutable(false);
+const setDisabledQuantity = (x) => (isDisabledQuantity.value = x);
+```
+
+```js
+const estimateInputQuantity = Inputs.range([0, 100], {
+  label: "In wievielen von 100 Fällen?",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
+const estimateValueQuantity = Generators.input(estimateInputQuantity);
+```
+
+```js
+const certaintyQuantity = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_quantity"
+);
+```
+
+```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerQuantityInput = Inputs.button("Antwort absenden", {
+  value: null,
+  reduce: (value) => btnEstimateQuantity(value),
+  disabled: isDisabledQuantity,
+});
+const answerQuantityValue = Generators.input(answerQuantityInput);
+```
+
+```js
+console.log("plotData", plotData);
+```
+
+```js
+const btnEstimateQuantity = (value) => {
+  setDisabledQuantity(true);
+  for (const input of estimateInputQuantity.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyQuantity.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  const i = Math.min(99, Number(hopIndex) || 0);
+
+  const match = plotData.comparisonA?.hopCumulative?.A?.find(
+    (d) => d.comparisons === i
+  );
+  const aSuccess = match?.success;
+
+  const matchB = plotData.comparisonA?.hopCumulative?.B?.find(
+    (d) => d.comparisons === i
+  );
+  const bSuccess = matchB?.success;
+
+  console.log("i, aSuccess, bSuccess", i, aSuccess, bSuccess);
+
+  const trueValueAtIndex = Math.round(100 * aSuccess);
+  const trueValueQuantity = Math.round(
+    100 * plotData.comparisonA.absoluteSuccessRates.aSuccess
+  );
+
+  logBtnEstimateQuantity({
+    estimateValueQuantity,
+    trueValue: trueValueQuantity,
+    hopIndex,
+    trueValueAtIndex,
+  });
+
   return value + 1;
 };
 ```
@@ -2205,22 +2304,33 @@ const chartValue = Generators.input(chartElement);
 const updateChart = chartElement.updateChart({
   data: dataSet.get(stepProps.age),
   stepProps,
-  hopIndex: j,
+  hopIndex,
   isEnhanced,
 });
 ```
 
 ```js
-const j = (async function* () {
+const hopIndex = (async function* () {
   for (
     let j = 0;
-    stepProps.variant === "hop" || stepProps.variant === "hop_traced";
+    stepProps.variant === "hop" ||
+    stepProps.variant === "hop_traced" ||
+    (variant === "hop" && stepProps.comparison) ||
+    (variant === "hop_traced" && stepProps.comparison);
     ++j
   ) {
     yield j;
     await new Promise((resolve) => setTimeout(resolve, hopDuration));
   }
 })();
+```
+
+```js
+console.log("hopIndex", hopIndex);
+```
+
+```js
+console.log("stepProps", stepProps);
 ```
 
 <!-- --- Observer -->
@@ -2337,8 +2447,12 @@ const comparisons = {
 ```
 
 ```js
-const plotData = generateDistributions(comparisons);
+const plotData = FileAttachment("./data/data_success_rates.json").json();
 ```
+
+<!-- ```js
+const plotData = generateDistributions(comparisons);
+``` -->
 
 <!-- Hop Data -->
 
@@ -2385,6 +2499,7 @@ const plots = {
       qradius,
       animate: true,
       duration: hopDuration,
+      index: hopIndex,
     }),
   hop_traced: (width) =>
     hopTracedPlot(plotData.comparisonA.hop, {
@@ -2395,6 +2510,7 @@ const plots = {
       animate: true,
       duration: hopDuration,
       window: hopCount,
+      index: hopIndex,
     }),
   percentile: (width) =>
     percentilePlot(plotData.comparisonA.percentile, {
@@ -2493,6 +2609,13 @@ Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen
 
 ${(variant === "all" ? Object.keys(plots) : [variant])
 .map(k => resize((width) => plots[k](width)))}
+
+${estimateInputQuantity}
+
+---
+
+${certaintyQuantity}
+${answerQuantityInput}
 
 </div>
 

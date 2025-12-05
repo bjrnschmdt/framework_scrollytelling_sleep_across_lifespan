@@ -7,7 +7,6 @@ import {
   resolveCssColor,
   pickNthByGroup,
   pickForwardWindowByGroup,
-  createAnimatedPlot,
 } from "./helperFunctions.js";
 
 const { colors, personPath, hopCount, hopDuration } = settings;
@@ -62,37 +61,24 @@ function dotPlot(
 
 function hopPlot(
   data,
-  {
-    width = 600,
-    height = 400,
-    yDomain,
-    qradius = 3,
-    animate = false,
-    duration = hopDuration,
-    frameIndex = 0,
-  } = {}
+  { width = 600, height = 400, yDomain, qradius = 3, index = 0 } = {}
 ) {
-  const renderFrame = (index) =>
-    Plot.plot({
-      width,
-      height,
-      y: defaultY(yDomain),
-      fx: defaultFx,
-      marks: [
-        Plot.dotY(animate ? pickNthByGroup(data, index) : data, {
-          fx: "group",
-          y: "q",
-          r: qradius,
-          stroke: "none",
-          fill: themeForeground,
-          symbol: { draw: personSymbol },
-        }),
-      ],
-    });
-
-  return animate
-    ? createAnimatedPlot({ duration, renderFrame, fixedHeight: height })
-    : renderFrame(frameIndex);
+  return Plot.plot({
+    width,
+    height,
+    y: defaultY(yDomain),
+    fx: defaultFx,
+    marks: [
+      Plot.dotY(pickNthByGroup(data, index), {
+        fx: "group",
+        y: "q",
+        r: qradius,
+        stroke: "none",
+        fill: themeForeground,
+        symbol: { draw: personSymbol },
+      }),
+    ],
+  });
 }
 
 function hopTracedPlot(
@@ -102,39 +88,29 @@ function hopTracedPlot(
     height = 400,
     yDomain,
     qradius = 3,
-    animate = false,
-    duration = hopDuration,
-    frameIndex = 0,
     window = hopCount,
+    index = 0,
   } = {}
 ) {
-  const renderFrame = (index) =>
-    Plot.plot({
-      width,
-      height,
-      y: defaultY(yDomain),
-      fx: defaultFx,
-      color: {
-        range: [themeBackgroundAlt, themeForeground],
-      },
-      marks: [
-        Plot.dotY(
-          animate ? pickForwardWindowByGroup(data, index, window) : data,
-          {
-            fx: "group",
-            y: "q",
-            r: qradius,
-            stroke: "none",
-            fill: (d) => (1 / hopCount) * (d.order ?? 0),
-            symbol: { draw: personSymbol },
-          }
-        ),
-      ],
-    });
-
-  return animate
-    ? createAnimatedPlot({ duration, renderFrame, fixedHeight: height })
-    : renderFrame(frameIndex);
+  return Plot.plot({
+    width,
+    height,
+    y: defaultY(yDomain),
+    fx: defaultFx,
+    color: {
+      range: [themeBackgroundAlt, themeForeground],
+    },
+    marks: [
+      Plot.dotY(pickForwardWindowByGroup(data, index, window), {
+        fx: "group",
+        y: "q",
+        r: qradius,
+        stroke: "none",
+        fill: (d) => (1 / hopCount) * (d.order ?? 0),
+        symbol: { draw: personSymbol },
+      }),
+    ],
+  });
 }
 
 function percentilePlot(data, { width = 600, height = 400, yDomain } = {}) {
