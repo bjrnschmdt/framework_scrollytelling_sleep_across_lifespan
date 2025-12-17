@@ -397,9 +397,6 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 8,
     height: height,
-    age: 20,
-    sleepTime: 6.5,
-    variant,
     xDomain: isEnhanced ? baseStep.xDomain : [20 - 5.5, 20 + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
@@ -408,6 +405,17 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 9,
     height: height,
+    age: 20,
+    sleepTime: 6.5,
+    variant,
+    xDomain: isEnhanced ? baseStep.xDomain : [20 - 5.5, 20 + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
+  },
+  10: {
+    ...baseStep,
+    scrollStep: 10,
+    height: height,
     age: 30,
     sleepTime: 6,
     variant,
@@ -415,9 +423,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  10: {
+  11: {
     ...baseStep,
-    scrollStep: 10,
+    scrollStep: 11,
     height: height,
     age: 40,
     sleepTime: 5.5,
@@ -426,9 +434,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  11: {
+  12: {
     ...baseStep,
-    scrollStep: 11,
+    scrollStep: 12,
     height: height,
     age: estimateSleepAge.A.age,
     sleepTime: estimateValueSleepA,
@@ -439,9 +447,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  12: {
+  13: {
     ...baseStep,
-    scrollStep: 12,
+    scrollStep: 13,
     height: height,
     age: estimateSleepAge.B.age,
     sleepTime: estimateValueSleepB,
@@ -452,9 +460,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  13: {
+  14: {
     ...baseStep,
-    scrollStep: 13,
+    scrollStep: 14,
     height: height,
     age: estimateSleepAge.C.age,
     sleepTime: estimateValueSleepC,
@@ -465,9 +473,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  14: {
+  15: {
     ...baseStep,
-    scrollStep: 14,
+    scrollStep: 15,
     height: height,
     comparison: true,
   },
@@ -2632,7 +2640,6 @@ ${answerQuantityInput}
 </div>
 
 </section>
-
 ${bntAdaptiveTest}
 ${miniVlatTest}
 ${followupQuestionsCard}
