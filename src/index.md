@@ -62,6 +62,7 @@ import {
   logBtnEstimateSleepA,
   logBtnEstimateSleepB,
   logBtnEstimateSleepC,
+  logBtnEstimateSleepD,
   logBtnEstimateQuantity,
 } from "./components/logger.js";
 import {
@@ -244,6 +245,10 @@ const debouncedLoggers = {
   ),
   estimateSleepC: createDebouncedLogger(
     (value) => logInput("estimate_sleep_c", value),
+    500
+  ),
+  estimateSleepD: createDebouncedLogger(
+    (value) => logInput("estimate_sleep_d", value),
     500
   ),
 };
@@ -513,6 +518,19 @@ const scrollyProps = {
   16: {
     ...baseStep,
     scrollStep: 16,
+    height: height,
+    age: estimateSleepSetup.D.age,
+    sleepTime: estimateValueSleepD,
+    variant,
+    xDomain: isEnhanced
+      ? baseStep.xDomain
+      : [estimateSleepSetup.D.age - 5.5, estimateSleepSetup.D.age + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
+  },
+  17: {
+    ...baseStep,
+    scrollStep: 17,
     height: height,
     comparison: true,
   },
@@ -830,6 +848,10 @@ debouncedLoggers.estimateSleepC(estimateValueSleepC);
 ```
 
 ```js
+debouncedLoggers.estimateSleepD(estimateValueSleepD);
+```
+
+```js
 const estimateInputSleepA = Inputs.range([sleepMin, sleepMax], {
   step: 0.25,
   label: "Schlafdauer in Stunden",
@@ -857,6 +879,15 @@ const estimateValueSleepC = Generators.input(estimateInputSleepC);
 ```
 
 ```js
+const estimateInputSleepD = Inputs.range([sleepMin, sleepMax], {
+  step: 0.25,
+  label: "Schlafdauer in Stunden",
+  value: dataSet.get(estimateSleepSetup.D.age).box[0].quartiles[1],
+});
+const estimateValueSleepD = Generators.input(estimateInputSleepD);
+```
+
+```js
 const certaintySleepA = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
@@ -880,6 +911,15 @@ const certaintySleepC = createSemanticDifferentialInput(
   "gar nicht sicher",
   "sehr sicher",
   "certainty_sleep_c"
+);
+```
+
+```js
+const certaintySleepD = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_sleep_d"
 );
 ```
 
@@ -914,6 +954,16 @@ const answerSleepValueC = Generators.input(answerSleepInputC);
 ```
 
 ```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerSleepInputD = Inputs.button("Antwort absenden", {
+  value: null,
+  reduce: (value) => btnEstimateSleepD(value),
+  disabled: isDisabledSleepD,
+});
+const answerSleepValueD = Generators.input(answerSleepInputD);
+```
+
+```js
 const isDisabledSleepA = Mutable(false);
 const setDisabledSleepA = (x) => (isDisabledSleepA.value = x);
 ```
@@ -926,6 +976,11 @@ const setDisabledSleepB = (x) => (isDisabledSleepB.value = x);
 ```js
 const isDisabledSleepC = Mutable(false);
 const setDisabledSleepC = (x) => (isDisabledSleepC.value = x);
+```
+
+```js
+const isDisabledSleepD = Mutable(false);
+const setDisabledSleepD = (x) => (isDisabledSleepD.value = x);
 ```
 
 ```js
@@ -974,6 +1029,23 @@ const btnEstimateSleepC = (value) => {
   logBtnEstimateSleepC({
     estimateValueSleepC,
     trueValue: estimateSleepSetup.C.sleepTime,
+  });
+  return value + 1;
+};
+```
+
+```js
+const btnEstimateSleepD = (value) => {
+  setDisabledSleepD(true); // not needed anymore because button stays disabled after first click
+  for (const input of estimateInputSleepD.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintySleepD.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  logBtnEstimateSleepD({
+    estimateValueSleepD,
+    trueValue: estimateSleepSetup.D.sleepTime,
   });
   return value + 1;
 };
@@ -2730,7 +2802,7 @@ ${answerSleepInputA}
 <div class="scroll-section card" data-step="14">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.B) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.B.age}-jährige **${estimateSleepSetup.B.name}**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **${estimateSleepSetup.B.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.B) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.B.age}-jährige **${estimateSleepSetup.B.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.B.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepB}
 
@@ -2743,7 +2815,7 @@ ${answerSleepInputB}
 <div class="scroll-section card" data-step="15">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.C) * 100)}% der Gleichaltrigen **weniger** schlafen der ${estimateSleepSetup.C.age}-jährige **${estimateSleepSetup.C.name}**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **${estimateSleepSetup.C.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.C) * 100)}% der Gleichaltrigen **weniger** schlafen der ${estimateSleepSetup.C.age}-jährige **${estimateSleepSetup.C.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.C.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepC}
 
@@ -2754,6 +2826,19 @@ ${answerSleepInputC}
 
 </div>
 <div class="scroll-section card" data-step="16">
+
+<!-- prettier-ignore -->
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.D) * 100)}% der Gleichaltrigen **weniger** schlafen die ${estimateSleepSetup.D.age}-jährige **${estimateSleepSetup.D.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.D.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+
+${estimateInputSleepD}
+
+---
+
+${certaintySleepD}
+${answerSleepInputD}
+
+</div>
+<div class="scroll-section card" data-step="17">
 Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
 ${(variant === "all" ? Object.keys(plots) : [variant])

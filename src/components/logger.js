@@ -105,6 +105,13 @@ export function logBtnEstimateSleepC({ estimateValueSleepC, trueValue }) {
   });
 }
 
+export function logBtnEstimateSleepD({ estimateValueSleepD, trueValue }) {
+  logEvent("kielscn_schlafdauer_btn_estimate_sleep_d", {
+    estimateSleepD: estimateValueSleepD,
+    trueValueSleepD: trueValue,
+  });
+}
+
 export function logBtnEstimateQuantity({
   estimateValueQuantity,
   trueValue,
