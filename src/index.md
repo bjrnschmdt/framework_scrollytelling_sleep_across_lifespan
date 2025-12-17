@@ -1251,10 +1251,6 @@ function createBntQuestion({
   const slider = Inputs.range([min, max], { step, value: defaultValue, label });
   const sliderValue = Generators.input(slider);
 
-  const feedback = document.createElement("p");
-  feedback.className = "bnt-feedback";
-  feedback.style.display = "none";
-
   const submitBtn = Inputs.button("Antwort bestätigen", {
     value: 0,
     disabled: false,
@@ -1265,18 +1261,12 @@ function createBntQuestion({
         input.disabled = true;
       }
       submitBtn.querySelector("button").disabled = true;
-      feedback.style.display = "block";
-      feedback.textContent = isCorrect
-        ? "Gut gemacht!"
-        : `Die richtige Antwort ist ${correctAnswer}.`;
-      feedback.className = `bnt-feedback ${isCorrect ? "tip" : "warning"}`;
-      feedback.setAttribute("label", isCorrect ? "Richtig!" : "Falsch.");
       onSubmit(id, numericValue, isCorrect);
       return value + 1;
     },
   });
 
-  wrapper.append(question, slider, submitBtn, feedback);
+  wrapper.append(question, slider, submitBtn);
 
   return {
     node: wrapper,
@@ -1284,9 +1274,6 @@ function createBntQuestion({
       slider.value = defaultValue;
       slider.disabled = false;
       submitBtn.disabled = false;
-      feedback.style.display = "none";
-      feedback.textContent = "";
-      feedback.className = "bnt-feedback";
     },
   };
 }
@@ -2323,14 +2310,6 @@ const hopIndex = (async function* () {
     await new Promise((resolve) => setTimeout(resolve, hopDuration));
   }
 })();
-```
-
-```js
-console.log("hopIndex", hopIndex);
-```
-
-```js
-console.log("stepProps", stepProps);
 ```
 
 <!-- --- Observer -->
