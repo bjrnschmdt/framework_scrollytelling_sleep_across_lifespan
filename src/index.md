@@ -63,7 +63,7 @@ import {
   logBtnEstimateSleepB,
   logBtnEstimateSleepC,
   logBtnEstimateSleepD,
-  logBtnEstimateQuantity,
+  logBtnEstimateQuantityA,
 } from "./components/logger.js";
 import {
   dotPlot,
@@ -249,6 +249,10 @@ const debouncedLoggers = {
   ),
   estimateSleepD: createDebouncedLogger(
     (value) => logInput("estimate_sleep_d", value),
+    500
+  ),
+  estimateQuantityA: createDebouncedLogger(
+    (value) => logInput("estimate_quantity_a", value),
     500
   ),
 };
@@ -1067,50 +1071,50 @@ console.log("Absolute Success Rates:", {
 ``` -->
 
 ```js
-const isDisabledQuantity = Mutable(false);
-const setDisabledQuantity = (x) => (isDisabledQuantity.value = x);
+debouncedLoggers.estimateQuantityA(estimateValueQuantityA);
 ```
 
 ```js
-const estimateInputQuantity = Inputs.range([0, 100], {
+const isDisabledQuantityA = Mutable(false);
+const setDisabledQuantityA = (x) => (isDisabledQuantityA.value = x);
+```
+
+```js
+const estimateInputQuantityA = Inputs.range([0, 100], {
   label: "In wievielen von 100 Fällen?",
   step: 1,
   value: 0,
   placeholder: "in %",
 });
-const estimateValueQuantity = Generators.input(estimateInputQuantity);
+const estimateValueQuantityA = Generators.input(estimateInputQuantityA);
 ```
 
 ```js
-const certaintyQuantity = createSemanticDifferentialInput(
+const certaintyQuantityA = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_quantity"
+  "certainty_quantity_a"
 );
 ```
 
 ```js
 // This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerQuantityInput = Inputs.button("Antwort absenden", {
+const answerQuantityInputA = Inputs.button("Antwort absenden", {
   value: null,
-  reduce: (value) => btnEstimateQuantity(value),
-  disabled: isDisabledQuantity,
+  reduce: (value) => btnEstimateQuantityA(value),
+  disabled: isDisabledQuantityA,
 });
-const answerQuantityValue = Generators.input(answerQuantityInput);
+const answerQuantityValueA = Generators.input(answerQuantityInputA);
 ```
 
 ```js
-console.log("plotData", plotData);
-```
-
-```js
-const btnEstimateQuantity = (value) => {
-  setDisabledQuantity(true);
-  for (const input of estimateInputQuantity.querySelectorAll("input")) {
+const btnEstimateQuantityA = (value) => {
+  setDisabledQuantityA(true);
+  for (const input of estimateInputQuantityA.querySelectorAll("input")) {
     input.disabled = true;
   }
-  for (const input of certaintyQuantity.querySelectorAll("input")) {
+  for (const input of certaintyQuantityA.querySelectorAll("input")) {
     input.disabled = true;
   }
   const i = Math.min(99, Number(hopIndex) || 0);
@@ -1132,8 +1136,8 @@ const btnEstimateQuantity = (value) => {
     100 * plotData.comparisonA.absoluteSuccessRates.aSuccess
   );
 
-  logBtnEstimateQuantity({
-    estimateValueQuantity,
+  logBtnEstimateQuantityA({
+    estimateValueQuantityA,
     trueValue: trueValueQuantity,
     hopIndex,
     trueValueAtIndex,
@@ -2844,12 +2848,12 @@ Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen
 ${(variant === "all" ? Object.keys(plots) : [variant])
 .map(k => resize((width) => plots[k](width)))}
 
-${estimateInputQuantity}
+${estimateInputQuantityA}
 
 ---
 
-${certaintyQuantity}
-${answerQuantityInput}
+${certaintyQuantityA}
+${answerQuantityInputA}
 
 </div>
 

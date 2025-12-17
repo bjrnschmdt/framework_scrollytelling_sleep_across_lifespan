@@ -112,15 +112,15 @@ export function logBtnEstimateSleepD({ estimateValueSleepD, trueValue }) {
   });
 }
 
-export function logBtnEstimateQuantity({
-  estimateValueQuantity,
+export function logBtnEstimateQuantityA({
+  estimateValueQuantityA,
   trueValue,
   hopIndex,
   trueValueAtIndex,
 }) {
-  logEvent("kielscn_hirnentwicklung_btn_estimate_quantity", {
-    estimateQuantity: estimateValueQuantity,
-    trueValueQuantity: trueValue,
+  logEvent("kielscn_hirnentwicklung_btn_estimate_quantity_a", {
+    estimateQuantityA: estimateValueQuantityA,
+    trueValueQuantityA: trueValue,
     hopIndex: hopIndex,
     trueValueAtIndex: trueValueAtIndex,
   });
