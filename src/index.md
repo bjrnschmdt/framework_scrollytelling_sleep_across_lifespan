@@ -102,7 +102,8 @@ const {
   relativeHeight,
   hopCount,
   hopDuration,
-  estimateSleepAge,
+  estimatePercentageSetup,
+  estimateSleepSetup,
   qstepComp,
   qheightComp,
 } = settings;
@@ -438,12 +439,12 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 12,
     height: height,
-    age: estimateSleepAge.A.age,
+    age: estimateSleepSetup.A.age,
     sleepTime: estimateValueSleepA,
     variant,
     xDomain: isEnhanced
       ? baseStep.xDomain
-      : [estimateSleepAge.A.age - 5.5, estimateSleepAge.A.age + 5.5],
+      : [estimateSleepSetup.A.age - 5.5, estimateSleepSetup.A.age + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
@@ -451,12 +452,12 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 13,
     height: height,
-    age: estimateSleepAge.B.age,
+    age: estimateSleepSetup.B.age,
     sleepTime: estimateValueSleepB,
     variant,
     xDomain: isEnhanced
       ? baseStep.xDomain
-      : [estimateSleepAge.B.age - 5.5, estimateSleepAge.B.age + 5.5],
+      : [estimateSleepSetup.B.age - 5.5, estimateSleepSetup.B.age + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
@@ -464,12 +465,12 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 14,
     height: height,
-    age: estimateSleepAge.C.age,
+    age: estimateSleepSetup.C.age,
     sleepTime: estimateValueSleepC,
     variant,
     xDomain: isEnhanced
       ? baseStep.xDomain
-      : [estimateSleepAge.C.age - 5.5, estimateSleepAge.C.age + 5.5],
+      : [estimateSleepSetup.C.age - 5.5, estimateSleepSetup.C.age + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
@@ -741,7 +742,7 @@ debouncedLoggers.estimateSleepC(estimateValueSleepC);
 const estimateInputSleepA = Inputs.range([sleepMin, sleepMax], {
   step: 0.25,
   label: "Schlafdauer in Stunden",
-  value: dataSet.get(estimateSleepAge.A.age).box[0].quartiles[1],
+  value: dataSet.get(estimateSleepSetup.A.age).box[0].quartiles[1],
 });
 const estimateValueSleepA = Generators.input(estimateInputSleepA);
 ```
@@ -750,7 +751,7 @@ const estimateValueSleepA = Generators.input(estimateInputSleepA);
 const estimateInputSleepB = Inputs.range([sleepMin, sleepMax], {
   step: 0.25,
   label: "Schlafdauer in Stunden",
-  value: dataSet.get(estimateSleepAge.B.age).box[0].quartiles[1],
+  value: dataSet.get(estimateSleepSetup.B.age).box[0].quartiles[1],
 });
 const estimateValueSleepB = Generators.input(estimateInputSleepB);
 ```
@@ -759,7 +760,7 @@ const estimateValueSleepB = Generators.input(estimateInputSleepB);
 const estimateInputSleepC = Inputs.range([sleepMin, sleepMax], {
   step: 0.25,
   label: "Schlafdauer in Stunden",
-  value: dataSet.get(estimateSleepAge.C.age).box[0].quartiles[1],
+  value: dataSet.get(estimateSleepSetup.C.age).box[0].quartiles[1],
 });
 const estimateValueSleepC = Generators.input(estimateInputSleepC);
 ```
@@ -847,7 +848,7 @@ const btnEstimateSleepA = (value) => {
   }
   logBtnEstimateSleepA({
     estimateValueSleepA,
-    trueValue: estimateSleepAge.A.sleepTime,
+    trueValue: estimateSleepSetup.A.sleepTime,
   });
   return value + 1;
 };
@@ -864,7 +865,7 @@ const btnEstimateSleepB = (value) => {
   }
   logBtnEstimateSleepB({
     estimateValueSleepB,
-    trueValue: estimateSleepAge.B.sleepTime,
+    trueValue: estimateSleepSetup.B.sleepTime,
   });
   return value + 1;
 };
@@ -881,7 +882,7 @@ const btnEstimateSleepC = (value) => {
   }
   logBtnEstimateSleepC({
     estimateValueSleepC,
-    trueValue: estimateSleepAge.C.sleepTime,
+    trueValue: estimateSleepSetup.C.sleepTime,
   });
   return value + 1;
 };
@@ -2610,7 +2611,7 @@ ${educationInput}
 <div class="scroll-section card" data-step="12">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.A) * 100)}% der Gleichaltrigen **weniger** schlafen als der ${estimateSleepSetup.A.age}-jährige **${estimateSleepSetup.A.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.A.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepA}
 
@@ -2623,7 +2624,7 @@ ${answerSleepInputA}
 <div class="scroll-section card" data-step="13">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.B) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.B.age}-jährige **${estimateSleepSetup.B.name}**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **${estimateSleepSetup.B.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepB}
 
@@ -2636,7 +2637,7 @@ ${answerSleepInputB}
 <div class="scroll-section card" data-step="14">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.C) * 100)}% der Gleichaltrigen **weniger** schlafen der ${estimateSleepSetup.C.age}-jährige **${estimateSleepSetup.C.name}**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **${estimateSleepSetup.C.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepC}
 

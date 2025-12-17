@@ -1,21 +1,49 @@
 import * as d3 from "npm:d3";
 import { Generators } from "npm:@observablehq/stdlib";
 
-const estimateSleepAge = {
+const estimatePercentageSetup = {
   A: {
-    age: 32,
-    sleepTime: 7,
-    p: 0.5,
+    name: "Alina",
+    age: 35,
+    sleepTime: 5.45,
   },
   B: {
-    age: 48,
-    sleepTime: 6.5,
-    p: 0.75,
+    name: "Mehmet",
+    age: 41,
+    sleepTime: 8.15,
   },
   C: {
-    age: 64,
-    sleepTime: 6,
-    p: 0.9,
+    name: "Liu",
+    age: 70,
+    sleepTime: 6.45,
+  },
+  D: {
+    name: "Carmen",
+    age: 55,
+    sleepTime: 6.15,
+  },
+};
+
+const estimateSleepSetup = {
+  A: {
+    name: "John",
+    age: 25,
+    sleepTime: 8,
+  },
+  B: {
+    name: "Eva",
+    age: 32,
+    sleepTime: 7,
+  },
+  C: {
+    name: "Josef",
+    age: 74,
+    sleepTime: 5.5,
+  },
+  D: {
+    name: "Andrea",
+    age: 45,
+    sleepTime: 6.5,
   },
 };
 
@@ -113,7 +141,8 @@ export const settings = {
   casesData,
   hopCount: 5,
   hopDuration: 400,
-  estimateSleepAge,
+  estimatePercentageSetup,
+  estimateSleepSetup,
   qstepComp: 0.25,
   qheightComp: 400,
 };
