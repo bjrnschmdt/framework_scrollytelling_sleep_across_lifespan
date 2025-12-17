@@ -38,25 +38,12 @@ export function setupIntersectionObserver({
       } else {
         // Section is not visible
         visibleSection.classList.add("inactive");
-
-        if (step === "7") {
-          // Reset estimate inputs when a new section becomes visible
-          const target = document.getElementById("answer");
-          if (target) {
-            target.style.display = "none";
-          }
-          setDisabled(false);
-          set(estimateInput, 0);
-          for (const input of estimateInput.querySelectorAll("input")) {
-            input.disabled = false;
-          }
-        }
       }
     });
 
     // If no section is currently visible, clear the scrolly step.
     const anyVisible = Array.from(targets).some(
-      (target) => !target.classList.contains("inactive"),
+      (target) => !target.classList.contains("inactive")
     );
     if (!anyVisible) {
       setScrollyStep(undefined);
