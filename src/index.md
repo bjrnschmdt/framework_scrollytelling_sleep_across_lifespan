@@ -2536,70 +2536,6 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}</p>
 </div>
 <div class="scroll-section card" data-step="8">
-<p>Was würden Sie schätzen, wie viel Prozent der 20-Jährigen schlafen kürzer als Sie?${estimateInputPercentageA}${certaintyPercentageA}${answerPercentageInputA}</p>
-</div>
-<div class="scroll-section card" data-step="9">
-<p>Was würden Sie schätzen, wie viel Prozent der 30-Jährigen schlafen kürzer als Sie?${estimateInputPercentageB}${certaintyPercentageB}${answerPercentageInputB}</p>
-</div>
-<div class="scroll-section card" data-step="10">
-<p>Was würden Sie schätzen, wie viel Prozent der 40-Jährigen schlafen kürzer als Sie?${estimateInputPercentageC}${certaintyPercentageC}${answerPercentageInputC}</p>
-</div>
-<div class="scroll-section card" data-step="11">
-
-<!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
-
-${estimateInputSleepA}
-
----
-
-${certaintySleepA}
-${answerSleepInputA}
-
-</div>
-<div class="scroll-section card" data-step="12">
-
-<!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
-
-${estimateInputSleepB}
-
----
-
-${certaintySleepB}
-${answerSleepInputB}
-
-</div>
-<div class="scroll-section card" data-step="13">
-
-<!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
-
-${estimateInputSleepC}
-
----
-
-${certaintySleepC}
-${answerSleepInputC}
-
-</div>
-<div class="scroll-section card" data-step="14">
-Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
-
-${(variant === "all" ? Object.keys(plots) : [variant])
-.map(k => resize((width) => plots[k](width)))}
-
-${estimateInputQuantity}
-
----
-
-${certaintyQuantity}
-${answerQuantityInput}
-
-</div>
-
-</section>
-<div class="bnt-container card">
 
 ## **Wie haben Sie den Artikel erlebt?**
 
@@ -2632,16 +2568,82 @@ ${interestForm}
 ${educationInput}
 
 </div>
+<div class="scroll-section card" data-step="9">
+<p>Was würden Sie schätzen, wie viel Prozent der 20-Jährigen schlafen kürzer als Sie?${estimateInputPercentageA}${certaintyPercentageA}${answerPercentageInputA}</p>
+</div>
+<div class="scroll-section card" data-step="10">
+<p>Was würden Sie schätzen, wie viel Prozent der 30-Jährigen schlafen kürzer als Sie?${estimateInputPercentageB}${certaintyPercentageB}${answerPercentageInputB}</p>
+</div>
+<div class="scroll-section card" data-step="11">
+<p>Was würden Sie schätzen, wie viel Prozent der 40-Jährigen schlafen kürzer als Sie?${estimateInputPercentageC}${certaintyPercentageC}${answerPercentageInputC}</p>
+</div>
+<div class="scroll-section card" data-step="12">
+
+<!-- prettier-ignore -->
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+
+${estimateInputSleepA}
+
+---
+
+${certaintySleepA}
+${answerSleepInputA}
+
+</div>
+<div class="scroll-section card" data-step="13">
+
+<!-- prettier-ignore -->
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+
+${estimateInputSleepB}
+
+---
+
+${certaintySleepB}
+${answerSleepInputB}
+
+</div>
+<div class="scroll-section card" data-step="14">
+
+<!-- prettier-ignore -->
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepAge.A) * 100)}% der Gesamtpopulation **weniger/mehr** schlafen als **Name**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **Name** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+
+${estimateInputSleepC}
+
+---
+
+${certaintySleepC}
+${answerSleepInputC}
+
+</div>
+<div class="scroll-section card" data-step="15">
+Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
+
+${(variant === "all" ? Object.keys(plots) : [variant])
+.map(k => resize((width) => plots[k](width)))}
+
+${estimateInputQuantity}
+
+---
+
+${certaintyQuantity}
+${answerQuantityInput}
+
+</div>
+
+</section>
+
 ${bntAdaptiveTest}
 ${miniVlatTest}
 ${followupQuestionsCard}
+
 <!-- <div class="outro card">
   <h2>Hinter den Daten</h2>
   <p>Studien zufolge unterliegt die Beurteilung der eigenen Schlafdauer oft Verzerrungen. Wer unter Schlafstörungen leidet, neigt dazu, die geschlafene Zeit zu unterschätzen. Gute Schläfer hingegen überschätzen sie häufig. Dieses Phänomen ist nur eins von vielen, mit denen sich die Schlafforschung befasst. Auf unseren Themenseiten finden Sie zahlreiche Artikel zu den Themen <a href="https://www.spektrum.de/thema/schlaf/1295691">Schlaf</a> und <a href="https://www.spektrum.de/thema/traeumen/1356995">Träumen</a>.</p>
   <p>Methodischer Hintergrund: Die Basis für die Grafik sind die Daten <a href="https://www.nature.com/articles/s41562-020-00965-x">dieser</a> Metaanalyse von Kocevska et al. Eine Metaanalyse fügt die Ergebnisse von vielen einzelnen Studien zusammen und gewinnt dadurch an Aussagekraft. Aus den statistischen Kennwerten haben wir eine realistische Verteilung nachgebildet und daraus die Perzentile berechnet.</p>
   <p>Die Grafik wurde erstellt vom Kiel Science Communication Network (KielSCN).</p>
   <p>Texte: Stephan Reiche/KielSCN, Anna von Hopffgarten/Spektrum der Wissenschaft und Carolin Wagener/Spektrum der Wissenschaft</br>Grafikdesign und Umsetzung: Björn Döge/KielSCN</p>
-  ${shareBtn} 
+  ${shareBtn}
 </div> -->
 
 <!-- CSS -->
