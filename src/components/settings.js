@@ -20,7 +20,7 @@ const estimatePercentageSetup = {
   D: {
     name: "Carmen",
     age: 55,
-    sleepTime: 6.15,
+    sleepTime: 6.25,
   },
 };
 

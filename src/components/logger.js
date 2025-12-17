@@ -74,6 +74,16 @@ export function logBtnEstimatePercentageC({
   });
 }
 
+export function logBtnEstimatePercentageD({
+  estimateValuePercentageD,
+  trueValue,
+}) {
+  logEvent("kielscn_schlafdauer_btn_estimate_percentage_d", {
+    estimatePercentageD: estimateValuePercentageD,
+    trueValuePercentageD: trueValue,
+  });
+}
+
 export function logBtnEstimateSleepA({ estimateValueSleepA, trueValue }) {
   logEvent("kielscn_schlafdauer_btn_estimate_sleep_a", {
     estimateSleepA: estimateValueSleepA,

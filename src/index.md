@@ -58,6 +58,7 @@ import {
   logBtnEstimatePercentageA,
   logBtnEstimatePercentageB,
   logBtnEstimatePercentageC,
+  logBtnEstimatePercentageD,
   logBtnEstimateSleepA,
   logBtnEstimateSleepB,
   logBtnEstimateSleepC,
@@ -227,6 +228,10 @@ const debouncedLoggers = {
   ),
   estimatePercentageC: createDebouncedLogger(
     (value) => logInput("estimate_percentage_c", value),
+    500
+  ),
+  estimatePercentageD: createDebouncedLogger(
+    (value) => logInput("estimate_percentage_d", value),
     500
   ),
   estimateSleepA: createDebouncedLogger(
@@ -454,6 +459,22 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 12,
     height: height,
+    age: estimatePercentageSetup.D.age,
+    sleepTime: estimatePercentageSetup.D.sleepTime,
+    variant,
+    xDomain: isEnhanced
+      ? baseStep.xDomain
+      : [
+          estimatePercentageSetup.D.age - 5.5,
+          estimatePercentageSetup.D.age + 5.5,
+        ],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
+  },
+  13: {
+    ...baseStep,
+    scrollStep: 13,
+    height: height,
     age: estimateSleepSetup.A.age,
     sleepTime: estimateValueSleepA,
     variant,
@@ -463,9 +484,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  13: {
+  14: {
     ...baseStep,
-    scrollStep: 13,
+    scrollStep: 14,
     height: height,
     age: estimateSleepSetup.B.age,
     sleepTime: estimateValueSleepB,
@@ -476,9 +497,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  14: {
+  15: {
     ...baseStep,
-    scrollStep: 14,
+    scrollStep: 15,
     height: height,
     age: estimateSleepSetup.C.age,
     sleepTime: estimateValueSleepC,
@@ -489,9 +510,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  15: {
+  16: {
     ...baseStep,
-    scrollStep: 15,
+    scrollStep: 16,
     height: height,
     comparison: true,
   },
@@ -587,6 +608,10 @@ debouncedLoggers.estimatePercentageC(estimateValuePercentageC);
 ```
 
 ```js
+debouncedLoggers.estimatePercentageD(estimateValuePercentageD);
+```
+
+```js
 const estimateInputPercentageA = Inputs.range([0, 100], {
   label: "Schätzung in %",
   step: 1,
@@ -617,6 +642,16 @@ const estimateValuePercentageC = Generators.input(estimateInputPercentageC);
 ```
 
 ```js
+const estimateInputPercentageD = Inputs.range([0, 100], {
+  label: "Schätzung in %",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
+const estimateValuePercentageD = Generators.input(estimateInputPercentageD);
+```
+
+```js
 const certaintyPercentageA = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
@@ -640,6 +675,15 @@ const certaintyPercentageC = createSemanticDifferentialInput(
   "gar nicht sicher",
   "sehr sicher",
   "certainty_percentage_c"
+);
+```
+
+```js
+const certaintyPercentageD = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_percentage_d"
 );
 ```
 
@@ -674,6 +718,16 @@ const answerPercentileValueC = Generators.input(answerPercentageInputC);
 ```
 
 ```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerPercentageInputD = Inputs.button("Antwort absenden", {
+  value: null,
+  reduce: (value) => btnEstimatePercentageD(value),
+  disabled: isDisabledPercentageD,
+});
+const answerPercentileValueD = Generators.input(answerPercentageInputD);
+```
+
+```js
 const isDisabledPercentageA = Mutable(false);
 const setDisabledPercentageA = (x) => (isDisabledPercentageA.value = x);
 ```
@@ -686,6 +740,11 @@ const setDisabledPercentageB = (x) => (isDisabledPercentageB.value = x);
 ```js
 const isDisabledPercentageC = Mutable(false);
 const setDisabledPercentageC = (x) => (isDisabledPercentageC.value = x);
+```
+
+```js
+const isDisabledPercentageD = Mutable(false);
+const setDisabledPercentageD = (x) => (isDisabledPercentageD.value = x);
 ```
 
 ```js
@@ -733,6 +792,23 @@ const btnEstimatePercentageC = (value) => {
   }
   logBtnEstimatePercentageC({
     estimateValuePercentageC,
+    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
+  });
+  return value + 1;
+};
+```
+
+```js
+const btnEstimatePercentageD = (value) => {
+  setDisabledPercentageD(true); // not needed anymore because button stays disabled after first click
+  for (const input of estimateInputPercentageD.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyPercentageD.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  logBtnEstimatePercentageD({
+    estimateValuePercentageD,
     trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
   });
   return value + 1;
@@ -2635,6 +2711,12 @@ Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.C.age}
 <div class="scroll-section card" data-step="12">
 
 <!-- prettier-ignore -->
+Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.D.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.D.name}?**${estimateInputPercentageD}${certaintyPercentageD}${answerPercentageInputD}
+
+</div>
+<div class="scroll-section card" data-step="13">
+
+<!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.A) * 100)}% der Gleichaltrigen **weniger** schlafen als der ${estimateSleepSetup.A.age}-jährige **${estimateSleepSetup.A.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.A.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepA}
@@ -2645,7 +2727,7 @@ ${certaintySleepA}
 ${answerSleepInputA}
 
 </div>
-<div class="scroll-section card" data-step="13">
+<div class="scroll-section card" data-step="14">
 
 <!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.B) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.B.age}-jährige **${estimateSleepSetup.B.name}**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **${estimateSleepSetup.B.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
@@ -2658,7 +2740,7 @@ ${certaintySleepB}
 ${answerSleepInputB}
 
 </div>
-<div class="scroll-section card" data-step="14">
+<div class="scroll-section card" data-step="15">
 
 <!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.C) * 100)}% der Gleichaltrigen **weniger** schlafen der ${estimateSleepSetup.C.age}-jährige **${estimateSleepSetup.C.name}**. Was schätzen Sie: auf welcher Höhe müsste der schwarze Punkt für die Schlafdauer von **${estimateSleepSetup.C.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
@@ -2671,7 +2753,7 @@ ${certaintySleepC}
 ${answerSleepInputC}
 
 </div>
-<div class="scroll-section card" data-step="15">
+<div class="scroll-section card" data-step="16">
 Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
 ${(variant === "all" ? Object.keys(plots) : [variant])
