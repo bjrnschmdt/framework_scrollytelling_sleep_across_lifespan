@@ -5,17 +5,17 @@ const estimatePercentageSetup = {
   A: {
     name: "Alina",
     age: 35,
-    sleepTime: 5.45,
+    sleepTime: 5.75,
   },
   B: {
     name: "Mehmet",
     age: 41,
-    sleepTime: 8.15,
+    sleepTime: 8.25,
   },
   C: {
     name: "Liu",
     age: 70,
-    sleepTime: 6.45,
+    sleepTime: 6.75,
   },
   D: {
     name: "Carmen",

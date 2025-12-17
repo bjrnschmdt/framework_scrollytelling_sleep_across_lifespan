@@ -406,10 +406,15 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 9,
     height: height,
-    age: 20,
-    sleepTime: 6.5,
+    age: estimatePercentageSetup.A.age,
+    sleepTime: estimatePercentageSetup.A.sleepTime,
     variant,
-    xDomain: isEnhanced ? baseStep.xDomain : [20 - 5.5, 20 + 5.5],
+    xDomain: isEnhanced
+      ? baseStep.xDomain
+      : [
+          estimatePercentageSetup.A.age - 5.5,
+          estimatePercentageSetup.A.age + 5.5,
+        ],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
@@ -417,10 +422,15 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 10,
     height: height,
-    age: 30,
-    sleepTime: 6,
+    age: estimatePercentageSetup.B.age,
+    sleepTime: estimatePercentageSetup.B.sleepTime,
     variant,
-    xDomain: isEnhanced ? baseStep.xDomain : [30 - 5.5, 30 + 5.5],
+    xDomain: isEnhanced
+      ? baseStep.xDomain
+      : [
+          estimatePercentageSetup.B.age - 5.5,
+          estimatePercentageSetup.B.age + 5.5,
+        ],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
@@ -428,10 +438,15 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 11,
     height: height,
-    age: 40,
-    sleepTime: 5.5,
+    age: estimatePercentageSetup.C.age,
+    sleepTime: estimatePercentageSetup.C.sleepTime,
     variant,
-    xDomain: isEnhanced ? baseStep.xDomain : [40 - 5.5, 40 + 5.5],
+    xDomain: isEnhanced
+      ? baseStep.xDomain
+      : [
+          estimatePercentageSetup.C.age - 5.5,
+          estimatePercentageSetup.C.age + 5.5,
+        ],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
@@ -2600,13 +2615,22 @@ ${educationInput}
 
 </div>
 <div class="scroll-section card" data-step="9">
-<p>Was würden Sie schätzen, wie viel Prozent der 20-Jährigen schlafen kürzer als Sie?${estimateInputPercentageA}${certaintyPercentageA}${answerPercentageInputA}</p>
+
+<!-- prettier-ignore -->
+Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.A.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.A.name}?**${estimateInputPercentageA}${certaintyPercentageA}${answerPercentageInputA}
+
 </div>
 <div class="scroll-section card" data-step="10">
-<p>Was würden Sie schätzen, wie viel Prozent der 30-Jährigen schlafen kürzer als Sie?${estimateInputPercentageB}${certaintyPercentageB}${answerPercentageInputB}</p>
+
+<!-- prettier-ignore -->
+Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.B.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.B.name}?**${estimateInputPercentageB}${certaintyPercentageB}${answerPercentageInputB}
+
 </div>
 <div class="scroll-section card" data-step="11">
-<p>Was würden Sie schätzen, wie viel Prozent der 40-Jährigen schlafen kürzer als Sie?${estimateInputPercentageC}${certaintyPercentageC}${answerPercentageInputC}</p>
+
+<!-- prettier-ignore -->
+Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.C.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.C.name}?**${estimateInputPercentageC}${certaintyPercentageC}${answerPercentageInputC}
+
 </div>
 <div class="scroll-section card" data-step="12">
 
