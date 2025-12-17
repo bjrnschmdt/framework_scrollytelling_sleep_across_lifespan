@@ -1705,7 +1705,7 @@ function createFollowupQuestionsCard() {
   container.className = "card followup-card";
 
   const heading = document.createElement("h2");
-  heading.textContent = "Noch ein paar Fragen";
+  heading.textContent = "Noch ein paar abschließende Fragen:";
 
   const intro = document.createElement("p");
   intro.textContent =
