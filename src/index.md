@@ -1236,6 +1236,24 @@ const visualAestheticsScale = createShuffledSemanticDifferentialScale({
     },
   ],
 });
+const trustworthinessScale = createShuffledSemanticDifferentialScale({
+  id: "skala_trustworthiness",
+  question: "Die Infos und Daten, die die Grafik bereitstellt, sind:",
+  items: [
+    { id: "nutzlos_nuetzlich", left: "nutzlos", right: "nützlich" },
+    {
+      id: "unglaubwuerdig_glaubwuerdig",
+      left: "unglaubwürdig",
+      right: "glaubwürdig",
+    },
+    { id: "ungenau_genau", left: "ungenau", right: "genau" },
+    {
+      id: "unserioes_serioes",
+      left: "unseriös",
+      right: "seriös",
+    },
+  ],
+});
 ```
 
 ```js
@@ -2554,6 +2572,10 @@ ${stimulationScale}
 ---
 
 ${visualAestheticsScale}
+
+---
+
+${trustworthinessScale}
 
 ---
 
