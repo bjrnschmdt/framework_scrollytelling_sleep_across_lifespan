@@ -65,6 +65,8 @@ import {
   logBtnEstimateSleepD,
   logBtnEstimateQuantityA,
   logBtnEstimateQuantityB,
+  logBtnEstimateQuantityC,
+  logBtnEstimateQuantityD,
 } from "./components/logger.js";
 import {
   dotPlot,
@@ -258,6 +260,14 @@ const debouncedLoggers = {
   ),
   estimateQuantityB: createDebouncedLogger(
     (value) => logInput("estimate_quantity_b", value),
+    500
+  ),
+  estimateQuantityC: createDebouncedLogger(
+    (value) => logInput("estimate_quantity_c", value),
+    500
+  ),
+  estimateQuantityD: createDebouncedLogger(
+    (value) => logInput("estimate_quantity_d", value),
     500
   ),
 };
@@ -1102,11 +1112,27 @@ const plotsB = createPlots(plotData.comparisonB);
 ```
 
 ```js
+const plotsC = createPlots(plotData.comparisonC);
+```
+
+```js
+const plotsD = createPlots(plotData.comparisonD);
+```
+
+```js
 debouncedLoggers.estimateQuantityA(estimateValueQuantityA);
 ```
 
 ```js
 debouncedLoggers.estimateQuantityB(estimateValueQuantityB);
+```
+
+```js
+debouncedLoggers.estimateQuantityC(estimateValueQuantityC);
+```
+
+```js
+debouncedLoggers.estimateQuantityD(estimateValueQuantityD);
 ```
 
 ```js
@@ -1117,6 +1143,16 @@ const setDisabledQuantityA = (x) => (isDisabledQuantityA.value = x);
 ```js
 const isDisabledQuantityB = Mutable(false);
 const setDisabledQuantityB = (x) => (isDisabledQuantityB.value = x);
+```
+
+```js
+const isDisabledQuantityC = Mutable(false);
+const setDisabledQuantityC = (x) => (isDisabledQuantityC.value = x);
+```
+
+```js
+const isDisabledQuantityD = Mutable(false);
+const setDisabledQuantityD = (x) => (isDisabledQuantityD.value = x);
 ```
 
 ```js
@@ -1140,6 +1176,26 @@ const estimateValueQuantityB = Generators.input(estimateInputQuantityB);
 ```
 
 ```js
+const estimateInputQuantityC = Inputs.range([0, 100], {
+  label: "In wievielen von 100 Fällen?",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
+const estimateValueQuantityC = Generators.input(estimateInputQuantityC);
+```
+
+```js
+const estimateInputQuantityD = Inputs.range([0, 100], {
+  label: "In wievielen von 100 Fällen?",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
+const estimateValueQuantityD = Generators.input(estimateInputQuantityD);
+```
+
+```js
 const certaintyQuantityA = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
@@ -1154,6 +1210,24 @@ const certaintyQuantityB = createSemanticDifferentialInput(
   "gar nicht sicher",
   "sehr sicher",
   "certainty_quantity_b"
+);
+```
+
+```js
+const certaintyQuantityC = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_quantity_c"
+);
+```
+
+```js
+const certaintyQuantityD = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_quantity_d"
 );
 ```
 
@@ -1178,6 +1252,26 @@ const answerQuantityValueB = Generators.input(answerQuantityInputB);
 ```
 
 ```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerQuantityInputC = Inputs.button("Antwort absenden", {
+  value: null,
+  reduce: (value) => btnEstimateQuantityC(value),
+  disabled: isDisabledQuantityC,
+});
+const answerQuantityValueC = Generators.input(answerQuantityInputC);
+```
+
+```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerQuantityInputD = Inputs.button("Antwort absenden", {
+  value: null,
+  reduce: (value) => btnEstimateQuantityD(value),
+  disabled: isDisabledQuantityD,
+});
+const answerQuantityValueD = Generators.input(answerQuantityInputD);
+```
+
+```js
 const btnEstimateQuantityA = (value) => {
   setDisabledQuantityA(true);
   for (const input of estimateInputQuantityA.querySelectorAll("input")) {
@@ -1197,8 +1291,6 @@ const btnEstimateQuantityA = (value) => {
     (d) => d.comparisons === i
   );
   const bSuccess = matchB?.success;
-
-  console.log("i, aSuccess, bSuccess", i, aSuccess, bSuccess);
 
   const trueValueAtIndex = Math.round(100 * aSuccess);
   const trueValueQuantity = Math.round(
@@ -1237,8 +1329,6 @@ const btnEstimateQuantityB = (value) => {
   );
   const bSuccess = matchB?.success;
 
-  console.log("i, aSuccess, bSuccess", i, aSuccess, bSuccess);
-
   const trueValueAtIndex = Math.round(100 * aSuccess);
   const trueValueQuantity = Math.round(
     100 * plotData.comparisonB.absoluteSuccessRates.aSuccess
@@ -1246,6 +1336,80 @@ const btnEstimateQuantityB = (value) => {
 
   logBtnEstimateQuantityB({
     estimateValueQuantityB,
+    trueValue: trueValueQuantity,
+    hopIndex,
+    trueValueAtIndex,
+  });
+
+  return value + 1;
+};
+```
+
+```js
+const btnEstimateQuantityC = (value) => {
+  setDisabledQuantityC(true);
+  for (const input of estimateInputQuantityC.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyQuantityC.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  const i = Math.min(99, Number(hopIndex) || 0);
+
+  const match = plotData.comparisonB?.hopCumulative?.A?.find(
+    (d) => d.comparisons === i
+  );
+  const aSuccess = match?.success;
+
+  const matchB = plotData.comparisonB?.hopCumulative?.B?.find(
+    (d) => d.comparisons === i
+  );
+  const bSuccess = matchB?.success;
+
+  const trueValueAtIndex = Math.round(100 * aSuccess);
+  const trueValueQuantity = Math.round(
+    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess
+  );
+
+  logBtnEstimateQuantityC({
+    estimateValueQuantityC,
+    trueValue: trueValueQuantity,
+    hopIndex,
+    trueValueAtIndex,
+  });
+
+  return value + 1;
+};
+```
+
+```js
+const btnEstimateQuantityD = (value) => {
+  setDisabledQuantityD(true);
+  for (const input of estimateInputQuantityD.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyQuantityD.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  const i = Math.min(99, Number(hopIndex) || 0);
+
+  const match = plotData.comparisonB?.hopCumulative?.A?.find(
+    (d) => d.comparisons === i
+  );
+  const aSuccess = match?.success;
+
+  const matchB = plotData.comparisonB?.hopCumulative?.B?.find(
+    (d) => d.comparisons === i
+  );
+  const bSuccess = matchB?.success;
+
+  const trueValueAtIndex = Math.round(100 * aSuccess);
+  const trueValueQuantity = Math.round(
+    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess
+  );
+
+  logBtnEstimateQuantityD({
+    estimateValueQuantityD,
     trueValue: trueValueQuantity,
     hopIndex,
     trueValueAtIndex,
@@ -2967,6 +3131,34 @@ ${estimateInputQuantityB}
 
 ${certaintyQuantityB}
 ${answerQuantityInputB}
+
+</div>
+<div class="scroll-section card" data-step="19">
+Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
+
+${(variant === "all" ? Object.keys(plotsC) : [variant])
+.map(k => resize((width) => plotsC[k](width)))}
+
+${estimateInputQuantityC}
+
+---
+
+${certaintyQuantityC}
+${answerQuantityInputC}
+
+</div>
+<div class="scroll-section card" data-step="20">
+Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
+
+${(variant === "all" ? Object.keys(plotsD) : [variant])
+.map(k => resize((width) => plotsD[k](width)))}
+
+${estimateInputQuantityD}
+
+---
+
+${certaintyQuantityD}
+${answerQuantityInputD}
 
 </div>
 

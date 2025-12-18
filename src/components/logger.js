@@ -140,6 +140,34 @@ export function logBtnEstimateQuantityB({
   });
 }
 
+export function logBtnEstimateQuantityC({
+  estimateValueQuantityC,
+  trueValue,
+  hopIndex,
+  trueValueAtIndex,
+}) {
+  logEvent("kielscn_hirnentwicklung_btn_estimate_quantity_c", {
+    estimateQuantityC: estimateValueQuantityC,
+    trueValueQuantityC: trueValue,
+    hopIndex: hopIndex,
+    trueValueAtIndex: trueValueAtIndex,
+  });
+}
+
+export function logBtnEstimateQuantityD({
+  estimateValueQuantityD,
+  trueValue,
+  hopIndex,
+  trueValueAtIndex,
+}) {
+  logEvent("kielscn_hirnentwicklung_btn_estimate_quantity_d", {
+    estimateQuantityD: estimateValueQuantityD,
+    trueValueQuantityD: trueValue,
+    hopIndex: hopIndex,
+    trueValueAtIndex: trueValueAtIndex,
+  });
+}
+
 // Used in pointerInteraction.js
 export function logInteraction(event) {
   logEvent("kielscn_schlafdauer_input_custom", {
