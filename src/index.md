@@ -64,6 +64,7 @@ import {
   logBtnEstimateSleepC,
   logBtnEstimateSleepD,
   logBtnEstimateQuantityA,
+  logBtnEstimateQuantityB,
 } from "./components/logger.js";
 import {
   dotPlot,
@@ -253,6 +254,10 @@ const debouncedLoggers = {
   ),
   estimateQuantityA: createDebouncedLogger(
     (value) => logInput("estimate_quantity_a", value),
+    500
+  ),
+  estimateQuantityB: createDebouncedLogger(
+    (value) => logInput("estimate_quantity_b", value),
     500
   ),
 };
@@ -535,6 +540,24 @@ const scrollyProps = {
   17: {
     ...baseStep,
     scrollStep: 17,
+    height: height,
+    comparison: true,
+  },
+  18: {
+    ...baseStep,
+    scrollStep: 18,
+    height: height,
+    comparison: true,
+  },
+  19: {
+    ...baseStep,
+    scrollStep: 19,
+    height: height,
+    comparison: true,
+  },
+  20: {
+    ...baseStep,
+    scrollStep: 20,
     height: height,
     comparison: true,
   },
@@ -1071,12 +1094,29 @@ console.log("Absolute Success Rates:", {
 ``` -->
 
 ```js
+const plotsA = createPlots(plotData.comparisonA);
+```
+
+```js
+const plotsB = createPlots(plotData.comparisonB);
+```
+
+```js
 debouncedLoggers.estimateQuantityA(estimateValueQuantityA);
+```
+
+```js
+debouncedLoggers.estimateQuantityB(estimateValueQuantityB);
 ```
 
 ```js
 const isDisabledQuantityA = Mutable(false);
 const setDisabledQuantityA = (x) => (isDisabledQuantityA.value = x);
+```
+
+```js
+const isDisabledQuantityB = Mutable(false);
+const setDisabledQuantityB = (x) => (isDisabledQuantityB.value = x);
 ```
 
 ```js
@@ -1090,11 +1130,30 @@ const estimateValueQuantityA = Generators.input(estimateInputQuantityA);
 ```
 
 ```js
+const estimateInputQuantityB = Inputs.range([0, 100], {
+  label: "In wievielen von 100 Fällen?",
+  step: 1,
+  value: 0,
+  placeholder: "in %",
+});
+const estimateValueQuantityB = Generators.input(estimateInputQuantityB);
+```
+
+```js
 const certaintyQuantityA = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
   "certainty_quantity_a"
+);
+```
+
+```js
+const certaintyQuantityB = createSemanticDifferentialInput(
+  "Wie sicher sind Sie sich mit Ihrer Antwort?",
+  "gar nicht sicher",
+  "sehr sicher",
+  "certainty_quantity_b"
 );
 ```
 
@@ -1106,6 +1165,16 @@ const answerQuantityInputA = Inputs.button("Antwort absenden", {
   disabled: isDisabledQuantityA,
 });
 const answerQuantityValueA = Generators.input(answerQuantityInputA);
+```
+
+```js
+// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
+const answerQuantityInputB = Inputs.button("Antwort absenden", {
+  value: null,
+  reduce: (value) => btnEstimateQuantityB(value),
+  disabled: isDisabledQuantityB,
+});
+const answerQuantityValueB = Generators.input(answerQuantityInputB);
 ```
 
 ```js
@@ -1138,6 +1207,45 @@ const btnEstimateQuantityA = (value) => {
 
   logBtnEstimateQuantityA({
     estimateValueQuantityA,
+    trueValue: trueValueQuantity,
+    hopIndex,
+    trueValueAtIndex,
+  });
+
+  return value + 1;
+};
+```
+
+```js
+const btnEstimateQuantityB = (value) => {
+  setDisabledQuantityB(true);
+  for (const input of estimateInputQuantityB.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  for (const input of certaintyQuantityB.querySelectorAll("input")) {
+    input.disabled = true;
+  }
+  const i = Math.min(99, Number(hopIndex) || 0);
+
+  const match = plotData.comparisonB?.hopCumulative?.A?.find(
+    (d) => d.comparisons === i
+  );
+  const aSuccess = match?.success;
+
+  const matchB = plotData.comparisonB?.hopCumulative?.B?.find(
+    (d) => d.comparisons === i
+  );
+  const bSuccess = matchB?.success;
+
+  console.log("i, aSuccess, bSuccess", i, aSuccess, bSuccess);
+
+  const trueValueAtIndex = Math.round(100 * aSuccess);
+  const trueValueQuantity = Math.round(
+    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess
+  );
+
+  logBtnEstimateQuantityB({
+    estimateValueQuantityB,
     trueValue: trueValueQuantity,
     hopIndex,
     trueValueAtIndex,
@@ -2623,80 +2731,71 @@ const comparisons = {
 const plotData = FileAttachment("./data/data_success_rates.json").json();
 ```
 
+```js
+console.log("plotData", plotData);
+```
+
 <!-- ```js
 const plotData = generateDistributions(comparisons);
 ``` -->
 
-<!-- Hop Data -->
-
 ```js
-const hopDomain = d3.extent(plotData.comparisonA.hop, (d) => d.q);
-```
+const createPlots = (data) => {
+  const hopDomain = d3.extent(data.hop, (d) => d.q);
+  const qdomain = d3.extent(data.quantileDot, (d) => d.x);
+  const qradius = (0.5 * qheightComp * qstepComp) / (qdomain[1] - qdomain[0]);
+  const qxmax = d3.least(
+    d3.rollups(
+      data.quantileDot.map((d) => d.x),
+      (v) => v.length,
+      (d) => d
+    ),
+    ([, length]) => -length
+  )[1];
 
-<!-- Quantile Dot Plot Data -->
-
-```js
-const qradius = (0.5 * qheightComp * qstepComp) / (qdomain[1] - qdomain[0]);
-```
-
-```js
-const qdomain = d3.extent(plotData.comparisonA.quantileDot, (d) => d.x);
-```
-
-```js
-const qxmax = d3.least(
-  d3.rollups(
-    plotData.comparisonA.quantileDot.map((d) => d.x),
-    (v) => v.length,
-    (d) => d
-  ),
-  ([, length]) => -length
-)[1];
-```
-
-```js
-const plots = {
-  dot: (width) =>
-    dotPlot(plotData.comparisonA.quantileDot, {
-      width,
-      height: qheightComp,
-      yDomain: qdomain,
-      xMax: qxmax,
-      qradius,
-    }),
-  hop: (width) =>
-    hopPlot(plotData.comparisonA.hop, {
-      width,
-      height: qheightComp,
-      yDomain: hopDomain,
-      qradius,
-      animate: true,
-      duration: hopDuration,
-      index: hopIndex,
-    }),
-  hop_traced: (width) =>
-    hopTracedPlot(plotData.comparisonA.hop, {
-      width,
-      height: qheightComp,
-      yDomain: hopDomain,
-      qradius,
-      animate: true,
-      duration: hopDuration,
-      window: hopCount,
-      index: hopIndex,
-    }),
-  percentile: (width) =>
-    percentilePlot(plotData.comparisonA.percentile, {
-      width,
-      height: qheightComp,
-      yDomain: hopDomain,
-    }),
-  box: (width) =>
-    boxPlot(plotData.comparisonA.box, {
-      width,
-      height: qheightComp,
-      /* yDomain: hopDomain, */
-    }),
+  return {
+    dot: (width) =>
+      dotPlot(data.quantileDot, {
+        width,
+        height: qheightComp,
+        yDomain: qdomain,
+        xMax: qxmax,
+        qradius,
+      }),
+    hop: (width) =>
+      hopPlot(data.hop, {
+        width,
+        height: qheightComp,
+        yDomain: hopDomain,
+        qradius,
+        animate: true,
+        duration: hopDuration,
+        index: hopIndex,
+      }),
+    hop_traced: (width) =>
+      hopTracedPlot(data.hop, {
+        width,
+        height: qheightComp,
+        yDomain: hopDomain,
+        qradius,
+        animate: true,
+        duration: hopDuration,
+        window: hopCount,
+        index: hopIndex,
+      }),
+    percentile: (width) =>
+      percentilePlot(data.percentile, {
+        width,
+        height: qheightComp,
+        yDomain: hopDomain,
+      }),
+    box: (width) =>
+      boxPlot(data.box, {
+        width,
+        height: qheightComp,
+        /* yDomain: hopDomain, */
+      }),
+  };
 };
 ```
 
@@ -2845,8 +2944,8 @@ ${answerSleepInputD}
 <div class="scroll-section card" data-step="17">
 Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
-${(variant === "all" ? Object.keys(plots) : [variant])
-.map(k => resize((width) => plots[k](width)))}
+${(variant === "all" ? Object.keys(plotsA) : [variant])
+.map(k => resize((width) => plotsA[k](width)))}
 
 ${estimateInputQuantityA}
 
@@ -2854,6 +2953,20 @@ ${estimateInputQuantityA}
 
 ${certaintyQuantityA}
 ${answerQuantityInputA}
+
+</div>
+<div class="scroll-section card" data-step="18">
+Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
+
+${(variant === "all" ? Object.keys(plotsB) : [variant])
+.map(k => resize((width) => plotsB[k](width)))}
+
+${estimateInputQuantityB}
+
+---
+
+${certaintyQuantityB}
+${answerQuantityInputB}
 
 </div>
 
