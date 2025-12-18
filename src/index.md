@@ -1916,18 +1916,18 @@ const bntAdaptiveTest = createBntAdaptiveTest();
 
 ```js
 const miniVlatImageUrls = {
-  mv1: await FileAttachment("./data/TreeMap.png").url(),
-  mv2: await FileAttachment("./data/Stacked100.png").url(),
-  mv3: await FileAttachment("./data/Histogram.png").url(),
-  mv4: await FileAttachment("./data/Choropleth.png").url(),
-  mv5: await FileAttachment("./data/PieChart.png").url(),
-  mv6: await FileAttachment("./data/BubbleChart.png").url(),
-  mv7: await FileAttachment("./data/StackedBar.png").url(),
-  mv8: await FileAttachment("./data/LineChart.png").url(),
-  mv9: await FileAttachment("./data/BarChart.png").url(),
-  mv10: await FileAttachment("./data/AreaChart.png").url(),
-  mv11: await FileAttachment("./data/StackedArea.png").url(),
-  mv12: await FileAttachment("./data/Scatterplot.png").url(),
+  mv1: await FileAttachment("./data/de/TreeMap.png").url(),
+  mv2: await FileAttachment("./data/de/Stacked100.png").url(),
+  mv3: await FileAttachment("./data/de/Histogram.png").url(),
+  mv4: await FileAttachment("./data/de/Choropleth.png").url(),
+  mv5: await FileAttachment("./data/de/PieChart.png").url(),
+  mv6: await FileAttachment("./data/de/BubbleChart.png").url(),
+  mv7: await FileAttachment("./data/de/StackedBar.png").url(),
+  mv8: await FileAttachment("./data/de/LineChart.png").url(),
+  mv9: await FileAttachment("./data/de/BarChart.png").url(),
+  mv10: await FileAttachment("./data/de/AreaChart.png").url(),
+  mv11: await FileAttachment("./data/de/StackedArea.png").url(),
+  mv12: await FileAttachment("./data/de/Scatterplot.png").url(),
 };
 ```
 
