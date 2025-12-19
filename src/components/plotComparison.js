@@ -126,7 +126,7 @@ function percentilePlot(data, { width = 600, height = 400, yDomain } = {}) {
         fx: "group",
         x: 0,
         y: "q",
-        fill: colors.wmv,
+        fill: themeForeground,
       }),
       Plot.textY(data, {
         fx: "group",
@@ -153,7 +153,7 @@ function boxPlot(data, { width = 600, height = 400, yDomain } = {}) {
         x: 0,
         y1: "whisker_low",
         y2: "q1",
-        stroke: colors.wmv,
+        stroke: themeForeground,
         marker: "tick",
       }),
       Plot.ruleX(data, {
@@ -161,7 +161,7 @@ function boxPlot(data, { width = 600, height = 400, yDomain } = {}) {
         x: 0,
         y1: "q3",
         y2: "whisker_high",
-        stroke: colors.wmv,
+        stroke: themeForeground,
         marker: "tick",
       }),
       Plot.barY(data, {
@@ -176,7 +176,7 @@ function boxPlot(data, { width = 600, height = 400, yDomain } = {}) {
         fx: "group",
         x: 0,
         y: "median",
-        stroke: colors.wmv,
+        stroke: themeForeground,
       }),
     ],
   });
