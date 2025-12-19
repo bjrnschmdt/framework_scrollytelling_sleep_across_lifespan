@@ -75,6 +75,13 @@ import {
   percentilePlot,
   boxPlot,
 } from "./components/plotComparison.js";
+import {
+  genericDotPlot,
+  genericHopPlot,
+  genericHopTracedPlot,
+  genericPercentilePlot,
+  genericBoxPlot,
+} from "./components/plotProxy.js";
 ```
 
 <!-- ```js
@@ -427,13 +434,22 @@ const scrollyProps = {
     ...baseStep,
     scrollStep: 8,
     height: height,
-    xDomain: isEnhanced ? baseStep.xDomain : [20 - 5.5, 20 + 5.5],
+    xDomain: isEnhanced ? baseStep.xDomain : [ageValue - 5.5, ageValue + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
+    comparison: true,
   },
   9: {
     ...baseStep,
     scrollStep: 9,
+    height: height,
+    xDomain: isEnhanced ? baseStep.xDomain : [20 - 5.5, 20 + 5.5],
+    xResolution: d3.ticks(5, 95, 90),
+    ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
+  },
+  10: {
+    ...baseStep,
+    scrollStep: 10,
     height: height,
     age: estimatePercentageSetup.A.age,
     sleepTime: estimatePercentageSetup.A.sleepTime,
@@ -447,9 +463,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  10: {
+  11: {
     ...baseStep,
-    scrollStep: 10,
+    scrollStep: 11,
     height: height,
     age: estimatePercentageSetup.B.age,
     sleepTime: estimatePercentageSetup.B.sleepTime,
@@ -463,9 +479,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  11: {
+  12: {
     ...baseStep,
-    scrollStep: 11,
+    scrollStep: 12,
     height: height,
     age: estimatePercentageSetup.C.age,
     sleepTime: estimatePercentageSetup.C.sleepTime,
@@ -479,9 +495,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  12: {
+  13: {
     ...baseStep,
-    scrollStep: 12,
+    scrollStep: 13,
     height: height,
     age: estimatePercentageSetup.D.age,
     sleepTime: estimatePercentageSetup.D.sleepTime,
@@ -495,9 +511,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  13: {
+  14: {
     ...baseStep,
-    scrollStep: 13,
+    scrollStep: 14,
     height: height,
     age: estimateSleepSetup.A.age,
     sleepTime: estimateValueSleepA,
@@ -508,9 +524,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  14: {
+  15: {
     ...baseStep,
-    scrollStep: 14,
+    scrollStep: 15,
     height: height,
     age: estimateSleepSetup.B.age,
     sleepTime: estimateValueSleepB,
@@ -521,9 +537,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  15: {
+  16: {
     ...baseStep,
-    scrollStep: 15,
+    scrollStep: 16,
     height: height,
     age: estimateSleepSetup.C.age,
     sleepTime: estimateValueSleepC,
@@ -534,9 +550,9 @@ const scrollyProps = {
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
   },
-  16: {
+  17: {
     ...baseStep,
-    scrollStep: 16,
+    scrollStep: 17,
     height: height,
     age: estimateSleepSetup.D.age,
     sleepTime: estimateValueSleepD,
@@ -546,12 +562,6 @@ const scrollyProps = {
       : [estimateSleepSetup.D.age - 5.5, estimateSleepSetup.D.age + 5.5],
     xResolution: d3.ticks(5, 95, 90),
     ticks: isEnhanced ? d3.ticks(5, 95, 9) : d3.ticks(5, 95, 45),
-  },
-  17: {
-    ...baseStep,
-    scrollStep: 17,
-    height: height,
-    comparison: true,
   },
   18: {
     ...baseStep,
@@ -568,6 +578,12 @@ const scrollyProps = {
   20: {
     ...baseStep,
     scrollStep: 20,
+    height: height,
+    comparison: true,
+  },
+  21: {
+    ...baseStep,
+    scrollStep: 21,
     height: height,
     comparison: true,
   },
@@ -2963,6 +2979,88 @@ const createPlots = (data) => {
 };
 ```
 
+```js
+const genericPlots = createGenericPlots(plotData.comparisonA);
+```
+
+```js
+const createGenericPlots = (data) => {
+  const hopDomain = d3.extent(
+    data.hop.filter((d) => d.comparison === "comparisonA" && d.group === "A"),
+    (d) => d.q
+  );
+  const qdomain = d3.extent(data.quantileDot, (d) => d.x);
+  const qradius = (0.5 * qheightComp * qstepComp) / (qdomain[1] - qdomain[0]);
+  const qxmax = d3.least(
+    d3.rollups(
+      data.quantileDot.map((d) => d.x),
+      (v) => v.length,
+      (d) => d
+    ),
+    ([, length]) => -length
+  )[1];
+
+  return {
+    dot: (width) =>
+      genericDotPlot(
+        data.quantileDot.filter(
+          (d) => d.comparison === "comparisonA" && d.group === "A"
+        ),
+        {
+          width,
+          height: qheightComp,
+          yDomain: hopDomain,
+          xMax: qxmax,
+          qradius,
+        }
+      ),
+    hop: (width) =>
+      genericHopPlot(
+        data.hop.filter(
+          (d) => d.comparison === "comparisonA" && d.group === "A"
+        ),
+        {
+          width,
+          height: qheightComp,
+          yDomain: hopDomain,
+          qradius,
+          duration: hopDuration,
+          index: hopIndex,
+        }
+      ),
+    hop_traced: (width) =>
+      genericHopTracedPlot(
+        data.hop.filter(
+          (d) => d.comparison === "comparisonA" && d.group === "A"
+        ),
+        {
+          width,
+          height: qheightComp,
+          yDomain: hopDomain,
+          qradius,
+          duration: hopDuration,
+          window: hopCount,
+          index: hopIndex,
+        }
+      ),
+    percentile: (width) =>
+      genericPercentilePlot(
+        data.percentile.filter(
+          (d) => d.comparison === "comparisonA" && d.group === "A"
+        ),
+        { width, height: qheightComp, yDomain: hopDomain }
+      ),
+    box: (width) =>
+      genericBoxPlot(
+        data.box.filter(
+          (d) => d.comparison === "comparisonA" && d.group === "A"
+        ),
+        { width, height: qheightComp, yDomain: hopDomain }
+      ),
+  };
+};
+```
+
 # So viel schlafen andere in Ihrem Alter
 
 Finden Sie es mit unserer interaktiven Grafik heraus! Wie lange schlafen Sie im Vergleich zu anderen? Wie alt sind Menschen, die so lange schlafen wie Sie? Und wie sieht es mit der Schlafdauer in der Gesamtbevölkerung aus?
@@ -2993,6 +3091,14 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}</p>
 </div>
 <div class="scroll-section card" data-step="8">
+
+${familiarityForm}
+
+${(variant === "all" ? Object.keys(genericPlots) : [variant])
+.map(k => resize((width) => genericPlots[k](width)))}
+
+</div>
+<div class="scroll-section card" data-step="9">
 
 ## **Wie haben Sie den Artikel erlebt?**
 
@@ -3029,31 +3135,31 @@ ${interestForm}
 ${educationInput}
 
 </div>
-<div class="scroll-section card" data-step="9">
+<div class="scroll-section card" data-step="10">
 
 <!-- prettier-ignore -->
 Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.A.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.A.name}?**${estimateInputPercentageA}${certaintyPercentageA}${answerPercentageInputA}
 
 </div>
-<div class="scroll-section card" data-step="10">
+<div class="scroll-section card" data-step="11">
 
 <!-- prettier-ignore -->
 Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.B.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.B.name}?**${estimateInputPercentageB}${certaintyPercentageB}${answerPercentageInputB}
 
 </div>
-<div class="scroll-section card" data-step="11">
+<div class="scroll-section card" data-step="12">
 
 <!-- prettier-ignore -->
 Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.C.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.C.name}?**${estimateInputPercentageC}${certaintyPercentageC}${answerPercentageInputC}
 
 </div>
-<div class="scroll-section card" data-step="12">
+<div class="scroll-section card" data-step="13">
 
 <!-- prettier-ignore -->
 Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.D.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.D.name}?**${estimateInputPercentageD}${certaintyPercentageD}${answerPercentageInputD}
 
 </div>
-<div class="scroll-section card" data-step="13">
+<div class="scroll-section card" data-step="14">
 
 <!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.A) * 100)}% der Gleichaltrigen **weniger** schlafen als der ${estimateSleepSetup.A.age}-jährige **${estimateSleepSetup.A.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.A.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
@@ -3066,7 +3172,7 @@ ${certaintySleepA}
 ${answerSleepInputA}
 
 </div>
-<div class="scroll-section card" data-step="14">
+<div class="scroll-section card" data-step="15">
 
 <!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.B) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.B.age}-jährige **${estimateSleepSetup.B.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.B.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
@@ -3079,7 +3185,7 @@ ${certaintySleepB}
 ${answerSleepInputB}
 
 </div>
-<div class="scroll-section card" data-step="15">
+<div class="scroll-section card" data-step="16">
 
 <!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.C) * 100)}% der Gleichaltrigen **weniger** schlafen der ${estimateSleepSetup.C.age}-jährige **${estimateSleepSetup.C.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.C.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
@@ -3092,7 +3198,7 @@ ${certaintySleepC}
 ${answerSleepInputC}
 
 </div>
-<div class="scroll-section card" data-step="16">
+<div class="scroll-section card" data-step="17">
 
 <!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.D) * 100)}% der Gleichaltrigen **weniger** schlafen die ${estimateSleepSetup.D.age}-jährige **${estimateSleepSetup.D.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.D.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
@@ -3105,7 +3211,7 @@ ${certaintySleepD}
 ${answerSleepInputD}
 
 </div>
-<div class="scroll-section card" data-step="17">
+<div class="scroll-section card" data-step="18">
 Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
 ${(variant === "all" ? Object.keys(plotsA) : [variant])
@@ -3119,7 +3225,7 @@ ${certaintyQuantityA}
 ${answerQuantityInputA}
 
 </div>
-<div class="scroll-section card" data-step="18">
+<div class="scroll-section card" data-step="19">
 Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
 ${(variant === "all" ? Object.keys(plotsB) : [variant])
@@ -3133,7 +3239,7 @@ ${certaintyQuantityB}
 ${answerQuantityInputB}
 
 </div>
-<div class="scroll-section card" data-step="19">
+<div class="scroll-section card" data-step="20">
 Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
 ${(variant === "all" ? Object.keys(plotsC) : [variant])
@@ -3147,7 +3253,7 @@ ${certaintyQuantityC}
 ${answerQuantityInputC}
 
 </div>
-<div class="scroll-section card" data-step="20">
+<div class="scroll-section card" data-step="21">
 Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
 ${(variant === "all" ? Object.keys(plotsD) : [variant])
