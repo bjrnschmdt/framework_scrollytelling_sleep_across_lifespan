@@ -7,6 +7,7 @@ import {
   resolveCssColor,
   pickNthByGroup,
   pickForwardWindowByGroup,
+  formatTime,
 } from "./helperFunctions.js";
 
 const { colors, personPath, hopCount, hopDuration } = settings;
@@ -24,6 +25,7 @@ const defaultY = (yDomain) => ({
   domain: yDomain,
   grid: true,
   label: "Schlafdauer (Stunden)",
+  tickFormat: formatTime,
 });
 
 const sexLabels = { Female: "weiblich", Male: "männlich" };
