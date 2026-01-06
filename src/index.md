@@ -1120,19 +1120,19 @@ console.log("Absolute Success Rates:", {
 ``` -->
 
 ```js
-const plotsA = createPlots(plotData.comparisonA, dotYDomain);
+const plotsA = createPlots(plotData.comparisonA);
 ```
 
 ```js
-const plotsB = createPlots(plotData.comparisonB, dotYDomain);
+const plotsB = createPlots(plotData.comparisonB);
 ```
 
 ```js
-const plotsC = createPlots(plotData.comparisonC, dotYDomain);
+const plotsC = createPlots(plotData.comparisonC);
 ```
 
 ```js
-const plotsD = createPlots(plotData.comparisonD, dotYDomain);
+const plotsD = createPlots(plotData.comparisonD);
 ```
 
 ```js
@@ -2922,7 +2922,21 @@ const rawDotYDomain = d3.extent(
   (d) => d.x
 );
 
-const dotYDomain = [rawDotYDomain[0] - 0.25, rawDotYDomain[1] + 0.25];
+const dotYDomain = [rawDotYDomain[0] - 0.5, rawDotYDomain[1] + 0.5];
+```
+
+```js
+const rawHopYDomain = d3.extent(
+  [
+    ...plotData.comparisonA.hop,
+    ...plotData.comparisonB.hop,
+    ...plotData.comparisonC.hop,
+    ...plotData.comparisonD.hop,
+  ],
+  (d) => d.q
+);
+
+const hopYDomain = [rawHopYDomain[0] - 0.5, rawHopYDomain[1] + 0.5];
 ```
 
 <!-- ```js
@@ -2930,11 +2944,14 @@ const plotData = generateDistributions(comparisons);
 ``` -->
 
 ```js
-const createPlots = (data, yDomain = dotYDomain) => {
-  const hopDomain = d3.extent(data.hop, (d) => d.q);
-  const qdomain = d3.extent(data.quantileDot, (d) => d.x);
-  /* const qradius = (0.5 * qheightComp * qstepComp) / (qdomain[1] - qdomain[0]); */
-  const qradius = (0.5 * qheightComp * qstepComp) / (yDomain[1] - yDomain[0]);
+const createPlots = (
+  data,
+  { dotDomain = dotYDomain, hopDomain = hopYDomain } = {}
+) => {
+  const qradiusDot =
+    (0.5 * qheightComp * qstepComp) / (dotDomain[1] - dotDomain[0]);
+  const qradiusHop =
+    (0.5 * qheightComp * qstepComp) / (hopDomain[1] - hopDomain[0]);
   const qxmax = d3.least(
     d3.rollups(
       data.quantileDot.map((d) => d.x),
@@ -2949,16 +2966,16 @@ const createPlots = (data, yDomain = dotYDomain) => {
       dotPlot(data.quantileDot, {
         width,
         height: qheightComp,
-        yDomain,
+        yDomain: dotDomain,
         xMax: qxmax,
-        qradius,
+        qradius: qradiusDot,
       }),
     hop: (width) =>
       hopPlot(data.hop, {
         width,
         height: qheightComp,
         yDomain: hopDomain,
-        qradius,
+        qradius: qradiusHop,
         animate: true,
         duration: hopDuration,
         index: hopIndex,
@@ -2968,7 +2985,7 @@ const createPlots = (data, yDomain = dotYDomain) => {
         width,
         height: qheightComp,
         yDomain: hopDomain,
-        qradius,
+        qradius: qradiusHop,
         animate: true,
         duration: hopDuration,
         window: hopCount,
@@ -2984,7 +3001,7 @@ const createPlots = (data, yDomain = dotYDomain) => {
       boxPlot(data.box, {
         width,
         height: qheightComp,
-        /* yDomain: hopDomain, */
+        yDomain: hopDomain,
       }),
   };
 };
