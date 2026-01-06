@@ -32,7 +32,6 @@ function genericDotPlot(
   data,
   { width = 600, height = 400, yDomain, xMax = 10, qradius = 3 } = {}
 ) {
-  console.log("dotPlot data", data);
   return Plot.plot({
     width,
     height,
