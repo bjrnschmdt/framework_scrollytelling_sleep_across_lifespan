@@ -35,12 +35,12 @@ function dotPlot(
   data,
   { width = 600, height = 400, yDomain, xMax = 10, qradius = 3 } = {}
 ) {
-  // ...existing code...
+  const oddXMax = xMax % 2 === 0 ? xMax + 1 : xMax;
   return Plot.plot({
     height,
     width,
     y: defaultY(yDomain),
-    x: { domain: [-0.5, xMax - 0.5], axis: null },
+    x: { domain: [-0.5, oddXMax - 0.5], axis: null },
     fx: defaultFx,
     marks: [
       Plot.dotY(
