@@ -1120,19 +1120,19 @@ console.log("Absolute Success Rates:", {
 ``` -->
 
 ```js
-const plotsA = createPlots(plotData.comparisonA);
+const plotsA = createPlots(plotData.comparisonA, dotYDomain);
 ```
 
 ```js
-const plotsB = createPlots(plotData.comparisonB);
+const plotsB = createPlots(plotData.comparisonB, dotYDomain);
 ```
 
 ```js
-const plotsC = createPlots(plotData.comparisonC);
+const plotsC = createPlots(plotData.comparisonC, dotYDomain);
 ```
 
 ```js
-const plotsD = createPlots(plotData.comparisonD);
+const plotsD = createPlots(plotData.comparisonD, dotYDomain);
 ```
 
 ```js
@@ -2912,7 +2912,17 @@ const plotData = FileAttachment("./data/data_success_rates.json").json();
 ```
 
 ```js
-console.log("plotData", plotData);
+const rawDotYDomain = d3.extent(
+  [
+    ...plotData.comparisonA.quantileDot,
+    ...plotData.comparisonB.quantileDot,
+    ...plotData.comparisonC.quantileDot,
+    ...plotData.comparisonD.quantileDot,
+  ],
+  (d) => d.x
+);
+
+const dotYDomain = [rawDotYDomain[0] - 0.25, rawDotYDomain[1] + 0.25];
 ```
 
 <!-- ```js
@@ -2920,10 +2930,11 @@ const plotData = generateDistributions(comparisons);
 ``` -->
 
 ```js
-const createPlots = (data) => {
+const createPlots = (data, yDomain = dotYDomain) => {
   const hopDomain = d3.extent(data.hop, (d) => d.q);
   const qdomain = d3.extent(data.quantileDot, (d) => d.x);
-  const qradius = (0.5 * qheightComp * qstepComp) / (qdomain[1] - qdomain[0]);
+  /* const qradius = (0.5 * qheightComp * qstepComp) / (qdomain[1] - qdomain[0]); */
+  const qradius = (0.5 * qheightComp * qstepComp) / (yDomain[1] - yDomain[0]);
   const qxmax = d3.least(
     d3.rollups(
       data.quantileDot.map((d) => d.x),
@@ -2938,7 +2949,7 @@ const createPlots = (data) => {
       dotPlot(data.quantileDot, {
         width,
         height: qheightComp,
-        yDomain: qdomain,
+        yDomain,
         xMax: qxmax,
         qradius,
       }),
