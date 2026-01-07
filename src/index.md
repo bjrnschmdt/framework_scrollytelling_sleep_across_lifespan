@@ -1492,7 +1492,7 @@ function createSemanticDifferentialInput(
   const form = html`<form
     style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 10px; margin-bottom: 25px; max-width: 100%;"
   >
-    <h2 style="font-weight: 500;">${question}</h2>
+    ${question ? html`<h2 style="font-weight: 500;">${question}</h2>` : null}
     <div
       style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: no-wrap; justify-content: flex-start; width: 100%;"
     >
@@ -1624,6 +1624,89 @@ function createShuffledSemanticDifferentialScale({
 
   updateFormValue();
   return form;
+}
+```
+
+```js
+const attentionCheckStorageKey =
+  "kielscn_schlafdauer_attention_check_completed_v1";
+const attentionCheckRedirectUrl =
+  getURLParameter("attention_redirect_url") || "https://www.spektrum.de/";
+
+function buildAttentionCheckOverlay() {
+  const overlay = document.createElement("div");
+  overlay.className = "attention-overlay";
+
+  const card = document.createElement("div");
+  card.className = "attention-overlay__card";
+
+  const intro = document.createElement("p");
+  intro.className = "attention-overlay__text";
+  intro.textContent =
+    "Sie sehen nun einen Onlineartikel, bitte lesen Sie ihn so durch, wie sie es normalerweise sonst auch tun würden und beantworten Sie die gestellten Fragen. Bevor es losgeht, kreuzen Sie bei der folgenden Frage bitte einmal die zweite Option an.";
+
+  const attentionScale = createSemanticDifferentialInput(
+    null,
+    "stimmt nicht",
+    "stimmt",
+    "attention_check_overlay"
+  );
+  attentionScale.classList.add("attention-overlay__scale");
+
+  attentionScale.addEventListener("change", () => {
+    const selectedValue = parseInt(
+      attentionScale.querySelector("input:checked")?.value ?? "",
+      10
+    );
+    if (!selectedValue) return;
+
+    if (selectedValue === 2) {
+      try {
+        localStorage.setItem(attentionCheckStorageKey, "passed");
+      } catch (error) {
+        console.warn("Attention check storage skipped", error);
+      }
+      logEvent("kielscn_schlafdauer_attention_check_passed", {
+        selectedValue,
+      });
+      overlay.classList.add("attention-overlay--hidden");
+      document.body.classList.remove("attention-overlay-open");
+      setTimeout(() => overlay.remove(), 220);
+    } else {
+      logEvent("kielscn_schlafdauer_attention_check_failed", {
+        selectedValue,
+      });
+      window.location.href = attentionCheckRedirectUrl;
+    }
+  });
+
+  card.append(intro, attentionScale);
+  overlay.append(card);
+  return overlay;
+}
+
+function showAttentionCheckOverlay() {
+  let hasCompleted = false;
+  try {
+    hasCompleted =
+      window.localStorage.getItem(attentionCheckStorageKey) === "passed";
+  } catch (error) {
+    console.warn("Attention check storage unavailable", error);
+  }
+  if (hasCompleted) return;
+
+  const overlay = buildAttentionCheckOverlay();
+  document.body.appendChild(overlay);
+  document.body.classList.add("attention-overlay-open");
+  logEvent("kielscn_schlafdauer_attention_check_shown");
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", showAttentionCheckOverlay, {
+    once: true,
+  });
+} else {
+  showAttentionCheckOverlay();
 }
 ```
 
@@ -3542,6 +3625,49 @@ ${followupQuestionsCard}
 .followup-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.attention-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 3vw, 2rem);
+  z-index: 10000;
+  transition: opacity 0.2s ease;
+}
+
+.attention-overlay--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.attention-overlay__card {
+  background: #0f0f0f;
+  border: 1px solid #333;
+  border-radius: 12px;
+  max-width: 720px;
+  width: min(720px, 100%);
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
+  max-height: calc(100vh - 2.5rem);
+  overflow: auto;
+}
+
+.attention-overlay__text {
+  margin: 0 0 1rem;
+  line-height: 1.45;
+  font-size: 1rem;
+}
+
+.attention-overlay__scale {
+  margin-top: 0.5rem;
+}
+
+.attention-overlay-open {
+  overflow: hidden;
 }
 
 </style>
