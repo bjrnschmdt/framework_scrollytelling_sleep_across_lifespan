@@ -2356,7 +2356,20 @@ function createFollowupQuestionsCard() {
 
   feedbackWrap.append(feedbackLabel, feedbackInput, submit);
 
-  container.append(heading, intro, questionsWrap, feedbackWrap);
+  const referrer = document.referrer;
+  const returnUrl =
+    referrer && referrer !== window.location.href
+      ? referrer
+      : attentionCheckRedirectUrl;
+  const returnButton = Inputs.button("Zurück zu Prolific", {
+    reduce: () => {
+      logEvent("kielscn_schlafdauer_followup_return", { target: returnUrl });
+      window.location.assign(returnUrl);
+    },
+  });
+  returnButton.classList.add("followup-return");
+
+  container.append(heading, intro, questionsWrap, feedbackWrap, returnButton);
   return container;
 }
 ```
@@ -3599,6 +3612,7 @@ ${followupQuestionsCard}
   flex-direction: column;
   gap: 0.5rem;
   margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .followup-feedback textarea {
@@ -3625,6 +3639,19 @@ ${followupQuestionsCard}
 .followup-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.followup-return {
+  align-self: flex-start;
+}
+
+.followup-return button {
+  padding: 0.55rem 1.25rem;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
 }
 
 .attention-overlay {
