@@ -1643,7 +1643,7 @@ function buildAttentionCheckOverlay() {
   const intro = document.createElement("p");
   intro.className = "attention-overlay__text";
   intro.textContent =
-    "Sie sehen nun einen Onlineartikel, bitte lesen Sie ihn so durch, wie sie es normalerweise sonst auch tun würden und beantworten Sie die gestellten Fragen. Bevor es losgeht, kreuzen Sie bei der folgenden Frage bitte einmal die zweite Option an.";
+    "Sie sehen nun einen Onlineartikel, bitte lesen Sie ihn so durch, wie Sie es normalerweise sonst auch tun würden und beantworten Sie die gestellten Fragen. Bevor es losgeht, kreuzen Sie bei der folgenden Frage bitte einmal die zweite Option an.";
 
   const attentionScale = createSemanticDifferentialInput(
     null,
@@ -1849,6 +1849,14 @@ function createBntAdaptiveTest() {
   const container = document.createElement("div");
   container.className = "card bnt-container";
 
+  const intro = document.createElement("p");
+  intro.className = "bnt-intro";
+  intro.textContent =
+    "Nach dem Beantworten der folgenden Frage erscheinen noch einige weitere solcher Fragen. Bitte Beantworten Sie alle, die erscheinen, bevor Sie weiterscrollen.";
+
+  const divider = document.createElement("div");
+  divider.className = "bnt-divider";
+
   const followUpContainer = document.createElement("div");
   followUpContainer.className = "bnt-follow-up";
   const q3Container = document.createElement("div");
@@ -1909,7 +1917,7 @@ function createBntAdaptiveTest() {
     q1: createBntQuestion({
       id: "q1",
       prompt:
-        "Von 1.000 Leuten in einer Kleinstadt sind 500 Mitglied im Gesangsverein. Von diesen 500 Mitgliedern im Gesangsverein sind 100 Männer. Von den 500 Einwohnern, die nicht im Gesangsverein sind, sind 300 Männer. Wie groß ist die Wahrscheinlichkeit, dass ein zufällig ausgewählter Mann ein Mitglied des Gesangsvereins ist? Bitte geben sie die Wahrscheinlichkeit in Prozent an.",
+        "Von 1.000 Leuten in einer Kleinstadt sind 500 Mitglied im Gesangsverein. Von diesen 500 Mitgliedern im Gesangsverein sind 100 Männer. Von den 500 Einwohnern, die nicht im Gesangsverein sind, sind 300 Männer. Wie groß ist die Wahrscheinlichkeit, dass ein zufällig ausgewählter Mann ein Mitglied des Gesangsvereins ist? Bitte geben Sie die Wahrscheinlichkeit in Prozent an.",
       label: "Antwort in Prozent",
       min: 0,
       max: 100,
@@ -1956,7 +1964,13 @@ function createBntAdaptiveTest() {
     }),
   };
 
-  container.append(questions.q1.node, followUpContainer, q3Container);
+  container.append(
+    intro,
+    divider,
+    questions.q1.node,
+    followUpContainer,
+    q3Container
+  );
 
   function showFollowUp(questionKey) {
     followUpContainer.innerHTML = "";
@@ -2146,13 +2160,13 @@ function createMiniVlatQuiz() {
   const intro = document.createElement("div");
   const introLead = document.createElement("p");
   introLead.textContent =
-    "Dieser Test misst deine Fähigkeit, Diagramme zu lesen und zu interpretieren.";
+    "Dieser Test misst Ihre Fähigkeit, Diagramme zu lesen und zu interpretieren.";
   const introList = document.createElement("ol");
   [
     "Der Test besteht aus 12 Fragen.",
-    "Für jede richtige Antwort bekommst du +1 Punkt; für falsche Antworten gibt es keinen Punktabzug.",
-    "Das Quiz dauert etwa 5 Minuten (bis zu 25 Sekunden pro Frage).",
-    "Wenn du dir bei einer Antwort unsicher bist, überspringe die Frage.",
+    "Für jede richtige Antwort bekommen Sie +1 Punkt; für falsche Antworten gibt es keinen Punktabzug.",
+    "Dieses Quiz dauert etwa 5 Minuten (bis zu 25 Sekunden pro Frage).",
+    "Wenn Sie sich bei einer Antwort unsicher sind, überspringen Sie die Frage.",
   ].forEach((text) => {
     const li = document.createElement("li");
     li.textContent = text;
@@ -3492,6 +3506,18 @@ ${followupQuestionsCard}
 
 .bnt-container {
   margin: 10svh auto 20svh;
+}
+
+.bnt-intro {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.bnt-divider {
+  height: 1px;
+  background: #333;
+  margin: 0 0 1.25rem;
 }
 
 .bnt-follow-up {
