@@ -2377,8 +2377,10 @@ function createFollowupQuestionsCard() {
       : attentionCheckRedirectUrl;
   const returnButton = Inputs.button("Zurück zu Prolific", {
     reduce: () => {
+      const text = feedbackInput.value.trim();
+      logInput("followup_feedback", text);
       logEvent("kielscn_schlafdauer_followup_return", { target: returnUrl });
-      window.location.assign(returnUrl);
+      /* window.location.assign(returnUrl); */
     },
   });
   returnButton.classList.add("followup-return");
