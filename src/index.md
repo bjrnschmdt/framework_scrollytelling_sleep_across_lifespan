@@ -2018,7 +2018,7 @@ const miniVlatImageUrls = {
   mv1: await FileAttachment("./data/de/TreeMap.png").url(),
   mv2: await FileAttachment("./data/de/Stacked100.png").url(),
   mv3: await FileAttachment("./data/de/Histogram.png").url(),
-  mv4: await FileAttachment("./data/de/Choropleth.png").url(),
+  mv4: await FileAttachment("./data/de/Choropleth_New.png").url(),
   mv5: await FileAttachment("./data/de/PieChart.png").url(),
   mv6: await FileAttachment("./data/de/BubbleChart.png").url(),
   mv7: await FileAttachment("./data/de/StackedBar.png").url(),
@@ -3336,12 +3336,21 @@ ${answerSleepInputD}
 
 </div>
 <div class="scroll-section card" data-step="18">
-Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
+
+Bisher haben wir uns, wie eingangs beschrieben, auf eine große Datenmenge von über 150.000 Personen bezogen.
+Die folgenden 4 Fragen drehen sich um den Vergleich von zwei kleineren Gruppen. Dafür wurden aus der großen Gruppe zufällig 200 gleichaltrige Personen ausgewählt und in zwei Gruppen aufgeteilt: Gruppe A und Gruppe B, jeweils mit 100 Personen.
+
+Obwohl alle Personen gleich alt sind, kann es durch die zufällige Auswahl passieren, dass die Gruppen unterschiedlich lange schlafen. Zum Beispiel könnte in einer Gruppe zufällig ein größerer Anteil an Langschläfern sein als in der anderen. Es kann aber auch sein, dass sich die Gruppen in ihrer Schlafdauer sehr ähnlich sind.
+
+In den folgenden 4 Fragen sehen Sie jeweils die Schlafdauer-Verteilungen beider Gruppen nebeneinander.
+Stellen Sie sich 100 zufällige Vergleiche vor: Jedes Mal wählen Sie gedanklich eine Person aus Gruppe A und eine Person aus Gruppe B und vergleichen deren Schlafdauer.
 
 ---
 
 ${(variant === "all" ? Object.keys(plotsA) : [variant])
 .map(k => resize((width) => plotsA[k](width)))}
+
+Wie häufig kommt es vor, dass eine Person aus Gruppe A kürzer schläft, als eine Person aus Gruppe B?
 
 ${estimateInputQuantityA}
 
@@ -3352,12 +3361,11 @@ ${answerQuantityInputA}
 
 </div>
 <div class="scroll-section card" data-step="19">
-Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
-
----
 
 ${(variant === "all" ? Object.keys(plotsB) : [variant])
 .map(k => resize((width) => plotsB[k](width)))}
+
+Wie häufig kommt es vor, dass eine Person aus Gruppe A kürzer schläft, als eine Person aus Gruppe B?
 
 ${estimateInputQuantityB}
 
@@ -3370,10 +3378,10 @@ ${answerQuantityInputB}
 <div class="scroll-section card" data-step="20">
 Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
----
-
 ${(variant === "all" ? Object.keys(plotsC) : [variant])
 .map(k => resize((width) => plotsC[k](width)))}
+
+Wie häufig kommt es vor, dass eine Person aus Gruppe A kürzer schläft, als eine Person aus Gruppe B?
 
 ${estimateInputQuantityC}
 
@@ -3386,10 +3394,10 @@ ${answerQuantityInputC}
 <div class="scroll-section card" data-step="21">
 Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
----
-
 ${(variant === "all" ? Object.keys(plotsD) : [variant])
 .map(k => resize((width) => plotsD[k](width)))}
+
+Wie häufig kommt es vor, dass eine Person aus Gruppe A kürzer schläft, als eine Person aus Gruppe B?
 
 ${estimateInputQuantityD}
 
