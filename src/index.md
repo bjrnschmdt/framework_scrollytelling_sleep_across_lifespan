@@ -614,6 +614,23 @@ debugLog("inputs", "ageValue", ageValue);
 ```
 
 ```js
+const createTimeRangeInput = (rangeInput) => {
+  const wrapper = html`<div class="time-range-input"></div>`;
+  const display = html`<span class="time-range-display"></span>`;
+  const updateDisplay = () => {
+    const numericValue = Number(rangeInput.value);
+    display.textContent = Number.isFinite(numericValue)
+      ? formatTime(numericValue)
+      : "--:--";
+  };
+  rangeInput.addEventListener("input", updateDisplay);
+  updateDisplay();
+  wrapper.append(rangeInput, display);
+  return wrapper;
+};
+```
+
+```js
 const sleepTimeInput = Inputs.range([sleepMin, sleepMax], {
   step: 0.25,
   label: "Schlafdauer",
@@ -621,6 +638,7 @@ const sleepTimeInput = Inputs.range([sleepMin, sleepMax], {
   /* format: (x) => formatTime(x), */
 });
 const sleepTimeValue = Generators.input(sleepTimeInput);
+const sleepTimeInputUi = createTimeRangeInput(sleepTimeInput);
 ```
 
 ```js
@@ -911,6 +929,7 @@ const estimateInputSleepA = Inputs.range([sleepMin, sleepMax], {
   value: dataSet.get(estimateSleepSetup.A.age).box[0].quartiles[1],
 });
 const estimateValueSleepA = Generators.input(estimateInputSleepA);
+const estimateInputSleepAUi = createTimeRangeInput(estimateInputSleepA);
 ```
 
 ```js
@@ -920,6 +939,7 @@ const estimateInputSleepB = Inputs.range([sleepMin, sleepMax], {
   value: dataSet.get(estimateSleepSetup.B.age).box[0].quartiles[1],
 });
 const estimateValueSleepB = Generators.input(estimateInputSleepB);
+const estimateInputSleepBUi = createTimeRangeInput(estimateInputSleepB);
 ```
 
 ```js
@@ -929,6 +949,7 @@ const estimateInputSleepC = Inputs.range([sleepMin, sleepMax], {
   value: dataSet.get(estimateSleepSetup.C.age).box[0].quartiles[1],
 });
 const estimateValueSleepC = Generators.input(estimateInputSleepC);
+const estimateInputSleepCUi = createTimeRangeInput(estimateInputSleepC);
 ```
 
 ```js
@@ -938,6 +959,7 @@ const estimateInputSleepD = Inputs.range([sleepMin, sleepMax], {
   value: dataSet.get(estimateSleepSetup.D.age).box[0].quartiles[1],
 });
 const estimateValueSleepD = Generators.input(estimateInputSleepD);
+const estimateInputSleepDUi = createTimeRangeInput(estimateInputSleepD);
 ```
 
 ```js
@@ -3221,7 +3243,7 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
 <div class="scroll-section card" data-step="4">
 </div>
 <div class="scroll-section card" data-step="5" id="user-input">
-  <p>Wie ist es bei Ihnen? Geben Sie hier Ihr Alter und Ihre übliche Schlafdauer (bspw. von letzter Nacht) ein, um sich in der Grafik verorten zu können! Wenn Sie weiter scrollen, können Sie sich mit anderen in Ihrem Alter vergleichen.</p>${ageInput}${sleepTimeInput}
+  <p>Wie ist es bei Ihnen? Geben Sie hier Ihr Alter und Ihre übliche Schlafdauer (bspw. von letzter Nacht) ein, um sich in der Grafik verorten zu können! Wenn Sie weiter scrollen, können Sie sich mit anderen in Ihrem Alter vergleichen.</p>${ageInput}${sleepTimeInputUi}
   <p class="disclaimer">Die auf dieser Seite erhobenen Daten werden in vollständig anonymisierter Form für wissenschaftliche Zwecke durch das Kiel Science Communication Network verwendet. Es ist kein Rückschluss auf Ihre Person möglich.</p>
 </div>
 <div class="scroll-section card" data-step="6">
@@ -3304,7 +3326,7 @@ Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.D.age}
 <!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.A) * 100)}% der Gleichaltrigen **weniger** schlafen als der ${estimateSleepSetup.A.age}-jährige **${estimateSleepSetup.A.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.A.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
-${estimateInputSleepA}
+${estimateInputSleepAUi}
 
 ---
 
@@ -3317,7 +3339,7 @@ ${answerSleepInputA}
 <!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.B) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.B.age}-jährige **${estimateSleepSetup.B.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.B.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
-${estimateInputSleepB}
+${estimateInputSleepBUi}
 
 ---
 
@@ -3330,7 +3352,7 @@ ${answerSleepInputB}
 <!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.C) * 100)}% der Gleichaltrigen **weniger** schlafen der ${estimateSleepSetup.C.age}-jährige **${estimateSleepSetup.C.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.C.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
-${estimateInputSleepC}
+${estimateInputSleepCUi}
 
 ---
 
@@ -3343,7 +3365,7 @@ ${answerSleepInputC}
 <!-- prettier-ignore -->
 Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.D) * 100)}% der Gleichaltrigen **weniger** schlafen die ${estimateSleepSetup.D.age}-jährige **${estimateSleepSetup.D.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.D.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
-${estimateInputSleepD}
+${estimateInputSleepDUi}
 
 ---
 
@@ -3731,6 +3753,23 @@ ${followupQuestionsCard}
 
 .attention-overlay-open {
   overflow: hidden;
+}
+
+.time-range-input {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.time-range-input input[type="number"] {
+  display: none;
+}
+
+.time-range-display {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 3.5rem;
 }
 
 </style>
