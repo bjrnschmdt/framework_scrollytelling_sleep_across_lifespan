@@ -4,19 +4,21 @@ import { settings } from "./settings.js";
 
 const { sleepMin, sleepMax, margin, qstep } = settings;
 
+const VERTICAL_SPACING_FACTOR = 2.0;
+
 export function precalculateHeights(data, qradius) {
   const totalHeightMap = new Map();
   data.forEach((dot) => {
     const x = dot.x;
     const count = totalHeightMap.get(x) || 0;
-    totalHeightMap.set(x, count + 2 * qradius);
+    totalHeightMap.set(x, count + VERTICAL_SPACING_FACTOR * qradius);
   });
   return totalHeightMap;
 }
 
 function getStackOffset(x, radius, stackMap) {
   let currentHeight = stackMap.get(x) || 0;
-  stackMap.set(x, currentHeight + 2 * radius);
+  stackMap.set(x, currentHeight + VERTICAL_SPACING_FACTOR * radius);
   return currentHeight;
 }
 

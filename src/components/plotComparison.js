@@ -15,6 +15,8 @@ const { colors, personPath, hopCount, hopDuration } = settings;
 const themeBackgroundAlt = resolveCssColor("--theme-background-alt");
 const themeForeground = resolveCssColor("--theme-foreground");
 
+const VERTICAL_SPACING_FACTOR = 1.0;
+
 // Person symbol for plots
 const personSymbol = toTurtle(personPath, {
   scaleFn: (area) => Math.sqrt(area) / 20,
@@ -37,12 +39,21 @@ function dotPlot(
   data,
   { width = 600, height = 400, yDomain, xMax = 10, qradius = 3 } = {}
 ) {
-  const oddXMax = xMax % 2 === 0 ? xMax + 1 : xMax;
+  const oddXMax =
+    xMax % 2 === 0
+      ? xMax + VERTICAL_SPACING_FACTOR
+      : xMax + VERTICAL_SPACING_FACTOR - 1;
   return Plot.plot({
     height,
     width,
     y: defaultY(yDomain),
-    x: { domain: [-0.5, oddXMax - 0.5], axis: null },
+    x: {
+      domain: [
+        -VERTICAL_SPACING_FACTOR / 2,
+        oddXMax - VERTICAL_SPACING_FACTOR / 2,
+      ],
+      axis: null,
+    },
     fx: defaultFx,
     marks: [
       Plot.dotY(
