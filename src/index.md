@@ -3414,7 +3414,6 @@ ${answerQuantityInputB}
 
 </div>
 <div class="scroll-section card" data-step="20">
-Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
 ${(variant === "all" ? Object.keys(plotsC) : [variant])
 .map(k => resize((width) => plotsC[k](width)))}
@@ -3430,7 +3429,6 @@ ${answerQuantityInputC}
 
 </div>
 <div class="scroll-section card" data-step="21">
-Schaut man nur auf die Mediane, könnte man meinen: Die Werte der Männer liegen klar über denen der Frauen. Blicken wir jedoch auf die Verteilungen, zeigt sich, dass es längst nicht so eindeutig ist. Gleichzeitig wird die Interpretation dadurch anspruchsvoller.
 
 ${(variant === "all" ? Object.keys(plotsD) : [variant])
 .map(k => resize((width) => plotsD[k](width)))}
