@@ -652,16 +652,6 @@ const estimateValue = Generators.input(estimateInput);
 ```
 
 ```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerInput = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimate(value),
-  disabled: isDisabled,
-});
-const answerValue = Generators.input(answerInput);
-```
-
-```js
 const educationInput = Inputs.select(
   new Map([
     ["", null],
@@ -775,46 +765,6 @@ const certaintyPercentageD = createSemanticDifferentialInput(
   "sehr sicher",
   "certainty_percentage_d",
 );
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerPercentageInputA = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimatePercentageA(value),
-  disabled: isDisabledPercentageA,
-});
-const answerPercentileValueA = Generators.input(answerPercentageInputA);
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerPercentageInputB = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimatePercentageB(value),
-  disabled: isDisabledPercentageB,
-});
-const answerPercentileValueB = Generators.input(answerPercentageInputB);
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerPercentageInputC = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimatePercentageC(value),
-  disabled: isDisabledPercentageC,
-});
-const answerPercentileValueC = Generators.input(answerPercentageInputC);
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerPercentageInputD = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimatePercentageD(value),
-  disabled: isDisabledPercentageD,
-});
-const answerPercentileValueD = Generators.input(answerPercentageInputD);
 ```
 
 ```js
@@ -997,46 +947,6 @@ const certaintySleepD = createSemanticDifferentialInput(
   "sehr sicher",
   "certainty_sleep_d",
 );
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerSleepInputA = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimateSleepA(value),
-  disabled: isDisabledSleepA,
-});
-const answerSleepValueA = Generators.input(answerSleepInputA);
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerSleepInputB = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimateSleepB(value),
-  disabled: isDisabledSleepB,
-});
-const answerSleepValueB = Generators.input(answerSleepInputB);
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerSleepInputC = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimateSleepC(value),
-  disabled: isDisabledSleepC,
-});
-const answerSleepValueC = Generators.input(answerSleepInputC);
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerSleepInputD = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimateSleepD(value),
-  disabled: isDisabledSleepD,
-});
-const answerSleepValueD = Generators.input(answerSleepInputD);
 ```
 
 ```js
@@ -1268,46 +1178,6 @@ const certaintyQuantityD = createSemanticDifferentialInput(
   "sehr sicher",
   "certainty_quantity_d",
 );
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerQuantityInputA = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimateQuantityA(value),
-  disabled: isDisabledQuantityA,
-});
-const answerQuantityValueA = Generators.input(answerQuantityInputA);
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerQuantityInputB = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimateQuantityB(value),
-  disabled: isDisabledQuantityB,
-});
-const answerQuantityValueB = Generators.input(answerQuantityInputB);
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerQuantityInputC = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimateQuantityC(value),
-  disabled: isDisabledQuantityC,
-});
-const answerQuantityValueC = Generators.input(answerQuantityInputC);
-```
-
-```js
-// This code is always reset/triggered when isDisabled changes. So we unfortunately cannot estimate how often a user clicks this button
-const answerQuantityInputD = Inputs.button("Antwort absenden", {
-  value: null,
-  reduce: (value) => btnEstimateQuantityD(value),
-  disabled: isDisabledQuantityD,
-});
-const answerQuantityValueD = Generators.input(answerQuantityInputD);
 ```
 
 ```js
@@ -3266,7 +3136,7 @@ Scrollen Sie einfach nach unten - die Inhalte entfalten sich Schritt für Schrit
   <!-- Description Variant -->
 </div>
 <div class="scroll-section card" data-step="7">
-  <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}${answerInput}</p>
+  <p>Was würden Sie schätzen, wie viel Prozent der Menschen in ${personalizationValue ? "dieser" : "Ihrer"} Altersgruppe schlafen kürzer als Sie?${estimateInput}</p>
 </div>
 <div class="scroll-section card" data-step="8">
 
@@ -3312,25 +3182,25 @@ ${educationInput}
 <div class="scroll-section card" data-step="10">
 
 <!-- prettier-ignore -->
-Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.A.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.A.name}?**${estimateInputPercentageA}${certaintyPercentageA}${answerPercentageInputA}
+Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.A.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.A.name}?**${estimateInputPercentageA}${certaintyPercentageA}
 
 </div>
 <div class="scroll-section card" data-step="11">
 
 <!-- prettier-ignore -->
-Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.B.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.B.name}?**${estimateInputPercentageB}${certaintyPercentageB}${answerPercentageInputB}
+Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.B.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.B.name}?**${estimateInputPercentageB}${certaintyPercentageB}
 
 </div>
 <div class="scroll-section card" data-step="12">
 
 <!-- prettier-ignore -->
-Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.C.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.C.name}?**${estimateInputPercentageC}${certaintyPercentageC}${answerPercentageInputC}
+Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.C.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.C.name}?**${estimateInputPercentageC}${certaintyPercentageC}
 
 </div>
 <div class="scroll-section card" data-step="13">
 
 <!-- prettier-ignore -->
-Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.D.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.D.name}?**${estimateInputPercentageD}${certaintyPercentageD}${answerPercentageInputD}
+Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.D.age}-Jährigen schlafen **kürzer** als **${estimatePercentageSetup.D.name}?**${estimateInputPercentageD}${certaintyPercentageD}
 
 </div>
 <div class="scroll-section card" data-step="14">
@@ -3343,7 +3213,6 @@ ${estimateInputSleepAUi}
 ---
 
 ${certaintySleepA}
-${answerSleepInputA}
 
 </div>
 <div class="scroll-section card" data-step="15">
@@ -3356,7 +3225,6 @@ ${estimateInputSleepBUi}
 ---
 
 ${certaintySleepB}
-${answerSleepInputB}
 
 </div>
 <div class="scroll-section card" data-step="16">
@@ -3369,7 +3237,6 @@ ${estimateInputSleepCUi}
 ---
 
 ${certaintySleepC}
-${answerSleepInputC}
 
 </div>
 <div class="scroll-section card" data-step="17">
@@ -3382,7 +3249,6 @@ ${estimateInputSleepDUi}
 ---
 
 ${certaintySleepD}
-${answerSleepInputD}
 
 </div>
 <div class="scroll-section card" data-step="18">
@@ -3407,7 +3273,6 @@ ${estimateInputQuantityA}
 ---
 
 ${certaintyQuantityA}
-${answerQuantityInputA}
 
 </div>
 <div class="scroll-section card" data-step="19">
@@ -3422,7 +3287,6 @@ ${estimateInputQuantityB}
 ---
 
 ${certaintyQuantityB}
-${answerQuantityInputB}
 
 </div>
 <div class="scroll-section card" data-step="20">
@@ -3437,7 +3301,6 @@ ${estimateInputQuantityC}
 ---
 
 ${certaintyQuantityC}
-${answerQuantityInputC}
 
 </div>
 <div class="scroll-section card" data-step="21">
@@ -3452,7 +3315,6 @@ ${estimateInputQuantityD}
 ---
 
 ${certaintyQuantityD}
-${answerQuantityInputD}
 
 </div>
 
