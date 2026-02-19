@@ -2286,17 +2286,17 @@ function createFollowupQuestionsCard() {
       options: ["Ja", "Nein"],
     },
     {
-      id: "data_use_honesty",
-      question:
-        "Seien Sie bitte ehrlich: Sollten wir Ihre Angaben in diesem Fragebogen für unsere Analysen verwenden?",
-      options: ["Ja", "Nein"],
-    },
-    {
       id: "carefulness",
       question: "Wie sorgfältig haben Sie diese Studie bearbeitet?",
       inputType: "semantic_differential",
       extremeLeft: "Gar nicht sorgfältig",
       extremeRight: "Sehr sorgfältig",
+    },
+    {
+      id: "data_use_honesty",
+      question:
+        "Sollten wir Ihre Angaben in diesem Fragebogen für unsere Analysen verwenden?",
+      options: ["Ja", "Nein"],
     },
   ];
 
@@ -2385,7 +2385,7 @@ function createFollowupQuestionsCard() {
 
   const feedbackLabel = document.createElement("p");
   feedbackLabel.textContent =
-    "Vielen Dank für Ihre Teilnahme! Möchten Sie uns noch etwas mitteilen?";
+    "Vielen Dank für Ihre Teilnahme! Möchten Sie uns noch etwas mitteilen? Teilen Sie uns bitte auch mit, wenn etwas nicht funktioniert hat oder es andere Probleme oder Schwierigkeiten gab.";
 
   const feedbackInput = document.createElement("textarea");
   feedbackInput.rows = 3;
