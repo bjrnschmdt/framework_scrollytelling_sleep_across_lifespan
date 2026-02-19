@@ -2294,12 +2294,9 @@ function createFollowupQuestionsCard() {
     {
       id: "carefulness",
       question: "Wie sorgfältig haben Sie diese Studie bearbeitet?",
-      options: [
-        "Gar nicht sorgfältig",
-        "wenig sorgfältig",
-        "eher sorgfältig",
-        "sehr sorgfältig",
-      ],
+      inputType: "semantic_differential",
+      extremeLeft: "Gar nicht sorgfältig",
+      extremeRight: "Sehr sorgfältig",
     },
   ];
 
@@ -2332,36 +2329,54 @@ function createFollowupQuestionsCard() {
     const block = document.createElement("div");
     block.className = "followup-question";
 
-    const prompt = document.createElement("p");
-    prompt.textContent = q.question;
-
-    const optionsWrap = document.createElement("div");
-    optionsWrap.className = "followup-options";
-
-    q.options.forEach((opt) => {
-      const label = document.createElement("label");
-      label.className = "followup-option";
-
-      const input = document.createElement("input");
-      input.type = "radio";
-      input.name = `followup_${q.id}`;
-      input.value = opt;
-
-      input.addEventListener("change", () => {
+    if (q.inputType === "semantic_differential") {
+      const semanticInput = createSemanticDifferentialInput(
+        q.question,
+        q.extremeLeft,
+        q.extremeRight,
+        `followup_${q.id}`,
+      );
+      semanticInput.addEventListener("change", () => {
         answered.add(q.id);
-        logInput(`followup_${q.id}`, opt);
         logEvent("kielscn_schlafdauer_followup_answer", {
           id: q.id,
-          choice: opt,
+          choice: semanticInput.value,
         });
         checkCompletion();
       });
+      block.append(semanticInput);
+    } else {
+      const prompt = document.createElement("p");
+      prompt.textContent = q.question;
 
-      label.append(input, document.createTextNode(opt));
-      optionsWrap.appendChild(label);
-    });
+      const optionsWrap = document.createElement("div");
+      optionsWrap.className = "followup-options";
 
-    block.append(prompt, optionsWrap);
+      q.options.forEach((opt) => {
+        const label = document.createElement("label");
+        label.className = "followup-option";
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = `followup_${q.id}`;
+        input.value = opt;
+
+        input.addEventListener("change", () => {
+          answered.add(q.id);
+          logInput(`followup_${q.id}`, opt);
+          logEvent("kielscn_schlafdauer_followup_answer", {
+            id: q.id,
+            choice: opt,
+          });
+          checkCompletion();
+        });
+
+        label.append(input, document.createTextNode(opt));
+        optionsWrap.appendChild(label);
+      });
+
+      block.append(prompt, optionsWrap);
+    }
     questionsWrap.appendChild(block);
   });
 
