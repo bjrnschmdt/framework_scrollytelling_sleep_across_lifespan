@@ -226,56 +226,56 @@ const debouncedLoggers = {
   age: createDebouncedLogger((value) => logInput("age", value), 500),
   sleepTime: createDebouncedLogger(
     (value) => logInput("sleeptime", value),
-    500
+    500,
   ),
   estimate: createDebouncedLogger((value) => logInput("estimate", value), 500),
   estimatePercentageA: createDebouncedLogger(
     (value) => logInput("estimate_percentage_a", value),
-    500
+    500,
   ),
   estimatePercentageB: createDebouncedLogger(
     (value) => logInput("estimate_percentage_b", value),
-    500
+    500,
   ),
   estimatePercentageC: createDebouncedLogger(
     (value) => logInput("estimate_percentage_c", value),
-    500
+    500,
   ),
   estimatePercentageD: createDebouncedLogger(
     (value) => logInput("estimate_percentage_d", value),
-    500
+    500,
   ),
   estimateSleepA: createDebouncedLogger(
     (value) => logInput("estimate_sleep_a", value),
-    500
+    500,
   ),
   estimateSleepB: createDebouncedLogger(
     (value) => logInput("estimate_sleep_b", value),
-    500
+    500,
   ),
   estimateSleepC: createDebouncedLogger(
     (value) => logInput("estimate_sleep_c", value),
-    500
+    500,
   ),
   estimateSleepD: createDebouncedLogger(
     (value) => logInput("estimate_sleep_d", value),
-    500
+    500,
   ),
   estimateQuantityA: createDebouncedLogger(
     (value) => logInput("estimate_quantity_a", value),
-    500
+    500,
   ),
   estimateQuantityB: createDebouncedLogger(
     (value) => logInput("estimate_quantity_b", value),
-    500
+    500,
   ),
   estimateQuantityC: createDebouncedLogger(
     (value) => logInput("estimate_quantity_c", value),
-    500
+    500,
   ),
   estimateQuantityD: createDebouncedLogger(
     (value) => logInput("estimate_quantity_d", value),
-    500
+    500,
   ),
 };
 ```
@@ -664,6 +664,7 @@ const answerValue = Generators.input(answerInput);
 ```js
 const educationInput = Inputs.select(
   new Map([
+    ["", null],
     ["Kein Schulabschluss", 0],
     ["Hauptschulabschluss", 1],
     ["Realschulabschluss", 2],
@@ -674,8 +675,8 @@ const educationInput = Inputs.select(
   ]),
   {
     label: "Höchster Bildungsabschluss",
-    value: 2,
-  }
+    value: null,
+  },
 );
 const educationValue = Generators.input(educationInput);
 ```
@@ -745,7 +746,7 @@ const certaintyPercentageA = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_percentage_a"
+  "certainty_percentage_a",
 );
 ```
 
@@ -754,7 +755,7 @@ const certaintyPercentageB = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_percentage_b"
+  "certainty_percentage_b",
 );
 ```
 
@@ -763,7 +764,7 @@ const certaintyPercentageC = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_percentage_c"
+  "certainty_percentage_c",
 );
 ```
 
@@ -772,7 +773,7 @@ const certaintyPercentageD = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_percentage_d"
+  "certainty_percentage_d",
 );
 ```
 
@@ -967,7 +968,7 @@ const certaintySleepA = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_sleep_a"
+  "certainty_sleep_a",
 );
 ```
 
@@ -976,7 +977,7 @@ const certaintySleepB = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_sleep_b"
+  "certainty_sleep_b",
 );
 ```
 
@@ -985,7 +986,7 @@ const certaintySleepC = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_sleep_c"
+  "certainty_sleep_c",
 );
 ```
 
@@ -994,7 +995,7 @@ const certaintySleepD = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_sleep_d"
+  "certainty_sleep_d",
 );
 ```
 
@@ -1238,7 +1239,7 @@ const certaintyQuantityA = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_quantity_a"
+  "certainty_quantity_a",
 );
 ```
 
@@ -1247,7 +1248,7 @@ const certaintyQuantityB = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_quantity_b"
+  "certainty_quantity_b",
 );
 ```
 
@@ -1256,7 +1257,7 @@ const certaintyQuantityC = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_quantity_c"
+  "certainty_quantity_c",
 );
 ```
 
@@ -1265,7 +1266,7 @@ const certaintyQuantityD = createSemanticDifferentialInput(
   "Wie sicher sind Sie sich mit Ihrer Antwort?",
   "gar nicht sicher",
   "sehr sicher",
-  "certainty_quantity_d"
+  "certainty_quantity_d",
 );
 ```
 
@@ -1321,18 +1322,18 @@ const btnEstimateQuantityA = (value) => {
   const i = Math.min(99, Number(hopIndex) || 0);
 
   const match = plotData.comparisonA?.hopCumulative?.A?.find(
-    (d) => d.comparisons === i
+    (d) => d.comparisons === i,
   );
   const aSuccess = match?.success;
 
   const matchB = plotData.comparisonA?.hopCumulative?.B?.find(
-    (d) => d.comparisons === i
+    (d) => d.comparisons === i,
   );
   const bSuccess = matchB?.success;
 
   const trueValueAtIndex = Math.round(100 * aSuccess);
   const trueValueQuantity = Math.round(
-    100 * plotData.comparisonA.absoluteSuccessRates.aSuccess
+    100 * plotData.comparisonA.absoluteSuccessRates.aSuccess,
   );
 
   logBtnEstimateQuantityA({
@@ -1358,18 +1359,18 @@ const btnEstimateQuantityB = (value) => {
   const i = Math.min(99, Number(hopIndex) || 0);
 
   const match = plotData.comparisonB?.hopCumulative?.A?.find(
-    (d) => d.comparisons === i
+    (d) => d.comparisons === i,
   );
   const aSuccess = match?.success;
 
   const matchB = plotData.comparisonB?.hopCumulative?.B?.find(
-    (d) => d.comparisons === i
+    (d) => d.comparisons === i,
   );
   const bSuccess = matchB?.success;
 
   const trueValueAtIndex = Math.round(100 * aSuccess);
   const trueValueQuantity = Math.round(
-    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess
+    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess,
   );
 
   logBtnEstimateQuantityB({
@@ -1395,18 +1396,18 @@ const btnEstimateQuantityC = (value) => {
   const i = Math.min(99, Number(hopIndex) || 0);
 
   const match = plotData.comparisonB?.hopCumulative?.A?.find(
-    (d) => d.comparisons === i
+    (d) => d.comparisons === i,
   );
   const aSuccess = match?.success;
 
   const matchB = plotData.comparisonB?.hopCumulative?.B?.find(
-    (d) => d.comparisons === i
+    (d) => d.comparisons === i,
   );
   const bSuccess = matchB?.success;
 
   const trueValueAtIndex = Math.round(100 * aSuccess);
   const trueValueQuantity = Math.round(
-    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess
+    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess,
   );
 
   logBtnEstimateQuantityC({
@@ -1432,18 +1433,18 @@ const btnEstimateQuantityD = (value) => {
   const i = Math.min(99, Number(hopIndex) || 0);
 
   const match = plotData.comparisonB?.hopCumulative?.A?.find(
-    (d) => d.comparisons === i
+    (d) => d.comparisons === i,
   );
   const aSuccess = match?.success;
 
   const matchB = plotData.comparisonB?.hopCumulative?.B?.find(
-    (d) => d.comparisons === i
+    (d) => d.comparisons === i,
   );
   const bSuccess = matchB?.success;
 
   const trueValueAtIndex = Math.round(100 * aSuccess);
   const trueValueQuantity = Math.round(
-    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess
+    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess,
   );
 
   logBtnEstimateQuantityD({
@@ -1509,7 +1510,7 @@ function createSemanticDifferentialInput(
   question,
   extremeLeft,
   extremeRight,
-  logKey
+  logKey,
 ) {
   const form = html`<form
     style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 10px; margin-bottom: 25px; max-width: 100%;"
@@ -1637,7 +1638,7 @@ function createShuffledSemanticDifferentialScale({
   const updateFormValue = () => {
     form.value = shuffledItems.reduce((acc, item) => {
       const selected = form.querySelector(
-        `input[name="${id}_${item.id}"]:checked`
+        `input[name="${id}_${item.id}"]:checked`,
       );
       acc[item.id] = selected ? parseInt(selected.value, 10) : null;
       return acc;
@@ -1671,14 +1672,14 @@ function buildAttentionCheckOverlay() {
     null,
     "stimmt nicht",
     "stimmt",
-    "attention_check_overlay"
+    "attention_check_overlay",
   );
   attentionScale.classList.add("attention-overlay__scale");
 
   attentionScale.addEventListener("change", () => {
     const selectedValue = parseInt(
       attentionScale.querySelector("input:checked")?.value ?? "",
-      10
+      10,
     );
     if (!selectedValue) return;
 
@@ -1737,28 +1738,28 @@ const aestheticsForm = createSemanticDifferentialInput(
   "Die Gestaltung der Grafik ist ansprechend.",
   "stimme gar nicht zu",
   "stimme voll zu",
-  "aesthetic"
+  "aesthetic",
 );
 
 const interestForm = createSemanticDifferentialInput(
   "Das Thema interessiert mich.",
   "stimme gar nicht zu",
   "stimme voll zu",
-  "interest"
+  "interest",
 );
 
 const familiarityForm = createSemanticDifferentialInput(
-  "Die folgende Visualisierung ist mir bekannt.",
+  "Eine solche Darstellung habe ich schon einmal außerhalb dieser Studie gesehen.",
   "stimme gar nicht zu",
   "stimme voll zu",
-  "familiarity"
+  "familiarity",
 );
 
 const manipulationCheck = createSemanticDifferentialInput(
   "Wählen Sie hier bitte die Antwort zwei.",
   "stimme gar nicht zu",
   "stimme voll zu",
-  "manipulation_check"
+  "manipulation_check",
 );
 
 const stimulationScale = createShuffledSemanticDifferentialScale({
@@ -1874,7 +1875,7 @@ function createBntAdaptiveTest() {
   const intro = document.createElement("p");
   intro.className = "bnt-intro";
   intro.textContent =
-    "Nach dem Beantworten der folgenden Frage erscheinen noch einige weitere solcher Fragen. Bitte Beantworten Sie alle, die erscheinen, bevor Sie weiterscrollen.";
+    "Nach dem Beantworten der folgenden Frage erscheinen noch einige weitere solcher Fragen. Bitte beantworten Sie alle, die erscheinen, bevor Sie weiterscrollen.";
 
   const divider = document.createElement("div");
   divider.className = "bnt-divider";
@@ -1991,7 +1992,7 @@ function createBntAdaptiveTest() {
     divider,
     questions.q1.node,
     followUpContainer,
-    q3Container
+    q3Container,
   );
 
   function showFollowUp(questionKey) {
@@ -2310,7 +2311,7 @@ function createFollowupQuestionsCard() {
 
   const intro = document.createElement("p");
   intro.textContent =
-    "Bitte beantworten Sie die folgenden Fragen. Ihre Antworten helfen uns, die Studie besser auszuwerten.";
+    "Bitte beantworten Sie die folgenden Fragen ehrlich. Ihre Antworten haben keinen Einfluss auf Ihre Vergütung. Ihnen entstehen keinerlei Nachteile durch Ihre Antworten. Sie helfen uns damit, die Studie besser auszuwerten.";
 
   const questionsWrap = document.createElement("div");
   questionsWrap.className = "followup-questions";
@@ -2535,7 +2536,7 @@ const { gx, gy, xAxis, yAxis, updateAxes /* , styleYAxis  */ } = createAxes(
     yScaleSVG,
     w: width,
     h: initialHeight,
-  }
+  },
 );
 
 const percentilesGroup = svg.append("g").attr("class", "percentiles");
@@ -2571,7 +2572,7 @@ if (isEnhanced) {
     container.node(),
     xScaleSVG,
     yScaleSVG,
-    width
+    width,
   );
 }
 
@@ -2838,7 +2839,7 @@ function updateChart({ data, stepProps, hopIndex, isEnhanced }) {
       xScaleSVG,
       yScaleSVG,
       isEnhanced,
-      duration
+      duration,
     );
   }
 
@@ -2967,7 +2968,7 @@ const btnEstimate = (value) => {
 ```js
 // Get the div where the visualization description will be displayed
 const visualizationDescriptionDiv = document.querySelector(
-  '.scroll-section[data-step="6"]'
+  '.scroll-section[data-step="6"]',
 );
 
 // Object to store descriptions for each visualization type
@@ -3004,7 +3005,7 @@ const stepContent = {
 
 function appendStepContent(step) {
   const stepDiv = document.querySelector(
-    `.scroll-section[data-step="${step}"]`
+    `.scroll-section[data-step="${step}"]`,
   );
 
   if (stepDiv) {
@@ -3053,7 +3054,7 @@ const rawDotYDomain = d3.extent(
     ...plotData.comparisonC.quantileDot,
     ...plotData.comparisonD.quantileDot,
   ],
-  (d) => d.x
+  (d) => d.x,
 );
 
 const dotYDomain = [rawDotYDomain[0] - 0.5, rawDotYDomain[1] + 0.5];
@@ -3067,7 +3068,7 @@ const rawHopYDomain = d3.extent(
     ...plotData.comparisonC.hop,
     ...plotData.comparisonD.hop,
   ],
-  (d) => d.q
+  (d) => d.q,
 );
 
 const hopYDomain = [rawHopYDomain[0] - 0.5, rawHopYDomain[1] + 0.5];
@@ -3080,7 +3081,7 @@ const plotData = generateDistributions(comparisons);
 ```js
 const createPlots = (
   data,
-  { dotDomain = dotYDomain, hopDomain = hopYDomain } = {}
+  { dotDomain = dotYDomain, hopDomain = hopYDomain } = {},
 ) => {
   const qradiusDot =
     (0.5 * qheightComp * qstepComp) / (dotDomain[1] - dotDomain[0]);
@@ -3090,9 +3091,9 @@ const createPlots = (
     d3.rollups(
       data.quantileDot.map((d) => d.x),
       (v) => v.length,
-      (d) => d
+      (d) => d,
     ),
-    ([, length]) => -length
+    ([, length]) => -length,
   )[1];
 
   return {
@@ -3149,7 +3150,7 @@ const genericPlots = createGenericPlots(plotData.comparisonA);
 const createGenericPlots = (data) => {
   const hopDomain = d3.extent(
     data.hop.filter((d) => d.comparison === "comparisonA" && d.group === "A"),
-    (d) => d.q
+    (d) => d.q,
   );
   const qdomain = d3.extent(data.quantileDot, (d) => d.x);
   const qradius = (0.5 * qheightComp * qstepComp) / (qdomain[1] - qdomain[0]);
@@ -3157,16 +3158,16 @@ const createGenericPlots = (data) => {
     d3.rollups(
       data.quantileDot.map((d) => d.x),
       (v) => v.length,
-      (d) => d
+      (d) => d,
     ),
-    ([, length]) => -length
+    ([, length]) => -length,
   )[1];
 
   return {
     dot: (width) =>
       genericDotPlot(
         data.quantileDot.filter(
-          (d) => d.comparison === "comparisonA" && d.group === "A"
+          (d) => d.comparison === "comparisonA" && d.group === "A",
         ),
         {
           width,
@@ -3174,12 +3175,12 @@ const createGenericPlots = (data) => {
           yDomain: hopDomain,
           xMax: qxmax,
           qradius,
-        }
+        },
       ),
     hop: (width) =>
       genericHopPlot(
         data.hop.filter(
-          (d) => d.comparison === "comparisonA" && d.group === "A"
+          (d) => d.comparison === "comparisonA" && d.group === "A",
         ),
         {
           width,
@@ -3188,12 +3189,12 @@ const createGenericPlots = (data) => {
           qradius,
           duration: hopDuration,
           index: hopIndex,
-        }
+        },
       ),
     hop_traced: (width) =>
       genericHopTracedPlot(
         data.hop.filter(
-          (d) => d.comparison === "comparisonA" && d.group === "A"
+          (d) => d.comparison === "comparisonA" && d.group === "A",
         ),
         {
           width,
@@ -3203,21 +3204,21 @@ const createGenericPlots = (data) => {
           duration: hopDuration,
           window: hopCount,
           index: hopIndex,
-        }
+        },
       ),
     percentile: (width) =>
       genericPercentilePlot(
         data.percentile.filter(
-          (d) => d.comparison === "comparisonA" && d.group === "A"
+          (d) => d.comparison === "comparisonA" && d.group === "A",
         ),
-        { width, height: qheightComp, yDomain: hopDomain }
+        { width, height: qheightComp, yDomain: hopDomain },
       ),
     box: (width) =>
       genericBoxPlot(
         data.box.filter(
-          (d) => d.comparison === "comparisonA" && d.group === "A"
+          (d) => d.comparison === "comparisonA" && d.group === "A",
         ),
-        { width, height: qheightComp, yDomain: hopDomain }
+        { width, height: qheightComp, yDomain: hopDomain },
       ),
   };
 };
@@ -3275,10 +3276,6 @@ ${visualAestheticsScale}
 ---
 
 ${trustworthinessScale}
-
----
-
-## **Was trifft für Sie zu?**
 
 ---
 
@@ -3350,7 +3347,7 @@ ${answerSleepInputB}
 <div class="scroll-section card" data-step="16">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.C) * 100)}% der Gleichaltrigen **weniger** schlafen der ${estimateSleepSetup.C.age}-jährige **${estimateSleepSetup.C.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.C.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.C) * 100)}% der Gleichaltrigen **weniger** schlafen als der ${estimateSleepSetup.C.age}-jährige **${estimateSleepSetup.C.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.C.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepCUi}
 
@@ -3363,7 +3360,7 @@ ${answerSleepInputC}
 <div class="scroll-section card" data-step="17">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.D) * 100)}% der Gleichaltrigen **weniger** schlafen die ${estimateSleepSetup.D.age}-jährige **${estimateSleepSetup.D.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.D.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.D) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.D.age}-jährige **${estimateSleepSetup.D.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.D.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepDUi}
 
