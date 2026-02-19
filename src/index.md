@@ -654,7 +654,7 @@ const estimateValue = Generators.input(estimateInput);
 ```js
 const educationInput = Inputs.select(
   new Map([
-    ["", null],
+    ["", 99],
     ["Kein Schulabschluss", 0],
     ["Hauptschulabschluss", 1],
     ["Realschulabschluss", 2],
@@ -665,7 +665,7 @@ const educationInput = Inputs.select(
   ]),
   {
     label: "Höchster Bildungsabschluss",
-    value: null,
+    value: 99,
   },
 );
 const educationValue = Generators.input(educationInput);
