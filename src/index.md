@@ -2261,22 +2261,7 @@ function createFollowupQuestionsCard() {
   feedbackInput.rows = 3;
   feedbackInput.placeholder = "Ihre Nachricht (optional)";
 
-  const submit = document.createElement("button");
-  submit.type = "button";
-  submit.className = "followup-submit";
-  submit.textContent = "Antwort senden";
-
-  submit.addEventListener("click", () => {
-    const text = feedbackInput.value.trim();
-    logInput("followup_feedback", text);
-    logEvent("kielscn_schlafdauer_followup_feedback_submitted", {
-      hasText: text.length > 0,
-    });
-    feedbackInput.disabled = true;
-    submit.disabled = true;
-  });
-
-  feedbackWrap.append(feedbackLabel, feedbackInput, submit);
+  feedbackWrap.append(feedbackLabel, feedbackInput);
 
   const referrer = document.referrer;
   const returnUrl =
