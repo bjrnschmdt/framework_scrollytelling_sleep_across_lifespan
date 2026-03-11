@@ -1521,85 +1521,121 @@ function createShuffledSemanticDifferentialScale({
 ```
 
 ```js
-const attentionCheckStorageKey =
-  "kielscn_schlafdauer_attention_check_completed_v1";
-const attentionCheckRedirectUrl =
+const participantInfoStorageKey =
+  "kielscn_schlafdauer_participant_info_completed_v1";
+const studyReturnUrl =
   getURLParameter("attention_redirect_url") || "https://www.spektrum.de/";
 
-function buildAttentionCheckOverlay() {
+function buildParticipantInfoOverlay() {
   const overlay = document.createElement("div");
-  overlay.className = "attention-overlay";
+  overlay.className = "participant-info-overlay";
 
   const card = document.createElement("div");
-  card.className = "attention-overlay__card";
+  card.className = "participant-info-overlay__card";
 
-  const intro = document.createElement("p");
-  intro.className = "attention-overlay__text";
-  intro.textContent =
-    "Sie sehen nun einen Onlineartikel, bitte lesen Sie ihn so durch, wie Sie es normalerweise sonst auch tun würden und beantworten Sie die gestellten Fragen. Bevor es losgeht, kreuzen Sie bei der folgenden Frage bitte einmal die zweite Option an.";
+  const infoHeading = document.createElement("h2");
+  infoHeading.className = "participant-info-overlay__heading";
+  infoHeading.textContent = "Informationen für StudienteilnehmerInnen";
 
-  const attentionScale = createSemanticDifferentialInput(
-    null,
-    "stimmt nicht",
-    "stimmt",
-    "attention_check_overlay",
-  );
-  attentionScale.classList.add("attention-overlay__scale");
+  const paragraphs = [
+    "Hallo!",
+    "Vielen Dank, dass Sie an unserer Studie über interaktive Datendarstellungen teilnehmen möchten. Die Studie wird im Rahmen des Kiel Science Communication Network (KielSCN) Projekts in Deutschland durchgeführt. Beteiligt sind dabei das Leibniz Institut für die Pädagogik der Mathematik und Naturwissenschaften (IPN), die Universität Kiel, die Muthesius Kunsthochschule sowie Spektrum der Wissenschaft als unser Praxispartner. Im Folgenden erhalten Sie Informationen zur Studie und zu Datenschutzthemen. Bitte lesen Sie die Informationen sorgfältig durch, bevor Sie der Teilnahme an der Studie zustimmen.",
+    "Worum geht es?",
+    "Das Ziel der Studie ist es, herauszufinden, wie interaktive Datendarstellungen verwendet werden können, um komplexe Daten verständlich darzustellen. Dafür haben wir einen Info-Artikel zum Thema Schlaf über die Lebensspanne erstellt, den Sie lesen werden und dazu einige Fragen beantworten. Sie können dabei auch herausfinden, wieviel Sie selbst im Vergleich zu anderen schlafen.",
+    "Die Studie dauert ca. 20-30 Minuten.",
+    "Was passiert, wenn Sie teilnehmen?",
+    "Sie erhalten eine Aufwandsentschädigung in Höhe von 9 GBP pro Stunde für Ihre Teilnahme, welche über Prolific ausbezahlt wird. Es sind keine Risiken durch die Teilnahme zu erwarten. Ihre Teilnahme ist freiwillig und kann jederzeit ohne Angabe von Gründen und ohne negative Folgen abgebrochen werden. Sie können auch einzelne Fragen überspringen, wenn Sie dazu keine Angabe machen möchten. Ihre Angaben sind anonym.",
+    "Was passiert mit Ihren Daten?",
+    "Ihre Antworten und Nutzungsdaten werden ausschließlich anonymisiert für Forschungszwecke aufgezeichnet. Anonym bedeutet: Wir speichern keine Daten, die Sie als Person identifizieren. Auch Ihre Prolific-ID wird nicht mit Ihren Antworten verknüpft. Damit wir Ihre Antworten und Nutzungsdaten anonym aufzeichnen und Sie an der Studie teilnehmen können, müssen Sie das Cookie-Banner von spektrum.de akzeptieren.",
+    "Eine nachträgliche Löschung einzelner Datensätze ist aufgrund der kompletten Anonymisierung nach der Erhebung nicht mehr möglich. Dadurch entfallen Ihre Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung oder Übertragung (personenbezogener) Daten gemäß Artikel 15-18; 20 der Datenschutzgrundverordnung (DSGVO).",
+    "Die Daten sind technisch gegen unautorisierten Zugriff geschützt und werden, in Übereinstimmung mit den Empfehlungen der Deutschen Forschungsgesellschaft (DFG), für zehn Jahre aufbewahrt und anschließend gelöscht.",
+    "Eine Nachnutzung der Daten im Rahmen der wissenschaftlichen Forschung kann jedoch unter Umständen gestattet werden, sofern die hier bekannten Grundsätze der Datennutzung, Speicherung und Verarbeitung nicht verletzt werden. Dies schließt auch die Bereitstellung der Daten in einem wissenschaftlichen Repositorium mit ein.",
+    "Weitere Informationen",
+    "Zum Forschungsteam gehören Stephan Reiche (Studienleitung), Prof. Dr. Melanie Keller und Björn Döge (alle Mitglieder des KielSCN Projekts, www.kielscn.de). Bei Fragen o.ä. zur Untersuchung wenden Sie sich bitte an Stephan Reiche (reiche@leibniz-ipn.de). Fragen können jederzeit vor, während und nach der Untersuchung per Mail gestellt werden. Wenn Sie Sorgen bzgl. Ihrer Rechte als StudienteilnehmerIn haben, können Sie den Datenschutzbeauftragten des Leibniz Institut für die Pädagogik der Mathematik und Naturwissenschaften unter datenschutz@leibniz-ipn.de erreichen. Sie haben außerdem das Recht, Beschwerde beim Unabhängigen Landeszentrum für Datenschutz Schleswig-Holstein, Holstenstraße 98, 24104 Kiel (mail@datenschutzzentrum.de) einzulegen.",
+    "Einverständniserklärung",
+    "Ich bestätige hiermit, über 18 Jahre alt zu sein und die vorstehenden Informationen zur Untersuchung und zum Datenschutz sorgfältig gelesen zu haben. Außerdem bestätige ich, dass ich freiwillig an der Studie teilnehmen möchte, dass ich darüber informiert wurde, wie meine Daten verarbeitet werden und dass sie anonym für Forschungszwecke verwendet werden.",
+  ];
 
-  attentionScale.addEventListener("change", () => {
-    const selectedValue = parseInt(
-      attentionScale.querySelector("input:checked")?.value ?? "",
-      10,
-    );
-    if (!selectedValue) return;
-
-    if (selectedValue === 2) {
-      try {
-        localStorage.setItem(attentionCheckStorageKey, "passed");
-      } catch (error) {
-        console.warn("Attention check storage skipped", error);
-      }
-      logEvent("kielscn_schlafdauer_attention_check_passed", {
-        selectedValue,
-      });
-      overlay.classList.add("attention-overlay--hidden");
-      document.body.classList.remove("attention-overlay-open");
-      setTimeout(() => overlay.remove(), 220);
-    } else {
-      logEvent("kielscn_schlafdauer_attention_check_failed", {
-        selectedValue,
-      });
-      window.location.href = attentionCheckRedirectUrl;
-    }
+  const content = document.createElement("div");
+  content.className = "participant-info-overlay__content";
+  paragraphs.forEach((text) => {
+    const p = document.createElement("p");
+    p.className = "participant-info-overlay__text";
+    p.textContent = text;
+    content.appendChild(p);
   });
 
-  card.append(intro, attentionScale);
+  const consentLabel = document.createElement("label");
+  consentLabel.className = "participant-info-overlay__consent";
+
+  const consentInput = document.createElement("input");
+  consentInput.type = "checkbox";
+  consentInput.name = "participant_info_consent";
+  consentInput.value = "agreed";
+
+  const consentText = document.createElement("span");
+  consentText.textContent = "Ich stimme zu";
+  consentLabel.append(consentInput, consentText);
+
+  const outro = document.createElement("p");
+  outro.className = "participant-info-overlay__outro";
+  outro.textContent =
+    "Sie sehen nun einen Onlineartikel, bitte lesen Sie ihn so durch, wie Sie es normalerweise sonst auch tun würden und beantworten Sie die gestellten Fragen.";
+
+  const startButton = document.createElement("button");
+  startButton.type = "button";
+  startButton.className = "participant-info-overlay__start";
+  startButton.textContent = "Los geht's";
+  startButton.disabled = true;
+
+  consentInput.addEventListener("change", () => {
+    const checked = consentInput.checked;
+    startButton.disabled = !checked;
+    logEvent("kielscn_schlafdauer_participant_info_consent_changed", {
+      checked,
+    });
+  });
+
+  startButton.addEventListener("click", () => {
+    if (!consentInput.checked) return;
+    try {
+      localStorage.setItem(participantInfoStorageKey, "completed");
+    } catch (error) {
+      console.warn("Participant info storage skipped", error);
+    }
+    logEvent("kielscn_schlafdauer_participant_info_confirmed");
+    overlay.classList.add("participant-info-overlay--hidden");
+    document.body.classList.remove("participant-info-overlay-open");
+    setTimeout(() => overlay.remove(), 220);
+  });
+
+  card.append(infoHeading, content, consentLabel, outro, startButton);
   overlay.append(card);
   return overlay;
 }
 
-function showAttentionCheckOverlay() {
+function showParticipantInfoOverlay() {
   let hasCompleted = false;
   try {
     hasCompleted =
-      window.localStorage.getItem(attentionCheckStorageKey) === "passed";
+      window.localStorage.getItem(participantInfoStorageKey) === "completed";
   } catch (error) {
-    console.warn("Attention check storage unavailable", error);
+    console.warn("Participant info storage unavailable", error);
   }
   if (hasCompleted) return;
 
-  const overlay = buildAttentionCheckOverlay();
+  const overlay = buildParticipantInfoOverlay();
   document.body.appendChild(overlay);
-  document.body.classList.add("attention-overlay-open");
-  logEvent("kielscn_schlafdauer_attention_check_shown");
+  document.body.classList.add("participant-info-overlay-open");
+  // logEvent("kielscn_schlafdauer_participant_info_shown");
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", showAttentionCheckOverlay, {
+  document.addEventListener("DOMContentLoaded", showParticipantInfoOverlay, {
     once: true,
   });
 } else {
-  showAttentionCheckOverlay();
+  showParticipantInfoOverlay();
 }
 ```
 
@@ -2265,9 +2301,7 @@ function createFollowupQuestionsCard() {
 
   const referrer = document.referrer;
   const returnUrl =
-    referrer && referrer !== window.location.href
-      ? referrer
-      : attentionCheckRedirectUrl;
+    referrer && referrer !== window.location.href ? referrer : studyReturnUrl;
   const returnButton = Inputs.button("Zurück zu Prolific", {
     reduce: () => {
       const text = feedbackInput.value.trim();
@@ -3569,7 +3603,7 @@ ${followupQuestionsCard}
   cursor: pointer;
 }
 
-.attention-overlay {
+.participant-info-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.85);
@@ -3581,12 +3615,12 @@ ${followupQuestionsCard}
   transition: opacity 0.2s ease;
 }
 
-.attention-overlay--hidden {
+.participant-info-overlay--hidden {
   opacity: 0;
   pointer-events: none;
 }
 
-.attention-overlay__card {
+.participant-info-overlay__card {
   background: #0f0f0f;
   border: 1px solid #333;
   border-radius: 12px;
@@ -3598,17 +3632,50 @@ ${followupQuestionsCard}
   overflow: auto;
 }
 
-.attention-overlay__text {
+.participant-info-overlay__heading {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.participant-info-overlay__content {
+  margin-bottom: 1rem;
+}
+
+.participant-info-overlay__text {
   margin: 0 0 1rem;
   line-height: 1.45;
   font-size: 1rem;
 }
 
-.attention-overlay__scale {
-  margin-top: 0.5rem;
+.participant-info-overlay__consent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
 }
 
-.attention-overlay-open {
+.participant-info-overlay__outro {
+  margin: 1rem 0;
+  line-height: 1.45;
+}
+
+.participant-info-overlay__start {
+  appearance: none;
+  border: 1px solid #767676;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  padding: 0.55rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.participant-info-overlay__start:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.participant-info-overlay-open {
   overflow: hidden;
 }
 
