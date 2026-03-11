@@ -1485,15 +1485,6 @@ function createShuffledSemanticDifferentialScale({
           input.querySelector("input").addEventListener("change", () => {
             updateFormValue();
             logInput(`${id}_${item.id}`, value);
-            if (
-              Object.values(form.value).every((v) => v !== null) &&
-              !form.completionLogged
-            ) {
-              form.completionLogged = true;
-              logEvent(`kielscn_schlafdauer_input_${id}_complete`, {
-                ...form.value,
-              });
-            }
           });
           return input;
         })}
@@ -2220,16 +2211,6 @@ function createFollowupQuestionsCard() {
   questionsWrap.className = "followup-questions";
 
   const answered = new Set();
-  let completionLogged = false;
-
-  const checkCompletion = () => {
-    if (!completionLogged && answered.size === questions.length) {
-      completionLogged = true;
-      logEvent("kielscn_schlafdauer_followup_complete", {
-        answered: Array.from(answered),
-      });
-    }
-  };
 
   questions.forEach((q) => {
     const block = document.createElement("div");
@@ -2248,7 +2229,6 @@ function createFollowupQuestionsCard() {
           id: q.id,
           choice: semanticInput.value,
         });
-        checkCompletion();
       });
       block.append(semanticInput);
     } else {
@@ -2274,7 +2254,6 @@ function createFollowupQuestionsCard() {
             id: q.id,
             choice: opt,
           });
-          checkCompletion();
         });
 
         label.append(input, document.createTextNode(opt));
