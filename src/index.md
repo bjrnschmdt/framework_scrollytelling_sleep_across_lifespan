@@ -975,17 +975,6 @@ const certaintyQuantityD = createSemanticDifferentialInput(
 <!-- ********************************************************* -->
 <!-- ********************************************************* -->
 
-```js
-const scrollTo = Inputs.button("Nochmal versuchen", {
-  reduce: () => {
-    logEvent("kielscn_schlafdauer_btn_retry");
-    const target = document.getElementById("user-input");
-    target.scrollIntoView({ behavior: "smooth", block: "center" });
-  },
-});
-const scrollToValue = Generators.input(scrollTo);
-```
-
 <!-- ```js
 const aestheticsInput = Inputs.radio(
   new Map([
@@ -1942,29 +1931,6 @@ function createFollowupQuestionsCard() {
 ```js
 const miniVlatTest = createMiniVlatQuiz();
 const followupQuestionsCard = createFollowupQuestionsCard();
-```
-
-```js
-const shareBtn = Inputs.button("Teilen Sie diesen Artikel", {
-  reduce: () => {
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Schau dir diese interaktive Grafik zur Schlafdauer an!",
-          text: "So viel schlafen andere in Ihrem Alter",
-          url: window.location.href,
-        })
-        .then(() => {
-          logEvent("kielscn_schlafdauer_shared", { shared: true }); // Log success
-        })
-        .catch((error) => {
-          logEvent("kielscn_schlafdauer_shared", { shared: false }); // Log failure
-        });
-    } else {
-      console.log("Web Share API wird nicht unterstützt.");
-    }
-  },
-});
 ```
 
 <!-- Main Visualization code -->
