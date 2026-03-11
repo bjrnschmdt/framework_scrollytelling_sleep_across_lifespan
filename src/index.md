@@ -2105,10 +2105,10 @@ function createMiniVlatQuiz() {
   const updateScore = () => {
     if (answeredCount === questions.length && !completionLogged) {
       completionLogged = true;
-      logEvent("kielscn_schlafdauer_minivlat_complete", {
+      /* logEvent("kielscn_schlafdauer_minivlat_complete", {
         score: correctCount,
         total: questions.length,
-      });
+      }); */
     }
   };
 
@@ -2225,10 +2225,10 @@ function createFollowupQuestionsCard() {
       );
       semanticInput.addEventListener("change", () => {
         answered.add(q.id);
-        logEvent("kielscn_schlafdauer_followup_answer", {
+        /* logEvent("kielscn_schlafdauer_followup_answer", {
           id: q.id,
           choice: semanticInput.value,
-        });
+        }); */
       });
       block.append(semanticInput);
     } else {
@@ -2250,10 +2250,10 @@ function createFollowupQuestionsCard() {
         input.addEventListener("change", () => {
           answered.add(q.id);
           logInput(`followup_${q.id}`, opt);
-          logEvent("kielscn_schlafdauer_followup_answer", {
+          /* logEvent("kielscn_schlafdauer_followup_answer", {
             id: q.id,
             choice: opt,
-          });
+          }); */
         });
 
         label.append(input, document.createTextNode(opt));
