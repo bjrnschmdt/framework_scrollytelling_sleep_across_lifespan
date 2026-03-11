@@ -1,0 +1,483 @@
+[
+  {
+    "event_name": "kielscn_schlafdauer_sctn_visible",
+    "fields": {
+      "sctn": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_type",
+    "fields": {
+      "type": "string"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_age",
+    "fields": {
+      "age": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_sleeptime",
+    "fields": {
+      "sleeptime": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate",
+    "fields": {
+      "estimate": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_percentage_a",
+    "fields": {
+      "estimatePercentageA": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_percentage_b",
+    "fields": {
+      "estimatePercentageB": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_percentage_c",
+    "fields": {
+      "estimatePercentageC": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_percentage_d",
+    "fields": {
+      "estimatePercentageD": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_sleep_a",
+    "fields": {
+      "estimateSleepA": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_sleep_b",
+    "fields": {
+      "estimateSleepB": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_sleep_c",
+    "fields": {
+      "estimateSleepC": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_sleep_d",
+    "fields": {
+      "estimateSleepD": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_quantity_a",
+    "fields": {
+      "estimateQuantityA": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_quantity_b",
+    "fields": {
+      "estimateQuantityB": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_quantity_c",
+    "fields": {
+      "estimateQuantityC": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_estimate_quantity_d",
+    "fields": {
+      "estimateQuantityD": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_education",
+    "fields": {
+      "education": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_percentage_a",
+    "fields": {
+      "certaintyPercentageA": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_percentage_b",
+    "fields": {
+      "certaintyPercentageB": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_percentage_c",
+    "fields": {
+      "certaintyPercentageC": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_percentage_d",
+    "fields": {
+      "certaintyPercentageD": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_sleep_a",
+    "fields": {
+      "certaintySleepA": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_sleep_b",
+    "fields": {
+      "certaintySleepB": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_sleep_c",
+    "fields": {
+      "certaintySleepC": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_sleep_d",
+    "fields": {
+      "certaintySleepD": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_quantity_a",
+    "fields": {
+      "certaintyQuantityA": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_quantity_b",
+    "fields": {
+      "certaintyQuantityB": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_quantity_c",
+    "fields": {
+      "certaintyQuantityC": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_certainty_quantity_d",
+    "fields": {
+      "certaintyQuantityD": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_btn_estimate",
+    "fields": {
+      "age": "number",
+      "sleepTime": "number",
+      "estimate": "number",
+      "trueValue": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_btn_estimate_percentage_a",
+    "fields": {
+      "estimatePercentageA": "number",
+      "trueValuePercentageA": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_btn_estimate_percentage_b",
+    "fields": {
+      "estimatePercentageB": "number",
+      "trueValuePercentageB": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_btn_estimate_percentage_c",
+    "fields": {
+      "estimatePercentageC": "number",
+      "trueValuePercentageC": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_btn_estimate_percentage_d",
+    "fields": {
+      "estimatePercentageD": "number",
+      "trueValuePercentageD": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_btn_estimate_sleep_a",
+    "fields": {
+      "estimateSleepA": "number",
+      "trueValueSleepA": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_btn_estimate_sleep_b",
+    "fields": {
+      "estimateSleepB": "number",
+      "trueValueSleepB": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_btn_estimate_sleep_c",
+    "fields": {
+      "estimateSleepC": "number",
+      "trueValueSleepC": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_btn_estimate_sleep_d",
+    "fields": {
+      "estimateSleepD": "number",
+      "trueValueSleepD": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_hirnentwicklung_btn_estimate_quantity_a",
+    "fields": {
+      "estimateQuantityA": "number",
+      "trueValueQuantityA": "number",
+      "hopIndex": "number",
+      "trueValueAtIndex": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_hirnentwicklung_btn_estimate_quantity_b",
+    "fields": {
+      "estimateQuantityB": "number",
+      "trueValueQuantityB": "number",
+      "hopIndex": "number",
+      "trueValueAtIndex": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_hirnentwicklung_btn_estimate_quantity_c",
+    "fields": {
+      "estimateQuantityC": "number",
+      "trueValueQuantityC": "number",
+      "hopIndex": "number",
+      "trueValueAtIndex": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_hirnentwicklung_btn_estimate_quantity_d",
+    "fields": {
+      "estimateQuantityD": "number",
+      "trueValueQuantityD": "number",
+      "hopIndex": "number",
+      "trueValueAtIndex": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_btn_retry",
+    "fields": {}
+  },
+  {
+    "event_name": "kielscn_schlafdauer_participant_info_consent_changed",
+    "fields": {
+      "checked": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_participant_info_confirmed",
+    "fields": {}
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_aesthetic",
+    "fields": {
+      "aesthetic": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_interest",
+    "fields": {
+      "interest": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_familiarity",
+    "fields": {
+      "familiarity": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_manipulation_check",
+    "fields": {
+      "manipulationCheck": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_stimulation_langweilig_spannend",
+    "fields": {
+      "skalaStimulationLangweiligSpannend": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_stimulation_uninteressant_interessant",
+    "fields": {
+      "skalaStimulationUninteressantInteressant": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_stimulation_einschlaefernd_aktivierend",
+    "fields": {
+      "skalaStimulationEinschlaeferndAktivierend": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_stimulation_minderwertig_wertvoll",
+    "fields": {
+      "skalaStimulationMinderwertigWertvoll": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_visual_aesthetics_haesslich_schoen",
+    "fields": {
+      "skalaVisualAestheticsHaesslichSchoen": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_visual_aesthetics_unaesthetisch_aesthetisch",
+    "fields": {
+      "skalaVisualAestheticsUnaesthetischAesthetisch": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_visual_aesthetics_stillos_stilvoll",
+    "fields": {
+      "skalaVisualAestheticsStillosStilvoll": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_visual_aesthetics_nicht_ansprechend_ansprechend",
+    "fields": {
+      "skalaVisualAestheticsNichtAnsprechendAnsprechend": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_trustworthiness_nutzlos_nuetzlich",
+    "fields": {
+      "skalaTrustworthinessNutzlosNuetzlich": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_trustworthiness_unglaubwuerdig_glaubwuerdig",
+    "fields": {
+      "skalaTrustworthinessUnglaubwuerdigGlaubwuerdig": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_trustworthiness_ungenau_genau",
+    "fields": {
+      "skalaTrustworthinessUngenauGenau": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_skala_trustworthiness_unserioes_serioes",
+    "fields": {
+      "skalaTrustworthinessUnserioesSerioes": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_bnt_submit_q1",
+    "fields": {
+      "question": "string",
+      "value": "number",
+      "correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_bnt_submit_q2a",
+    "fields": {
+      "question": "string",
+      "value": "number",
+      "correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_bnt_submit_q2b",
+    "fields": {
+      "question": "string",
+      "value": "number",
+      "correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_bnt_submit_q3",
+    "fields": {
+      "question": "string",
+      "value": "number",
+      "correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_bnt_score",
+    "fields": {
+      "score": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer",
+    "fields": {
+      "id": "string",
+      "choice": "string",
+      "correct": "boolean",
+      "attempt": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_followup_delayed_recognition",
+    "fields": {
+      "followupDelayedRecognition": "string"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_followup_carefulness",
+    "fields": {
+      "followupCarefulness": "number"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_followup_data_use_honesty",
+    "fields": {
+      "followupDataUseHonesty": "string"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_followup_feedback",
+    "fields": {
+      "followupFeedback": "string"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_followup_return",
+    "fields": {
+      "target": "string"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_shared",
+    "fields": {
+      "shared": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_input_custom",
+    "fields": {
+      "age": "number",
+      "sleepTime": "number"
+    }
+  }
+]
