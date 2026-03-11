@@ -200,8 +200,8 @@ logEvent("kielscn_schlafdauer_type", { type: variant });
 
 ```js
 const def = {
-  age: 89,
-  sleepTime: 6.5,
+  age: 95,
+  sleepTime: 13,
   showRecommended: false,
   showPointcloud: true,
   showPercentiles: ["B", "C"],
