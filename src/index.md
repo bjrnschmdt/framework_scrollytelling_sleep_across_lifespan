@@ -54,19 +54,6 @@ import {
   logEvent,
   logSectionVisible,
   logInput,
-  logBtnEstimate,
-  logBtnEstimatePercentageA,
-  logBtnEstimatePercentageB,
-  logBtnEstimatePercentageC,
-  logBtnEstimatePercentageD,
-  logBtnEstimateSleepA,
-  logBtnEstimateSleepB,
-  logBtnEstimateSleepC,
-  logBtnEstimateSleepD,
-  logBtnEstimateQuantityA,
-  logBtnEstimateQuantityB,
-  logBtnEstimateQuantityC,
-  logBtnEstimateQuantityD,
 } from "./components/logger.js";
 import {
   dotPlot,
@@ -767,94 +754,6 @@ const certaintyPercentageD = createSemanticDifferentialInput(
 );
 ```
 
-```js
-const isDisabledPercentageA = Mutable(false);
-const setDisabledPercentageA = (x) => (isDisabledPercentageA.value = x);
-```
-
-```js
-const isDisabledPercentageB = Mutable(false);
-const setDisabledPercentageB = (x) => (isDisabledPercentageB.value = x);
-```
-
-```js
-const isDisabledPercentageC = Mutable(false);
-const setDisabledPercentageC = (x) => (isDisabledPercentageC.value = x);
-```
-
-```js
-const isDisabledPercentageD = Mutable(false);
-const setDisabledPercentageD = (x) => (isDisabledPercentageD.value = x);
-```
-
-```js
-const btnEstimatePercentageA = (value) => {
-  setDisabledPercentageA(true); // not needed anymore because button stays disabled after first click
-  for (const input of estimateInputPercentageA.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintyPercentageA.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  logBtnEstimatePercentageA({
-    estimateValuePercentageA,
-    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
-  });
-  return value + 1;
-};
-```
-
-```js
-const btnEstimatePercentageB = (value) => {
-  setDisabledPercentageB(true); // not needed anymore because button stays disabled after first click
-  for (const input of estimateInputPercentageB.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintyPercentageB.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  logBtnEstimatePercentageB({
-    estimateValuePercentageB,
-    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
-  });
-  return value + 1;
-};
-```
-
-```js
-const btnEstimatePercentageC = (value) => {
-  setDisabledPercentageC(true); // not needed anymore because button stays disabled after first click
-  for (const input of estimateInputPercentageC.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintyPercentageC.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  logBtnEstimatePercentageC({
-    estimateValuePercentageC,
-    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
-  });
-  return value + 1;
-};
-```
-
-```js
-const btnEstimatePercentageD = (value) => {
-  setDisabledPercentageD(true); // not needed anymore because button stays disabled after first click
-  for (const input of estimateInputPercentageD.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintyPercentageD.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  logBtnEstimatePercentageD({
-    estimateValuePercentageD,
-    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
-  });
-  return value + 1;
-};
-```
-
 <!-- ********************************************************* -->
 
 ```js
@@ -949,94 +848,6 @@ const certaintySleepD = createSemanticDifferentialInput(
 );
 ```
 
-```js
-const isDisabledSleepA = Mutable(false);
-const setDisabledSleepA = (x) => (isDisabledSleepA.value = x);
-```
-
-```js
-const isDisabledSleepB = Mutable(false);
-const setDisabledSleepB = (x) => (isDisabledSleepB.value = x);
-```
-
-```js
-const isDisabledSleepC = Mutable(false);
-const setDisabledSleepC = (x) => (isDisabledSleepC.value = x);
-```
-
-```js
-const isDisabledSleepD = Mutable(false);
-const setDisabledSleepD = (x) => (isDisabledSleepD.value = x);
-```
-
-```js
-const btnEstimateSleepA = (value) => {
-  setDisabledSleepA(true); // not needed anymore because button stays disabled after first click
-  for (const input of estimateInputSleepA.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintySleepA.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  logBtnEstimateSleepA({
-    estimateValueSleepA,
-    trueValue: estimateSleepSetup.A.sleepTime,
-  });
-  return value + 1;
-};
-```
-
-```js
-const btnEstimateSleepB = (value) => {
-  setDisabledSleepB(true); // not needed anymore because button stays disabled after first click
-  for (const input of estimateInputSleepB.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintySleepB.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  logBtnEstimateSleepB({
-    estimateValueSleepB,
-    trueValue: estimateSleepSetup.B.sleepTime,
-  });
-  return value + 1;
-};
-```
-
-```js
-const btnEstimateSleepC = (value) => {
-  setDisabledSleepC(true); // not needed anymore because button stays disabled after first click
-  for (const input of estimateInputSleepC.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintySleepC.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  logBtnEstimateSleepC({
-    estimateValueSleepC,
-    trueValue: estimateSleepSetup.C.sleepTime,
-  });
-  return value + 1;
-};
-```
-
-```js
-const btnEstimateSleepD = (value) => {
-  setDisabledSleepD(true); // not needed anymore because button stays disabled after first click
-  for (const input of estimateInputSleepD.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintySleepD.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  logBtnEstimateSleepD({
-    estimateValueSleepD,
-    trueValue: estimateSleepSetup.D.sleepTime,
-  });
-  return value + 1;
-};
-```
-
 <!-- ********************************************************* -->
 <!-- ********************************************************* -->
 
@@ -1082,26 +893,6 @@ debouncedLoggers.estimateQuantityC(estimateValueQuantityC);
 
 ```js
 debouncedLoggers.estimateQuantityD(estimateValueQuantityD);
-```
-
-```js
-const isDisabledQuantityA = Mutable(false);
-const setDisabledQuantityA = (x) => (isDisabledQuantityA.value = x);
-```
-
-```js
-const isDisabledQuantityB = Mutable(false);
-const setDisabledQuantityB = (x) => (isDisabledQuantityB.value = x);
-```
-
-```js
-const isDisabledQuantityC = Mutable(false);
-const setDisabledQuantityC = (x) => (isDisabledQuantityC.value = x);
-```
-
-```js
-const isDisabledQuantityD = Mutable(false);
-const setDisabledQuantityD = (x) => (isDisabledQuantityD.value = x);
 ```
 
 ```js
@@ -1178,154 +969,6 @@ const certaintyQuantityD = createSemanticDifferentialInput(
   "sehr sicher",
   "certainty_quantity_d",
 );
-```
-
-```js
-const btnEstimateQuantityA = (value) => {
-  setDisabledQuantityA(true);
-  for (const input of estimateInputQuantityA.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintyQuantityA.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  const i = Math.min(99, Number(hopIndex) || 0);
-
-  const match = plotData.comparisonA?.hopCumulative?.A?.find(
-    (d) => d.comparisons === i,
-  );
-  const aSuccess = match?.success;
-
-  const matchB = plotData.comparisonA?.hopCumulative?.B?.find(
-    (d) => d.comparisons === i,
-  );
-  const bSuccess = matchB?.success;
-
-  const trueValueAtIndex = Math.round(100 * aSuccess);
-  const trueValueQuantity = Math.round(
-    100 * plotData.comparisonA.absoluteSuccessRates.aSuccess,
-  );
-
-  logBtnEstimateQuantityA({
-    estimateValueQuantityA,
-    trueValue: trueValueQuantity,
-    hopIndex,
-    trueValueAtIndex,
-  });
-
-  return value + 1;
-};
-```
-
-```js
-const btnEstimateQuantityB = (value) => {
-  setDisabledQuantityB(true);
-  for (const input of estimateInputQuantityB.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintyQuantityB.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  const i = Math.min(99, Number(hopIndex) || 0);
-
-  const match = plotData.comparisonB?.hopCumulative?.A?.find(
-    (d) => d.comparisons === i,
-  );
-  const aSuccess = match?.success;
-
-  const matchB = plotData.comparisonB?.hopCumulative?.B?.find(
-    (d) => d.comparisons === i,
-  );
-  const bSuccess = matchB?.success;
-
-  const trueValueAtIndex = Math.round(100 * aSuccess);
-  const trueValueQuantity = Math.round(
-    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess,
-  );
-
-  logBtnEstimateQuantityB({
-    estimateValueQuantityB,
-    trueValue: trueValueQuantity,
-    hopIndex,
-    trueValueAtIndex,
-  });
-
-  return value + 1;
-};
-```
-
-```js
-const btnEstimateQuantityC = (value) => {
-  setDisabledQuantityC(true);
-  for (const input of estimateInputQuantityC.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintyQuantityC.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  const i = Math.min(99, Number(hopIndex) || 0);
-
-  const match = plotData.comparisonB?.hopCumulative?.A?.find(
-    (d) => d.comparisons === i,
-  );
-  const aSuccess = match?.success;
-
-  const matchB = plotData.comparisonB?.hopCumulative?.B?.find(
-    (d) => d.comparisons === i,
-  );
-  const bSuccess = matchB?.success;
-
-  const trueValueAtIndex = Math.round(100 * aSuccess);
-  const trueValueQuantity = Math.round(
-    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess,
-  );
-
-  logBtnEstimateQuantityC({
-    estimateValueQuantityC,
-    trueValue: trueValueQuantity,
-    hopIndex,
-    trueValueAtIndex,
-  });
-
-  return value + 1;
-};
-```
-
-```js
-const btnEstimateQuantityD = (value) => {
-  setDisabledQuantityD(true);
-  for (const input of estimateInputQuantityD.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  for (const input of certaintyQuantityD.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  const i = Math.min(99, Number(hopIndex) || 0);
-
-  const match = plotData.comparisonB?.hopCumulative?.A?.find(
-    (d) => d.comparisons === i,
-  );
-  const aSuccess = match?.success;
-
-  const matchB = plotData.comparisonB?.hopCumulative?.B?.find(
-    (d) => d.comparisons === i,
-  );
-  const bSuccess = matchB?.success;
-
-  const trueValueAtIndex = Math.round(100 * aSuccess);
-  const trueValueQuantity = Math.round(
-    100 * plotData.comparisonB.absoluteSuccessRates.aSuccess,
-  );
-
-  logBtnEstimateQuantityD({
-    estimateValueQuantityD,
-    trueValue: trueValueQuantity,
-    hopIndex,
-    trueValueAtIndex,
-  });
-
-  return value + 1;
-};
 ```
 
 <!-- ********************************************************* -->
@@ -2829,22 +2472,6 @@ setupIntersectionObserver({
 ```
 
 <!-- Helper functions -->
-
-```js
-const btnEstimate = (value) => {
-  setDisabled(true);
-  for (const input of estimateInput.querySelectorAll("input")) {
-    input.disabled = true;
-  }
-  logBtnEstimate({
-    estimateValue,
-    trueValue: Math.round(getTrueValue(dataSet, stepProps) * 100),
-    age: stepProps.age,
-    sleepTime: stepProps.sleepTime,
-  });
-  return value + 1;
-};
-```
 
 <!-- HTML -->
 
