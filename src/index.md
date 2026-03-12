@@ -1148,6 +1148,9 @@ const participantInfoStorageKey =
   "kielscn_schlafdauer_participant_info_completed_v1";
 const studyReturnUrl =
   getURLParameter("attention_redirect_url") || "https://www.spektrum.de/";
+const participantInfoDeclineRedirectUrl =
+  getURLParameter("participant_decline_redirect_url") ||
+  "https://www.kielscn.de/";
 
 function buildParticipantInfoOverlay() {
   const overlay = document.createElement("div");
@@ -1188,17 +1191,28 @@ function buildParticipantInfoOverlay() {
     content.appendChild(p);
   });
 
-  const consentLabel = document.createElement("label");
-  consentLabel.className = "participant-info-overlay__consent";
+  const consentGroup = document.createElement("div");
+  consentGroup.className = "participant-info-overlay__consent-group";
 
-  const consentInput = document.createElement("input");
-  consentInput.type = "checkbox";
-  consentInput.name = "participant_info_consent";
-  consentInput.value = "agreed";
+  const createConsentOption = (value, text) => {
+    const label = document.createElement("label");
+    label.className = "participant-info-overlay__consent";
 
-  const consentText = document.createElement("span");
-  consentText.textContent = "Ich stimme zu";
-  consentLabel.append(consentInput, consentText);
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "participant_info_consent";
+    input.value = value;
+
+    const labelText = document.createElement("span");
+    labelText.textContent = text;
+
+    label.append(input, labelText);
+    return label;
+  };
+
+  const agreeOption = createConsentOption("agree", "ich stimme zu");
+  const disagreeOption = createConsentOption("disagree", "Ich stimme nicht zu");
+  consentGroup.append(agreeOption, disagreeOption);
 
   const outro = document.createElement("p");
   outro.className = "participant-info-overlay__outro";
@@ -1211,16 +1225,30 @@ function buildParticipantInfoOverlay() {
   startButton.textContent = "Los geht's";
   startButton.disabled = true;
 
-  consentInput.addEventListener("change", () => {
-    const checked = consentInput.checked;
-    startButton.disabled = !checked;
+  consentGroup.addEventListener("change", () => {
+    const selectedConsent =
+      consentGroup.querySelector(
+        'input[name="participant_info_consent"]:checked',
+      )?.value || null;
+    startButton.disabled = selectedConsent !== "agree";
     logEvent("kielscn_schlafdauer_participant_info_consent_changed", {
-      checked,
+      choice: selectedConsent,
     });
+
+    if (selectedConsent === "disagree") {
+      logEvent("kielscn_schlafdauer_participant_info_declined", {
+        target: participantInfoDeclineRedirectUrl,
+      });
+      window.location.assign(participantInfoDeclineRedirectUrl);
+    }
   });
 
   startButton.addEventListener("click", () => {
-    if (!consentInput.checked) return;
+    const selectedConsent =
+      consentGroup.querySelector(
+        'input[name="participant_info_consent"]:checked',
+      )?.value || null;
+    if (selectedConsent !== "agree") return;
     try {
       localStorage.setItem(participantInfoStorageKey, "completed");
     } catch (error) {
@@ -1232,7 +1260,7 @@ function buildParticipantInfoOverlay() {
     setTimeout(() => overlay.remove(), 220);
   });
 
-  card.append(infoHeading, content, consentLabel, outro, startButton);
+  card.append(infoHeading, content, consentGroup, outro, startButton);
   overlay.append(card);
   return overlay;
 }
@@ -3212,6 +3240,12 @@ ${followupQuestionsCard}
   margin: 0 0 1rem;
   line-height: 1.45;
   font-size: 1rem;
+}
+
+.participant-info-overlay__consent-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .participant-info-overlay__consent {

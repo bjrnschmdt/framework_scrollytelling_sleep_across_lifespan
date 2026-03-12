@@ -182,12 +182,18 @@
   {
     "event_name": "kielscn_schlafdauer_participant_info_consent_changed",
     "fields": {
-      "checked": "boolean"
+      "choice": "string"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_participant_info_confirmed",
     "fields": {}
+  },
+  {
+    "event_name": "kielscn_schlafdauer_participant_info_declined",
+    "fields": {
+      "target": "string"
+    }
   },
   {
     "event_name": "kielscn_schlafdauer_input_aesthetic",
