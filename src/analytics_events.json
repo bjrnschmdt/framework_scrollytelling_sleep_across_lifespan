@@ -180,10 +180,6 @@
     }
   },
   {
-    "event_name": "kielscn_schlafdauer_btn_retry",
-    "fields": {}
-  },
-  {
     "event_name": "kielscn_schlafdauer_participant_info_consent_changed",
     "fields": {
       "checked": "boolean"
@@ -364,19 +360,6 @@
     "event_name": "kielscn_schlafdauer_followup_return",
     "fields": {
       "target": "string"
-    }
-  },
-  {
-    "event_name": "kielscn_schlafdauer_shared",
-    "fields": {
-      "shared": "boolean"
-    }
-  },
-  {
-    "event_name": "kielscn_schlafdauer_input_custom",
-    "fields": {
-      "age": "number",
-      "sleepTime": "number"
     }
   }
 ]
