@@ -1438,9 +1438,8 @@ function createBntAdaptiveTest() {
     state[id] = value;
     locked[id] = true;
     logEvent(`kielscn_schlafdauer_bnt_submit_${id}`, {
-      question: id,
-      value,
-      correct: isCorrect,
+      [`bnt_${id}_estimate`]: value,
+      [`bnt_${id}_correct`]: isCorrect,
     });
 
     if (id === "q1") {

@@ -288,33 +288,29 @@
   {
     "event_name": "kielscn_schlafdauer_bnt_submit_q1",
     "fields": {
-      "question": "string",
-      "value": "number",
-      "correct": "boolean"
+      "bnt_q1_estimate": "number",
+      "bnt_q1_correct": "boolean"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_bnt_submit_q2a",
     "fields": {
-      "question": "string",
-      "value": "number",
-      "correct": "boolean"
+      "bnt_q2a_estimate": "number",
+      "bnt_q2a_correct": "boolean"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_bnt_submit_q2b",
     "fields": {
-      "question": "string",
-      "value": "number",
-      "correct": "boolean"
+      "bnt_q2b_estimate": "number",
+      "bnt_q2b_correct": "boolean"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_bnt_submit_q3",
     "fields": {
-      "question": "string",
-      "value": "number",
-      "correct": "boolean"
+      "bnt_q3_estimate": "number",
+      "bnt_q3_correct": "boolean"
     }
   },
   {
