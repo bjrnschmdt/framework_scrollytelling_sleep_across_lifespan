@@ -1761,7 +1761,6 @@ function createMiniVlatQuiz() {
     form.className = "minivlat-options";
 
     let answered = false;
-    let attempts = 0;
 
     q.options.forEach((opt) => {
       const label = document.createElement("label");
@@ -1771,18 +1770,15 @@ function createMiniVlatQuiz() {
       input.name = q.id;
       input.value = opt;
       input.addEventListener("change", () => {
-        attempts += 1;
         const isCorrect = input.value === q.correct;
         if (!answered) {
           answered = true;
           answeredCount += 1;
           if (isCorrect) correctCount += 1;
         }
-        logEvent("kielscn_schlafdauer_minivlat_answer", {
-          id: q.id,
-          choice: input.value,
-          correct: isCorrect,
-          attempt: attempts,
+        logEvent(`kielscn_schlafdauer_minivlat_answer_${q.id}`, {
+          [`${q.id}_choice`]: input.value,
+          [`${q.id}_correct`]: isCorrect,
         });
         if (answered) {
           updateScore();

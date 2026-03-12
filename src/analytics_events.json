@@ -320,12 +320,87 @@
     }
   },
   {
-    "event_name": "kielscn_schlafdauer_minivlat_answer",
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv1",
     "fields": {
-      "id": "string",
-      "choice": "string",
-      "correct": "boolean",
-      "attempt": "number"
+      "mv1_choice": "string",
+      "mv1_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv2",
+    "fields": {
+      "mv2_choice": "string",
+      "mv2_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv3",
+    "fields": {
+      "mv3_choice": "string",
+      "mv3_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv4",
+    "fields": {
+      "mv4_choice": "string",
+      "mv4_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv5",
+    "fields": {
+      "mv5_choice": "string",
+      "mv5_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv6",
+    "fields": {
+      "mv6_choice": "string",
+      "mv6_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv7",
+    "fields": {
+      "mv7_choice": "string",
+      "mv7_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv8",
+    "fields": {
+      "mv8_choice": "string",
+      "mv8_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv9",
+    "fields": {
+      "mv9_choice": "string",
+      "mv9_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv10",
+    "fields": {
+      "mv10_choice": "string",
+      "mv10_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv11",
+    "fields": {
+      "mv11_choice": "string",
+      "mv11_correct": "boolean"
+    }
+  },
+  {
+    "event_name": "kielscn_schlafdauer_minivlat_answer_mv12",
+    "fields": {
+      "mv12_choice": "string",
+      "mv12_correct": "boolean"
     }
   },
   {
