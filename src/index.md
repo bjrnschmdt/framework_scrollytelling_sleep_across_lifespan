@@ -900,7 +900,6 @@ const estimateInputQuantityA = Inputs.range([0, 100], {
   label: "In wievielen von 100 Fällen?",
   step: 1,
   value: 0,
-  placeholder: "in %",
 });
 const estimateValueQuantityA = Generators.input(estimateInputQuantityA);
 ```
@@ -910,7 +909,6 @@ const estimateInputQuantityB = Inputs.range([0, 100], {
   label: "In wievielen von 100 Fällen?",
   step: 1,
   value: 0,
-  placeholder: "in %",
 });
 const estimateValueQuantityB = Generators.input(estimateInputQuantityB);
 ```
@@ -920,7 +918,6 @@ const estimateInputQuantityC = Inputs.range([0, 100], {
   label: "In wievielen von 100 Fällen?",
   step: 1,
   value: 0,
-  placeholder: "in %",
 });
 const estimateValueQuantityC = Generators.input(estimateInputQuantityC);
 ```
@@ -930,7 +927,6 @@ const estimateInputQuantityD = Inputs.range([0, 100], {
   label: "In wievielen von 100 Fällen?",
   step: 1,
   value: 0,
-  placeholder: "in %",
 });
 const estimateValueQuantityD = Generators.input(estimateInputQuantityD);
 ```
