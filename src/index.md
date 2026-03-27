@@ -1143,10 +1143,11 @@ function createShuffledSemanticDifferentialScale({
 const participantInfoStorageKey =
   "kielscn_schlafdauer_participant_info_completed_v1";
 const studyReturnUrl =
-  getURLParameter("attention_redirect_url") || "https://www.spektrum.de/";
+  getURLParameter("attention_redirect_url") ||
+  "https://app.prolific.com/submissions/complete?cc=C1EUUJLC";
 const participantInfoDeclineRedirectUrl =
   getURLParameter("participant_decline_redirect_url") ||
-  "https://www.kielscn.de/";
+  "https://app.prolific.com/submissions/complete?cc=C1LPLYWM";
 
 function buildParticipantInfoOverlay() {
   const overlay = document.createElement("div");
