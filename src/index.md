@@ -2949,12 +2949,14 @@ ${followupQuestionsCard}
 .scroll-container {
   margin: 1rem auto;
   padding-bottom: 1vh; /* hack to ensure last section scrolls past svg to */
+  overflow-anchor: none;
 }
 
 .scroll-info {
   position: sticky;
   top: 0;
   margin: 0 auto;
+  overflow-anchor: none;
 }
 
 .scroll-info,
@@ -2979,6 +2981,10 @@ ${followupQuestionsCard}
 
 .scroll-section:last-of-type {
   margin-bottom: 100svh;
+}
+
+main {
+  overflow-anchor: none;
 }
 
 .outro {
@@ -3013,6 +3019,7 @@ ${followupQuestionsCard}
 
 .bnt-container {
   margin: 10svh auto 20svh;
+  overflow-anchor: none;
 }
 
 .bnt-intro {
@@ -3046,6 +3053,7 @@ ${followupQuestionsCard}
   margin: 10svh auto 20svh;
   position: relative;
   z-index: 4;
+  overflow-anchor: none;
 }
 
 .minivlat-header h2 {
@@ -3116,6 +3124,7 @@ ${followupQuestionsCard}
 
 .followup-card {
   margin: 10svh auto 20svh;
+  overflow-anchor: none;
 }
 
 .followup-questions {
