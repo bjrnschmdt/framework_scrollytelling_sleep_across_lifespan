@@ -186,6 +186,14 @@ logEvent("kielscn_schlafdauer_type", { type: variant });
 ```
 
 ```js
+const prolificPid = getURLParameter("PROLIFIC_PID") || "none";
+```
+
+```js
+logEvent("kielscn_schlafdauer_prolific_pid", { prolificPid: prolificPid });
+```
+
+```js
 const def = {
   age: 95,
   sleepTime: 13,
