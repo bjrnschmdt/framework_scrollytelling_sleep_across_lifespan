@@ -5,14 +5,16 @@ import { debugLog, toCamelCase } from "./helperFunctions.js";
 export function initializeLogger(redirectUrl) {
   const existingOptimizely = window.optimizely;
 
-  if (!existingOptimizely) {
+  if (!existingOptimizely || Array.isArray(existingOptimizely)) {
     window.optimizely = [];
-    console.log("[logger] No Optimizely object found. Skipping production checks.");
+    console.log("[logger] Optimizely queue detected. Skipping production checks.");
     return false;
   }
 
-  const isInitialized = Object.keys(window.optimizely).includes("initialized");
-  const accountId = window.optimizely.get?.("data")?.accountId || null;
+  const isInitialized = Object.keys(existingOptimizely).includes(
+    "initialized"
+  );
+  const accountId = existingOptimizely.get?.("data")?.accountId || null;
 
   if (!isInitialized || !accountId) {
     console.log("[logger] Optimizely check failed", {
