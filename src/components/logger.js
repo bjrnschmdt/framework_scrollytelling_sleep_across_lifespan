@@ -2,18 +2,18 @@
 import { debugLog, toCamelCase } from "./helperFunctions.js";
 
 // Helper function to initialize the logging system
-export function initializeLogger(redirectUrl) {
+export function initializeLogger(redirectUrl, environment = "production") {
   const existingOptimizely = window.optimizely;
 
-  if (!existingOptimizely || Array.isArray(existingOptimizely)) {
+  if (environment === "development") {
     window.optimizely = [];
-    console.log("[logger] Optimizely queue detected. Skipping production checks.");
+    console.log(
+      "[logger] Development mode active. Skipping production checks.",
+    );
     return false;
   }
 
-  const isInitialized = Object.keys(existingOptimizely).includes(
-    "initialized"
-  );
+  const isInitialized = Object.keys(existingOptimizely).includes("initialized");
   const accountId = existingOptimizely.get?.("data")?.accountId || null;
 
   if (!isInitialized || !accountId) {

@@ -200,7 +200,11 @@ const participantInfoDeclineRedirectUrl =
 ```
 
 ```js
-initializeLogger(gtmFallbackRedirectUrl);
+const loggerEnvironment = getURLParameter("logger_env") || "production";
+```
+
+```js
+initializeLogger(gtmFallbackRedirectUrl, loggerEnvironment);
 ```
 
 ```js
