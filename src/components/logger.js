@@ -2,8 +2,27 @@
 import { debugLog, toCamelCase } from "./helperFunctions.js";
 
 // Helper function to initialize the logging system
-export function initializeLogger() {
-  window["optimizely"] = window["optimizely"] || [];
+export function initializeLogger(redirectUrl) {
+  const existingOptimizely = window.optimizely;
+
+  if (!existingOptimizely) {
+    window.optimizely = [];
+    console.log("[logger] No Optimizely object found. Skipping production checks.");
+    return false;
+  }
+
+  const isInitialized = Object.keys(window.optimizely).includes("initialized");
+  const accountId = window.optimizely.get?.("data")?.accountId || null;
+
+  if (!isInitialized || !accountId) {
+    console.log("[logger] Optimizely check failed", {
+      isInitialized,
+      accountId,
+    });
+    window.location.replace(redirectUrl);
+  }
+
+  return false;
 }
 
 // Log a generic event

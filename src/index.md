@@ -182,7 +182,25 @@ const variant = getURLParameter("v") || "dot";
 ```
 
 ```js
-logEvent("kielscn_schlafdauer_type", { type: variant });
+const studyReturnUrl =
+  getURLParameter("attention_redirect_url") ||
+  "https://app.prolific.com/submissions/complete?cc=C1EUUJLC";
+```
+
+```js
+const gtmFallbackRedirectUrl =
+  getURLParameter("gtm_redirect_url") ||
+  "https://app.prolific.com/submissions/complete?cc=CBAUPC78";
+```
+
+```js
+const participantInfoDeclineRedirectUrl =
+  getURLParameter("participant_decline_redirect_url") ||
+  "https://app.prolific.com/submissions/complete?cc=C1LPLYWM";
+```
+
+```js
+initializeLogger(gtmFallbackRedirectUrl);
 ```
 
 ```js
@@ -190,7 +208,7 @@ const prolificPid = getURLParameter("PROLIFIC_PID") || "none";
 ```
 
 ```js
-logEvent("kielscn_schlafdauer_prolific_pid", { prolificPid: prolificPid });
+logEvent("kielscn_schlafdauer_type", { type: variant });
 ```
 
 ```js
@@ -209,7 +227,7 @@ const def = {
 <!-- Analytics -->
 
 ```js
-initializeLogger();
+logEvent("kielscn_schlafdauer_prolific_pid", { prolificPid: prolificPid });
 ```
 
 ```js
@@ -1150,12 +1168,6 @@ function createShuffledSemanticDifferentialScale({
 ```js
 const participantInfoStorageKey =
   "kielscn_schlafdauer_participant_info_completed_v1";
-const studyReturnUrl =
-  getURLParameter("attention_redirect_url") ||
-  "https://app.prolific.com/submissions/complete?cc=C1EUUJLC";
-const participantInfoDeclineRedirectUrl =
-  getURLParameter("participant_decline_redirect_url") ||
-  "https://app.prolific.com/submissions/complete?cc=C1LPLYWM";
 
 function buildParticipantInfoOverlay() {
   const overlay = document.createElement("div");
