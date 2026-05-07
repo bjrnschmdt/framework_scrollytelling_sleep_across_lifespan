@@ -3,8 +3,6 @@ import { debugLog, toCamelCase } from "./helperFunctions.js";
 
 // Helper function to initialize the logging system
 export function initializeLogger(redirectUrl, environment = "production") {
-  const existingOptimizely = window.optimizely;
-
   if (environment === "development") {
     window.optimizely = [];
     console.log(
@@ -13,16 +11,19 @@ export function initializeLogger(redirectUrl, environment = "production") {
     return false;
   }
 
-  const isInitialized = Object.keys(existingOptimizely).includes("initialized");
-  const accountId = existingOptimizely.get?.("data")?.accountId || null;
+  window.setTimeout(() => {
+    const optimizely = window.optimizely;
+    const isInitialized = Object.keys(optimizely || {}).includes("initialized");
+    const accountId = optimizely?.get?.("data")?.accountId || null;
 
-  if (!isInitialized || !accountId) {
-    console.log("[logger] Optimizely check failed", {
-      isInitialized,
-      accountId,
-    });
-    window.location.replace(redirectUrl);
-  }
+    if (!isInitialized || !accountId) {
+      console.log("[logger] Optimizely check failed", {
+        isInitialized,
+        accountId,
+      });
+      window.location.replace(redirectUrl);
+    }
+  }, 5000);
 
   return false;
 }
