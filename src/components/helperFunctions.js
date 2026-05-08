@@ -113,7 +113,7 @@ export function getNearestPValue(dataSet, age, sleeptime) {
   const { estimatesPlotData } = binObj;
   if (!estimatesPlotData || !Array.isArray(estimatesPlotData)) {
     console.warn(
-      `No valid estimatesPlotData array found for age range [${binObj.ageRange.start}, ${binObj.ageRange.end})`
+      `No valid estimatesPlotData array found for age range [${binObj.ageRange.start}, ${binObj.ageRange.end})`,
     );
     return null;
   }
@@ -233,7 +233,7 @@ export function programmaticScroll({
     .tween("scrollTween", function () {
       const interpolator = d3.interpolateNumber(
         element.scrollLeft,
-        targetScroll
+        targetScroll,
       );
       return function (t) {
         /* console.log("tween", interpolator(t)); */
@@ -257,7 +257,7 @@ export function toTurtle(svgPath, options = {}) {
   const type = { M: "moveTo", L: "lineTo", C: "bezierCurveTo", Z: "closePath" };
   const segs = parse(svgPath, { normalize: true });
   const cmds = segs.map(
-    (s) => (ctx, len) => ctx[type[s.type]](...s.values.map((d) => d * len))
+    (s) => (ctx, len) => ctx[type[s.type]](...s.values.map((d) => d * len)),
   );
   return (ctx, area) => cmds.forEach((fn) => fn(ctx, scaleFn(area)));
 }
@@ -293,7 +293,7 @@ export function resolveCssColor(colorStr) {
 
 export function colorMixToHex(input) {
   const m = input.match(
-    /^color-mix\(\s*in\s+([a-z-]+)\s*,\s*(.*?)\s*,\s*(.*?)\s*\)$/i
+    /^color-mix\(\s*in\s+([a-z-]+)\s*,\s*(.*?)\s*,\s*(.*?)\s*\)$/i,
   );
   if (!m) throw new Error("Invalid color-mix() string");
   const space = m[1].toLowerCase();
@@ -472,6 +472,6 @@ const DEBUG = {
   scroll: false,
   update: false,
   inputs: false,
-  analytics: true,
+  analytics: false,
   ScrollInteraction: false,
 };
