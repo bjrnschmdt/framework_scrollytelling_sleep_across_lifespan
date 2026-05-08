@@ -23,7 +23,7 @@ export function initializeLogger(redirectUrl, environment = "production") {
       });
       window.location.replace(redirectUrl);
     }
-  }, 5000);
+  }, 20000);
 
   return false;
 }
