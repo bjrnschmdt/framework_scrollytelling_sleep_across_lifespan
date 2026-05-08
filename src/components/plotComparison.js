@@ -15,7 +15,7 @@ const { colors, personPath, hopCount, hopDuration } = settings;
 const themeBackgroundAlt = resolveCssColor("--theme-background-alt");
 const themeForeground = resolveCssColor("--theme-foreground");
 
-const VERTICAL_SPACING_FACTOR = 1.0;
+const VERTICAL_SPACING_FACTOR = 4.0;
 
 // Person symbol for plots
 const personSymbol = toTurtle(personPath, {
@@ -37,7 +37,7 @@ const defaultFx = { label: null, tickFormat: formatSex };
 
 function dotPlot(
   data,
-  { width = 600, height = 400, yDomain, xMax = 10, qradius = 3 } = {}
+  { width = 600, height = 400, yDomain, xMax = 10, qradius = 3 } = {},
 ) {
   const oddXMax =
     xMax % 2 === 0
@@ -66,7 +66,7 @@ function dotPlot(
           stroke: "none",
           fill: themeForeground,
           symbol: { draw: personSymbol },
-        })
+        }),
       ),
     ],
   });
@@ -74,7 +74,7 @@ function dotPlot(
 
 function hopPlot(
   data,
-  { width = 600, height = 400, yDomain, qradius = 3, index = 0 } = {}
+  { width = 600, height = 400, yDomain, qradius = 3, index = 0 } = {},
 ) {
   return Plot.plot({
     width,
@@ -103,7 +103,7 @@ function hopTracedPlot(
     qradius = 3,
     window = hopCount,
     index = 0,
-  } = {}
+  } = {},
 ) {
   return Plot.plot({
     width,

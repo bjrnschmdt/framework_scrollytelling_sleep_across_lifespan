@@ -2628,8 +2628,8 @@ const createPlots = (
       hopPlot(data.hop, {
         width,
         height: qheightComp,
-        yDomain: hopDomain,
-        qradius: qradiusHop,
+        yDomain: dotDomain,
+        qradius: qradiusDot,
         animate: true,
         duration: hopDuration,
         index: hopIndex,
@@ -2638,8 +2638,8 @@ const createPlots = (
       hopTracedPlot(data.hop, {
         width,
         height: qheightComp,
-        yDomain: hopDomain,
-        qradius: qradiusHop,
+        yDomain: dotDomain,
+        qradius: qradiusDot,
         animate: true,
         duration: hopDuration,
         window: hopCount,
@@ -2649,13 +2649,13 @@ const createPlots = (
       percentilePlot(data.percentile, {
         width,
         height: qheightComp,
-        yDomain: hopDomain,
+        yDomain: dotDomain,
       }),
     box: (width) =>
       boxPlot(data.box, {
         width,
         height: qheightComp,
-        yDomain: hopDomain,
+        yDomain: dotDomain,
       }),
   };
 };
