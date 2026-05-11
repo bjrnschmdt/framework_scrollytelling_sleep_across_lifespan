@@ -15,6 +15,7 @@ const { colors, personPath, hopCount, hopDuration } = settings;
 const themeBackgroundAlt = resolveCssColor("--theme-background-alt");
 const themeForeground = resolveCssColor("--theme-foreground");
 
+// set to 1.0 for comparability with old study; set to 4.0 for a new visualization
 const VERTICAL_SPACING_FACTOR = 1.0;
 
 // Person symbol for plots
