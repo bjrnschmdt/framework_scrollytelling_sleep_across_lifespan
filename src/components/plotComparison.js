@@ -15,7 +15,7 @@ const { colors, personPath, hopCount, hopDuration } = settings;
 const themeBackgroundAlt = resolveCssColor("--theme-background-alt");
 const themeForeground = resolveCssColor("--theme-foreground");
 
-const VERTICAL_SPACING_FACTOR = 4.0;
+const VERTICAL_SPACING_FACTOR = 1.0;
 
 // Person symbol for plots
 const personSymbol = toTurtle(personPath, {
