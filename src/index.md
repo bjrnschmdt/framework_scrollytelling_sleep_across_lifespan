@@ -1953,9 +1953,7 @@ function createFollowupQuestionsCard() {
 
   feedbackWrap.append(feedbackLabel, feedbackInput);
 
-  const referrer = document.referrer;
-  const returnUrl =
-    referrer && referrer !== window.location.href ? referrer : studyReturnUrl;
+  const returnUrl = studyReturnUrl;
   const returnButton = Inputs.button("Zurück zu Prolific", {
     reduce: () => {
       const text = feedbackInput.value.trim();
