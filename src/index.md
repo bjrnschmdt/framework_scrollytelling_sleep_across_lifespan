@@ -51,6 +51,7 @@ import { updateHOPPlot } from "./components/plotHOP.js";
 import { setupIntersectionObserver } from "./components/intersectionObserver.js";
 import {
   initializeLogger,
+  checkLoggerReadiness,
   logEvent,
   logSectionVisible,
   logInput,
@@ -1227,12 +1228,36 @@ function buildParticipantInfoOverlay() {
     labelText.textContent = text;
 
     label.append(input, labelText);
-    return label;
+    return { label, input };
   };
 
   const agreeOption = createConsentOption("agree", "ich stimme zu");
   const disagreeOption = createConsentOption("disagree", "Ich stimme nicht zu");
-  consentGroup.append(agreeOption, disagreeOption);
+  agreeOption.input.disabled = true;
+  consentGroup.append(agreeOption.label, disagreeOption.label);
+
+  const technicalCheck = document.createElement("label");
+  technicalCheck.className = "participant-info-overlay__technical-check";
+
+  const technicalCheckInput = document.createElement("input");
+  technicalCheckInput.type = "checkbox";
+  technicalCheckInput.name = "participant_info_technical_check";
+
+  const technicalCheckText = document.createElement("span");
+  technicalCheckText.textContent =
+    "Ich bestätige, dass ich einen Browser außer Firefox verwende und das Cookie-Banner akzeptiert habe.";
+
+  technicalCheck.append(technicalCheckInput, technicalCheckText);
+
+  const technicalCheckMessage = document.createElement("p");
+  technicalCheckMessage.className =
+    "participant-info-overlay__technical-message";
+  technicalCheckMessage.setAttribute("aria-live", "polite");
+
+  const resetTechnicalCheckMessageClass = () => {
+    technicalCheckMessage.classList.remove("tip", "warning");
+    technicalCheckMessage.removeAttribute("label");
+  };
 
   const outro = document.createElement("p");
   outro.className = "participant-info-overlay__outro";
@@ -1245,12 +1270,77 @@ function buildParticipantInfoOverlay() {
   startButton.textContent = "Los geht's";
   startButton.disabled = true;
 
+  let technicalCheckPassed = false;
+  let redirectTimer = null;
+
+  const updateConsentControls = () => {
+    agreeOption.input.disabled = !technicalCheckPassed;
+    const selectedConsent =
+      consentGroup.querySelector(
+        'input[name="participant_info_consent"]:checked',
+      )?.value || null;
+    startButton.disabled = !technicalCheckPassed || selectedConsent !== "agree";
+  };
+
+  const scheduleTechnicalCheckRedirect = (reason) => {
+    if (redirectTimer !== null) return;
+    let secondsRemaining = 10;
+    resetTechnicalCheckMessageClass();
+    technicalCheckMessage.classList.add("warning");
+    technicalCheckMessage.setAttribute("label", "Check fehlgeschlagen");
+
+    const updateMessage = () => {
+      technicalCheckMessage.textContent = `Die technischen Voraussetzungen sind nicht erfüllt (${reason}). Sie werden in ${secondsRemaining} Sekunden zu Prolific zurückgeleitet.`;
+    };
+
+    updateMessage();
+    redirectTimer = window.setInterval(() => {
+      secondsRemaining -= 1;
+      if (secondsRemaining <= 0) {
+        window.clearInterval(redirectTimer);
+        window.location.assign(gtmFallbackRedirectUrl);
+        return;
+      }
+      updateMessage();
+    }, 1000);
+  };
+
+  technicalCheckInput.addEventListener("change", () => {
+    if (!technicalCheckInput.checked) {
+      technicalCheckPassed = false;
+      technicalCheckMessage.textContent = "";
+      resetTechnicalCheckMessageClass();
+      updateConsentControls();
+      return;
+    }
+
+    const readiness = checkLoggerReadiness();
+    technicalCheckPassed = readiness.isReady;
+
+    resetTechnicalCheckMessageClass();
+
+    if (readiness.isReady) {
+      technicalCheckMessage.classList.add("tip");
+      technicalCheckMessage.setAttribute("label", "Check erfolgreich");
+      technicalCheckMessage.textContent =
+        "Die technischen Voraussetzungen sind erfüllt. Sie können nun Ihre Einwilligung geben.";
+      updateConsentControls();
+      return;
+    }
+
+    updateConsentControls();
+    const failureReason = !readiness.browserAllowed
+      ? "Firefox erkannt"
+      : "Datenaufzeichnung nicht bereit";
+    scheduleTechnicalCheckRedirect(failureReason);
+  });
+
   consentGroup.addEventListener("change", () => {
     const selectedConsent =
       consentGroup.querySelector(
         'input[name="participant_info_consent"]:checked',
       )?.value || null;
-    startButton.disabled = selectedConsent !== "agree";
+    updateConsentControls();
     logEvent("kielscn_schlafdauer_participant_info_consent_changed", {
       choice: selectedConsent,
     });
@@ -1268,7 +1358,7 @@ function buildParticipantInfoOverlay() {
       consentGroup.querySelector(
         'input[name="participant_info_consent"]:checked',
       )?.value || null;
-    if (selectedConsent !== "agree") return;
+    if (!technicalCheckPassed || selectedConsent !== "agree") return;
     try {
       localStorage.setItem(participantInfoStorageKey, "completed");
     } catch (error) {
@@ -1280,7 +1370,15 @@ function buildParticipantInfoOverlay() {
     setTimeout(() => overlay.remove(), 220);
   });
 
-  card.append(infoHeading, content, consentGroup, outro, startButton);
+  card.append(
+    infoHeading,
+    content,
+    technicalCheck,
+    technicalCheckMessage,
+    consentGroup,
+    outro,
+    startButton,
+  );
   overlay.append(card);
   return overlay;
 }
@@ -3275,10 +3373,22 @@ main {
   gap: 0.5rem;
 }
 
+.participant-info-overlay__technical-check,
 .participant-info-overlay__consent {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  font-weight: 600;
+}
+
+.participant-info-overlay__technical-check {
+  margin: 0 0 0.5rem;
+}
+
+.participant-info-overlay__technical-message {
+  min-height: 1.4rem;
+  margin: 0 0 1rem;
+  line-height: 1.4;
   font-weight: 600;
 }
 
