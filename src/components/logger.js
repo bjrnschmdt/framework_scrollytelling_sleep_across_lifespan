@@ -2,6 +2,7 @@
 import { debugLog, toCamelCase } from "./helperFunctions.js";
 
 let loggerEnvironment = "production";
+let loggerInitialized = false;
 
 function getBrowserDiagnostics() {
   const ua = navigator.userAgent || "";
@@ -39,6 +40,7 @@ function getOptimizelyStatus() {
 // Helper function to initialize the logging system
 export function initializeLogger(_redirectUrl, environment = "production") {
   loggerEnvironment = environment;
+  loggerInitialized = true;
 
   if (environment === "development") {
     window.optimizely = [];
@@ -50,12 +52,12 @@ export function initializeLogger(_redirectUrl, environment = "production") {
   return false;
 }
 
-export function checkLoggerReadiness() {
+export function checkLoggerReadiness(environment = loggerEnvironment) {
   const diagnostics = getBrowserDiagnostics();
   const optimizely = getOptimizelyStatus();
   const browserAllowed = !diagnostics.isFirefox;
   const isReady =
-    loggerEnvironment === "development" || (browserAllowed && optimizely.isReady);
+    environment === "development" || (browserAllowed && optimizely.isReady);
 
   return {
     isReady,
@@ -69,14 +71,27 @@ export function checkLoggerReadiness() {
 export function logEvent(eventName, tags = {}) {
   try {
     debugLog("analytics", "Log event", eventName, tags);
-    window["optimizely"] = window["optimizely"] || [];
-    window["optimizely"].push({
+    if (!loggerInitialized) {
+      debugLog("analytics", "Logger not initialized. Event skipped", eventName);
+      return false;
+    }
+
+    const optimizely = window.optimizely;
+    if (typeof optimizely?.push !== "function") {
+      debugLog("analytics", "Optimizely unavailable. Event skipped", eventName);
+      return false;
+    }
+
+    optimizely.push({
       type: "event",
       eventName,
       tags,
     });
+
+    return true;
   } catch (error) {
     console.error("Logging failed", error);
+    return false;
   }
 }
 

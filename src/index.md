@@ -201,19 +201,11 @@ const participantInfoDeclineRedirectUrl =
 ```
 
 ```js
-const loggerEnvironment = getURLParameter("logger_env") || "production";
-```
-
-```js
-initializeLogger(gtmFallbackRedirectUrl, loggerEnvironment);
+const loggerEnvironment = getURLParameter("logger_env") || "development";
 ```
 
 ```js
 const prolificPid = getURLParameter("PROLIFIC_PID") || "none";
-```
-
-```js
-logEvent("kielscn_schlafdauer_type", { type: variant });
 ```
 
 ```js
@@ -230,10 +222,6 @@ const def = {
 ```
 
 <!-- Analytics -->
-
-```js
-logEvent("kielscn_schlafdauer_prolific_pid", { prolificPid: prolificPid });
-```
 
 ```js
 logSectionVisible(scrollyStep);
@@ -1314,12 +1302,13 @@ function buildParticipantInfoOverlay() {
       return;
     }
 
-    const readiness = checkLoggerReadiness();
+    const readiness = checkLoggerReadiness(loggerEnvironment);
     technicalCheckPassed = readiness.isReady;
 
     resetTechnicalCheckMessageClass();
 
     if (readiness.isReady) {
+      initializeLogger(gtmFallbackRedirectUrl, loggerEnvironment);
       technicalCheckMessage.classList.add("tip");
       technicalCheckMessage.setAttribute("label", "Check erfolgreich");
       technicalCheckMessage.textContent =
@@ -1365,6 +1354,8 @@ function buildParticipantInfoOverlay() {
       console.warn("Participant info storage skipped", error);
     }
     logEvent("kielscn_schlafdauer_participant_info_confirmed");
+    logEvent("kielscn_schlafdauer_type", { type: variant });
+    logEvent("kielscn_schlafdauer_prolific_pid", { prolificPid: prolificPid });
     overlay.classList.add("participant-info-overlay--hidden");
     document.body.classList.remove("participant-info-overlay-open");
     setTimeout(() => overlay.remove(), 220);
