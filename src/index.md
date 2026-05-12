@@ -1247,7 +1247,7 @@ function buildParticipantInfoOverlay() {
 
   const technicalCheckText = document.createElement("span");
   technicalCheckText.textContent =
-    "Ich bestätige, dass ich einen Browser außer Firefox verwende und das Cookie-Banner akzeptiert habe.";
+    "Ich bestätige, dass ich das Cookie-Banner akzeptiert habe.";
 
   technicalCheck.append(technicalCheckInput, technicalCheckText);
 
@@ -1332,10 +1332,7 @@ function buildParticipantInfoOverlay() {
     }
 
     updateConsentControls();
-    const failureReason = !readiness.browserAllowed
-      ? "Firefox erkannt"
-      : "Datenaufzeichnung nicht bereit";
-    scheduleTechnicalCheckRedirect(failureReason);
+    scheduleTechnicalCheckRedirect("Datenaufzeichnung nicht bereit");
   });
 
   consentGroup.addEventListener("change", () => {

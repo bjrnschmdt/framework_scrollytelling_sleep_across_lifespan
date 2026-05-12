@@ -5,10 +5,8 @@ let loggerEnvironment = "production";
 let loggerInitialized = false;
 
 function getBrowserDiagnostics() {
-  const ua = navigator.userAgent || "";
   return {
-    userAgent: ua,
-    isFirefox: /\b(Firefox|FxiOS)\//.test(ua),
+    userAgent: navigator.userAgent || "",
     cookieEnabled: navigator.cookieEnabled,
     doNotTrack:
       navigator.doNotTrack ||
@@ -55,13 +53,10 @@ export function initializeLogger(_redirectUrl, environment = "production") {
 export function checkLoggerReadiness(environment = loggerEnvironment) {
   const diagnostics = getBrowserDiagnostics();
   const optimizely = getOptimizelyStatus();
-  const browserAllowed = !diagnostics.isFirefox;
-  const isReady =
-    environment === "development" || (browserAllowed && optimizely.isReady);
+  const isReady = environment === "development" || optimizely.isReady;
 
   return {
     isReady,
-    browserAllowed,
     diagnostics,
     optimizely,
   };
