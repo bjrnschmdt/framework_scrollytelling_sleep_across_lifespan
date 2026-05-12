@@ -1162,6 +1162,20 @@ function createShuffledSemanticDifferentialScale({
 const participantInfoStorageKey =
   "kielscn_schlafdauer_participant_info_completed_v1";
 
+function logStudyEntryMetadata() {
+  logEvent("kielscn_schlafdauer_type", { type: variant });
+  logEvent("kielscn_schlafdauer_prolific_pid", { prolificPid: prolificPid });
+}
+
+function initializeLoggerFromStoredConsent() {
+  const readiness = checkLoggerReadiness(loggerEnvironment);
+  if (!readiness.isReady) return false;
+
+  initializeLogger(gtmFallbackRedirectUrl, loggerEnvironment);
+  logStudyEntryMetadata();
+  return true;
+}
+
 function buildParticipantInfoOverlay() {
   const overlay = document.createElement("div");
   overlay.className = "participant-info-overlay";
@@ -1354,8 +1368,7 @@ function buildParticipantInfoOverlay() {
       console.warn("Participant info storage skipped", error);
     }
     logEvent("kielscn_schlafdauer_participant_info_confirmed");
-    logEvent("kielscn_schlafdauer_type", { type: variant });
-    logEvent("kielscn_schlafdauer_prolific_pid", { prolificPid: prolificPid });
+    logStudyEntryMetadata();
     overlay.classList.add("participant-info-overlay--hidden");
     document.body.classList.remove("participant-info-overlay-open");
     setTimeout(() => overlay.remove(), 220);
@@ -1382,7 +1395,7 @@ function showParticipantInfoOverlay() {
   } catch (error) {
     console.warn("Participant info storage unavailable", error);
   }
-  if (hasCompleted) return;
+  if (hasCompleted && initializeLoggerFromStoredConsent()) return;
 
   const overlay = buildParticipantInfoOverlay();
   document.body.appendChild(overlay);
