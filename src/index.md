@@ -1189,14 +1189,14 @@ function buildParticipantInfoOverlay() {
 
   const paragraphs = [
     "Hallo!",
-    "Vielen Dank, dass Sie an unserer Studie über interaktive Datendarstellungen teilnehmen möchten. Die Studie wird im Rahmen des Kiel Science Communication Network (KielSCN) Projekts in Deutschland durchgeführt. Beteiligt sind dabei das Leibniz Institut für die Pädagogik der Mathematik und Naturwissenschaften (IPN), die Universität Kiel, die Muthesius Kunsthochschule sowie Spektrum der Wissenschaft als unser Praxispartner. Im Folgenden erhalten Sie Informationen zur Studie und zu Datenschutzthemen. Bitte lesen Sie die Informationen sorgfältig durch, bevor Sie der Teilnahme an der Studie zustimmen.",
+    "Vielen Dank, dass Sie an unserer Studie über interaktive Datendarstellungen teilnehmen möchten. Die Studie wird im Rahmen des Kiel Science Communication Network (KielSCN) Projekts durchgeführt. Beteiligt sind dabei das Leibniz Institut für die Pädagogik der Mathematik und Naturwissenschaften (IPN), die Universität Kiel, die Muthesius Kunsthochschule sowie Spektrum der Wissenschaft. Im Folgenden erhalten Sie Informationen zur Studie und zum Datenschutz. Bitte lesen Sie diese sorgfältig durch, bevor Sie der Teilnahme zustimmen.",
     "Worum geht es?",
-    "Das Ziel der Studie ist es, herauszufinden, wie interaktive Datendarstellungen verwendet werden können, um komplexe Daten verständlich darzustellen. Dafür haben wir einen Info-Artikel zum Thema Schlaf über die Lebensspanne erstellt, den Sie lesen werden und dazu einige Fragen beantworten. Sie können dabei auch herausfinden, wieviel Sie selbst im Vergleich zu anderen schlafen.",
-    "Die Studie dauert ca. 20-30 Minuten.",
+    "In der Studie untersuchen wir, wie interaktive Datendarstellungen komplexe Daten verständlich machen können. Dazu lesen Sie einen Info-Artikel zum Thema Schlaf über die Lebensspanne und beantworten anschließend einige Fragen. Dabei können Sie auch sehen, wieviel Sie im Vergleich zu anderen schlafen.",
+    "Die Studie dauert ca. 20 Minuten.",
     "Was passiert, wenn Sie teilnehmen?",
-    "Sie erhalten eine Aufwandsentschädigung in Höhe von 9 GBP pro Stunde für Ihre Teilnahme, welche über Prolific ausbezahlt wird. Es sind keine Risiken durch die Teilnahme zu erwarten. Ihre Teilnahme ist freiwillig und kann jederzeit ohne Angabe von Gründen und ohne negative Folgen abgebrochen werden. Sie können auch einzelne Fragen überspringen, wenn Sie dazu keine Angabe machen möchten. Ihre Angaben sind anonym.",
+    "Sie erhalten eine Aufwandsentschädigung von 9 GBP pro Stunde, die über Prolific ausbezahlt wird. Es sind keine Risiken durch die Teilnahme zu erwarten. Die Teilnahme ist freiwillig und kann jederzeit ohne Angabe von Gründen und ohne Nachteile abgebrochen werden. Einzelne Fragen können Sie überspringen, wenn Sie dazu keine Angabe machen möchten.",
     "Was passiert mit Ihren Daten?",
-    "Alle Daten, die im Rahmen der Studie erhoben werden, werden in Verbindung mit Ihrer individuellen Prolific-ID gespeichert und verarbeitet. Damit Ihre Eingaben für die Studie aufgezeichnet werden können, müssen Sie das Cookie-Banner von spektrum.de akzeptieren. Bis zum 15.05.2026 haben Sie die Möglichkeit, Ihre Zustimmung zur Verwendung Ihrer Daten zu widerrufen, Auskunft über Ihre Daten zu verlangen und eine Korrektur, Löschung oder Einschränkung der Datenverarbeitung zu beantragen. Bitte kontaktieren Sie in diesem Fall die Studienverantwortlichen Stephan Reiche direkt über Prolific und geben Sie Ihre Prolific-ID an. Nach dem 15.05.2026 wird die Prolific-ID aus dem Datensatz gelöscht, sodass dieser vollständig anonymisiert ist. Eine Zuordnung Ihrer Daten zu Ihrer Person und ein Widerruf Ihres Einverständnisses zur Datennutzung ist dadurch nach dem 15.05.2026 nicht mehr möglich.",
+    "Alle Daten, die im Rahmen der Studie erhoben werden, werden in Verbindung mit Ihrer individuellen Prolific-ID gespeichert und verarbeitet. Damit Ihre Eingaben für die Studie aufgezeichnet werden können, müssen Sie das Cookie-Banner von spektrum.de akzeptieren. Bis zum 31.05.2026 haben Sie die Möglichkeit, Ihre Zustimmung zur Verwendung Ihrer Daten zu widerrufen, Auskunft über Ihre Daten zu verlangen und eine Korrektur, Löschung oder Einschränkung der Datenverarbeitung zu beantragen. Bitte kontaktieren Sie in diesem Fall den Studienverantwortlichen Stephan Reiche direkt über Prolific und geben Sie Ihre Prolific-ID an. Nach dem 31.05.2026 wird die Prolific-ID aus dem Datensatz gelöscht, sodass dieser vollständig anonymisiert ist. Eine Zuordnung Ihrer Daten zu Ihrer Person und ein Widerruf Ihres Einverständnisses zur Datennutzung ist dadurch nach dem 31.05.2026 nicht mehr möglich.",
     "Die Daten sind technisch gegen unautorisierten Zugriff geschützt und werden, in Übereinstimmung mit den Empfehlungen der Deutschen Forschungsgesellschaft (DFG), für zehn Jahre aufbewahrt und anschließend gelöscht.",
     "Eine Nachnutzung der Daten im Rahmen der wissenschaftlichen Forschung kann jedoch unter Umständen gestattet werden, sofern die hier bekannten Grundsätze der Datennutzung, Speicherung und Verarbeitung nicht verletzt werden. Dies schließt auch die Bereitstellung der Daten in einem wissenschaftlichen Repositorium mit ein.",
     "Weitere Informationen",
@@ -1247,7 +1247,7 @@ function buildParticipantInfoOverlay() {
 
   const technicalCheckText = document.createElement("span");
   technicalCheckText.textContent =
-    "Ich bestätige, dass ich das Cookie-Banner akzeptiert habe.";
+    "Bevor wir starten können: Klicken Sie bitte hier, damit wir kurz sicherstellen können, dass die Studie korrekt geladen wurde.";
 
   technicalCheck.append(technicalCheckInput, technicalCheckText);
 
@@ -1292,7 +1292,7 @@ function buildParticipantInfoOverlay() {
     technicalCheckMessage.setAttribute("label", "Check fehlgeschlagen");
 
     const updateMessage = () => {
-      technicalCheckMessage.textContent = `Die technischen Voraussetzungen sind nicht erfüllt (${reason}). Sie werden in ${secondsRemaining} Sekunden zu Prolific zurückgeleitet.`;
+      technicalCheckMessage.textContent = `Entschuldigung, die Studie wurde nicht korrekt geladen. Daher ist eine Teilnahme leider nicht möglich. Sie werden in ${secondsRemaining} Sekunden zu Prolific zurückgeleitet.`;
     };
 
     updateMessage();
@@ -1326,7 +1326,7 @@ function buildParticipantInfoOverlay() {
       technicalCheckMessage.classList.add("tip");
       technicalCheckMessage.setAttribute("label", "Check erfolgreich");
       technicalCheckMessage.textContent =
-        "Die technischen Voraussetzungen sind erfüllt. Sie können nun Ihre Einwilligung geben.";
+        "Alles funktioniert - Sie können mit der Studie fortfahren.";
       updateConsentControls();
       return;
     }
