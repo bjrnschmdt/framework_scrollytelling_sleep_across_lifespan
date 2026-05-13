@@ -1205,9 +1205,44 @@ function buildParticipantInfoOverlay() {
     "Ich bestätige hiermit, über 18 Jahre alt zu sein und die vorstehenden Informationen zur Untersuchung und zum Datenschutz sorgfältig gelesen zu haben. Außerdem bestätige ich, dass ich freiwillig an der Studie teilnehmen möchte, dass ich darüber informiert wurde, wie meine Daten verarbeitet werden und dass sie anonym für Forschungszwecke verwendet werden.",
   ];
 
+  const technicalCheck = document.createElement("label");
+  technicalCheck.className = "participant-info-overlay__technical-check";
+
+  const technicalCheckInput = document.createElement("input");
+  technicalCheckInput.type = "checkbox";
+  technicalCheckInput.name = "participant_info_technical_check";
+
+  const technicalCheckText = document.createElement("span");
+  technicalCheckText.textContent =
+    "Bevor wir starten können: Klicken Sie bitte hier, damit wir kurz sicherstellen können, dass die Studie korrekt geladen wurde.";
+
+  technicalCheck.append(technicalCheckInput, technicalCheckText);
+
+  const technicalCheckMessage = document.createElement("p");
+  technicalCheckMessage.className =
+    "participant-info-overlay__technical-message";
+  technicalCheckMessage.setAttribute("aria-live", "polite");
+
+  const resetTechnicalCheckMessageClass = () => {
+    technicalCheckMessage.classList.remove("tip", "warning");
+    technicalCheckMessage.removeAttribute("label");
+  };
+
+  const showConsentPrerequisiteWarning = () => {
+    resetTechnicalCheckMessageClass();
+    technicalCheckMessage.classList.add("warning");
+    technicalCheckMessage.setAttribute("label", "Check erforderlich");
+    technicalCheckMessage.textContent =
+      "Bevor Sie der Einverständniserklärung zustimmen können, führen Sie bitte zuerst den technischen Check aus.";
+  };
+
   const content = document.createElement("div");
   content.className = "participant-info-overlay__content";
   paragraphs.forEach((text) => {
+    if (text === "Einverständniserklärung") {
+      content.append(technicalCheck, technicalCheckMessage);
+    }
+
     const p = document.createElement("p");
     p.className = "participant-info-overlay__text";
     p.textContent = text;
@@ -1238,29 +1273,6 @@ function buildParticipantInfoOverlay() {
   agreeOption.input.disabled = true;
   consentGroup.append(agreeOption.label, disagreeOption.label);
 
-  const technicalCheck = document.createElement("label");
-  technicalCheck.className = "participant-info-overlay__technical-check";
-
-  const technicalCheckInput = document.createElement("input");
-  technicalCheckInput.type = "checkbox";
-  technicalCheckInput.name = "participant_info_technical_check";
-
-  const technicalCheckText = document.createElement("span");
-  technicalCheckText.textContent =
-    "Bevor wir starten können: Klicken Sie bitte hier, damit wir kurz sicherstellen können, dass die Studie korrekt geladen wurde.";
-
-  technicalCheck.append(technicalCheckInput, technicalCheckText);
-
-  const technicalCheckMessage = document.createElement("p");
-  technicalCheckMessage.className =
-    "participant-info-overlay__technical-message";
-  technicalCheckMessage.setAttribute("aria-live", "polite");
-
-  const resetTechnicalCheckMessageClass = () => {
-    technicalCheckMessage.classList.remove("tip", "warning");
-    technicalCheckMessage.removeAttribute("label");
-  };
-
   const outro = document.createElement("p");
   outro.className = "participant-info-overlay__outro";
   outro.textContent =
@@ -1277,12 +1289,34 @@ function buildParticipantInfoOverlay() {
 
   const updateConsentControls = () => {
     agreeOption.input.disabled = !technicalCheckPassed;
+    agreeOption.label.classList.toggle(
+      "participant-info-overlay__consent--disabled",
+      !technicalCheckPassed,
+    );
+    agreeOption.label.setAttribute(
+      "aria-disabled",
+      technicalCheckPassed ? "false" : "true",
+    );
+    if (technicalCheckPassed) {
+      agreeOption.label.removeAttribute("title");
+    } else {
+      agreeOption.label.title =
+        "Bitte führen Sie zuerst den technischen Check aus.";
+    }
     const selectedConsent =
       consentGroup.querySelector(
         'input[name="participant_info_consent"]:checked',
       )?.value || null;
     startButton.disabled = !technicalCheckPassed || selectedConsent !== "agree";
+    if (startButton.disabled) {
+      startButton.title =
+        "Bitte führen Sie zuerst den technischen Check aus und stimmen Sie der Einverständniserklärung zu.";
+    } else {
+      startButton.removeAttribute("title");
+    }
   };
+
+  updateConsentControls();
 
   const scheduleTechnicalCheckRedirect = (reason) => {
     if (redirectTimer !== null) return;
@@ -1335,6 +1369,13 @@ function buildParticipantInfoOverlay() {
     scheduleTechnicalCheckRedirect("Datenaufzeichnung nicht bereit");
   });
 
+  agreeOption.label.addEventListener("click", (event) => {
+    if (technicalCheckPassed) return;
+    event.preventDefault();
+    showConsentPrerequisiteWarning();
+    technicalCheckInput.focus();
+  });
+
   consentGroup.addEventListener("change", () => {
     const selectedConsent =
       consentGroup.querySelector(
@@ -1371,15 +1412,7 @@ function buildParticipantInfoOverlay() {
     setTimeout(() => overlay.remove(), 220);
   });
 
-  card.append(
-    infoHeading,
-    content,
-    technicalCheck,
-    technicalCheckMessage,
-    consentGroup,
-    outro,
-    startButton,
-  );
+  card.append(infoHeading, content, consentGroup, outro, startButton);
   overlay.append(card);
   return overlay;
 }
@@ -3386,11 +3419,29 @@ main {
   margin: 0 0 0.5rem;
 }
 
+.participant-info-overlay__consent--disabled {
+  color: #8a8a8a;
+  cursor: not-allowed;
+}
+
+.participant-info-overlay__consent--disabled input {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .participant-info-overlay__technical-message {
   min-height: 1.4rem;
   margin: 0 0 1rem;
   line-height: 1.4;
   font-weight: 600;
+}
+
+.participant-info-overlay__technical-message.tip {
+  color: #9bd7a5;
+}
+
+.participant-info-overlay__technical-message.warning {
+  color: #ffb4a8;
 }
 
 .participant-info-overlay__outro {
