@@ -201,7 +201,7 @@ const participantInfoDeclineRedirectUrl =
 ```
 
 ```js
-const loggerEnvironment = getURLParameter("logger_env") || "development";
+const loggerEnvironment = getURLParameter("logger_env") || "production";
 ```
 
 ```js
