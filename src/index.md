@@ -7,7 +7,7 @@ style: custom-style.css
 ```js
 import {
   set,
-  getTrueValue,
+  getTruePercentage,
   getURLParameter,
   createDebouncedLogger,
   formatTime,
@@ -201,7 +201,7 @@ const participantInfoDeclineRedirectUrl =
 ```
 
 ```js
-const loggerEnvironment = getURLParameter("logger_env") || "production";
+const loggerEnvironment = getURLParameter("logger_env") || "development";
 ```
 
 ```js
@@ -234,53 +234,60 @@ const debouncedLoggers = {
     (value) => logInput("sleeptime", value),
     500,
   ),
-  estimate: createDebouncedLogger((value) => logInput("estimate", value), 500),
+  estimate: createDebouncedLogger(
+    (value) => logEvent("kielscn_schlafdauer_input_estimate", value),
+    500,
+  ),
   estimatePercentageA: createDebouncedLogger(
-    (value) => logInput("estimate_percentage_a", value),
+    (value) =>
+      logEvent("kielscn_schlafdauer_input_estimate_percentage_a", value),
     500,
   ),
   estimatePercentageB: createDebouncedLogger(
-    (value) => logInput("estimate_percentage_b", value),
+    (value) =>
+      logEvent("kielscn_schlafdauer_input_estimate_percentage_b", value),
     500,
   ),
   estimatePercentageC: createDebouncedLogger(
-    (value) => logInput("estimate_percentage_c", value),
+    (value) =>
+      logEvent("kielscn_schlafdauer_input_estimate_percentage_c", value),
     500,
   ),
   estimatePercentageD: createDebouncedLogger(
-    (value) => logInput("estimate_percentage_d", value),
+    (value) =>
+      logEvent("kielscn_schlafdauer_input_estimate_percentage_d", value),
     500,
   ),
   estimateSleepA: createDebouncedLogger(
-    (value) => logInput("estimate_sleep_a", value),
+    (value) => logEvent("kielscn_schlafdauer_input_estimate_sleep_a", value),
     500,
   ),
   estimateSleepB: createDebouncedLogger(
-    (value) => logInput("estimate_sleep_b", value),
+    (value) => logEvent("kielscn_schlafdauer_input_estimate_sleep_b", value),
     500,
   ),
   estimateSleepC: createDebouncedLogger(
-    (value) => logInput("estimate_sleep_c", value),
+    (value) => logEvent("kielscn_schlafdauer_input_estimate_sleep_c", value),
     500,
   ),
   estimateSleepD: createDebouncedLogger(
-    (value) => logInput("estimate_sleep_d", value),
+    (value) => logEvent("kielscn_schlafdauer_input_estimate_sleep_d", value),
     500,
   ),
   estimateQuantityA: createDebouncedLogger(
-    (value) => logInput("estimate_quantity_a", value),
+    (value) => logEvent("kielscn_schlafdauer_input_estimate_quantity_a", value),
     500,
   ),
   estimateQuantityB: createDebouncedLogger(
-    (value) => logInput("estimate_quantity_b", value),
+    (value) => logEvent("kielscn_schlafdauer_input_estimate_quantity_b", value),
     500,
   ),
   estimateQuantityC: createDebouncedLogger(
-    (value) => logInput("estimate_quantity_c", value),
+    (value) => logEvent("kielscn_schlafdauer_input_estimate_quantity_c", value),
     500,
   ),
   estimateQuantityD: createDebouncedLogger(
-    (value) => logInput("estimate_quantity_d", value),
+    (value) => logEvent("kielscn_schlafdauer_input_estimate_quantity_d", value),
     500,
   ),
 };
@@ -295,7 +302,15 @@ debouncedLoggers.sleepTime(sleepTimeValue);
 ```
 
 ```js
-debouncedLoggers.estimate(estimateValue);
+debouncedLoggers.estimate({
+  estimate: estimateValue,
+  true: Math.round(
+    getTruePercentage(dataSet, {
+      age: ageValue,
+      sleepTime: sleepTimeValue,
+    }) * 100,
+  ),
+});
 ```
 
 ```js
@@ -682,19 +697,51 @@ const educationValue = Generators.input(educationInput);
 <!-- ********************************************************* -->
 
 ```js
-debouncedLoggers.estimatePercentageA(estimateValuePercentageA);
+debouncedLoggers.estimatePercentageA({
+  estimatePercentageA: estimateValuePercentageA,
+  truePercentageA: Math.round(
+    getTruePercentage(dataSet, {
+      age: estimatePercentageSetup.A.age,
+      sleepTime: estimatePercentageSetup.A.sleepTime,
+    }) * 100,
+  ),
+});
 ```
 
 ```js
-debouncedLoggers.estimatePercentageB(estimateValuePercentageB);
+debouncedLoggers.estimatePercentageB({
+  estimatePercentageB: estimateValuePercentageB,
+  truePercentageB: Math.round(
+    getTruePercentage(dataSet, {
+      age: estimatePercentageSetup.B.age,
+      sleepTime: estimatePercentageSetup.B.sleepTime,
+    }) * 100,
+  ),
+});
 ```
 
 ```js
-debouncedLoggers.estimatePercentageC(estimateValuePercentageC);
+debouncedLoggers.estimatePercentageC({
+  estimatePercentageC: estimateValuePercentageC,
+  truePercentageC: Math.round(
+    getTruePercentage(dataSet, {
+      age: estimatePercentageSetup.C.age,
+      sleepTime: estimatePercentageSetup.C.sleepTime,
+    }) * 100,
+  ),
+});
 ```
 
 ```js
-debouncedLoggers.estimatePercentageD(estimateValuePercentageD);
+debouncedLoggers.estimatePercentageD({
+  estimatePercentageD: estimateValuePercentageD,
+  truePercentageD: Math.round(
+    getTruePercentage(dataSet, {
+      age: estimatePercentageSetup.D.age,
+      sleepTime: estimatePercentageSetup.D.sleepTime,
+    }) * 100,
+  ),
+});
 ```
 
 ```js
@@ -776,19 +823,43 @@ const certaintyPercentageD = createSemanticDifferentialInput(
 <!-- ********************************************************* -->
 
 ```js
-debouncedLoggers.estimateSleepA(estimateValueSleepA);
+debouncedLoggers.estimateSleepA({
+  estimateSleepA: estimateValueSleepA,
+  trueSleepA: estimateSleepSetup.A.sleepTime,
+  displayedPercentageSleepA: Math.round(
+    getTruePercentage(dataSet, estimateSleepSetup.A) * 100,
+  ),
+});
 ```
 
 ```js
-debouncedLoggers.estimateSleepB(estimateValueSleepB);
+debouncedLoggers.estimateSleepB({
+  estimateSleepB: estimateValueSleepB,
+  trueSleepB: estimateSleepSetup.B.sleepTime,
+  displayedPercentageSleepB: Math.round(
+    getTruePercentage(dataSet, estimateSleepSetup.B) * 100,
+  ),
+});
 ```
 
 ```js
-debouncedLoggers.estimateSleepC(estimateValueSleepC);
+debouncedLoggers.estimateSleepC({
+  estimateSleepC: estimateValueSleepC,
+  trueSleepC: estimateSleepSetup.C.sleepTime,
+  displayedPercentageSleepC: Math.round(
+    getTruePercentage(dataSet, estimateSleepSetup.C) * 100,
+  ),
+});
 ```
 
 ```js
-debouncedLoggers.estimateSleepD(estimateValueSleepD);
+debouncedLoggers.estimateSleepD({
+  estimateSleepD: estimateValueSleepD,
+  trueSleepD: estimateSleepSetup.D.sleepTime,
+  displayedPercentageSleepD: Math.round(
+    getTruePercentage(dataSet, estimateSleepSetup.D) * 100,
+  ),
+});
 ```
 
 ```js
@@ -899,19 +970,68 @@ const plotsD = createPlots(plotData.comparisonD);
 ```
 
 ```js
-debouncedLoggers.estimateQuantityA(estimateValueQuantityA);
+console.log("plotData", plotData);
 ```
 
 ```js
-debouncedLoggers.estimateQuantityB(estimateValueQuantityB);
+/* const isHopVariant = variant === "hop" || variant === "hop_traced"; */
+const hopRowsA = plotData.comparisonA.hopCumulative.B;
+const hopRowsB = plotData.comparisonB.hopCumulative.B;
+const hopRowsC = plotData.comparisonC.hopCumulative.B;
+const hopRowsD = plotData.comparisonD.hopCumulative.B;
 ```
 
 ```js
-debouncedLoggers.estimateQuantityC(estimateValueQuantityC);
+plotData;
+debouncedLoggers.estimateQuantityA({
+  estimateQuantityA: estimateValueQuantityA,
+  trueQuantityA: Math.round(
+    plotData.comparisonA.absoluteSuccessRates.bSuccess * 100,
+  ),
+  hopIndexA: readHopIndex(),
+  trueValueAtHopIndexA: Math.round(
+    hopRowsA[readHopIndex() % hopRowsA.length].success * 100,
+  ),
+});
 ```
 
 ```js
-debouncedLoggers.estimateQuantityD(estimateValueQuantityD);
+debouncedLoggers.estimateQuantityB({
+  estimateQuantityB: estimateValueQuantityB,
+  trueQuantityB: Math.round(
+    plotData.comparisonB.absoluteSuccessRates.bSuccess * 100,
+  ),
+  hopIndexB: readHopIndex(),
+  trueValueAtHopIndexB: Math.round(
+    hopRowsB[readHopIndex() % hopRowsB.length].success * 100,
+  ),
+});
+```
+
+```js
+debouncedLoggers.estimateQuantityC({
+  estimateQuantityC: estimateValueQuantityC,
+  trueQuantityC: Math.round(
+    plotData.comparisonC.absoluteSuccessRates.bSuccess * 100,
+  ),
+  hopIndexC: readHopIndex(),
+  trueValueAtHopIndexC: Math.round(
+    hopRowsC[readHopIndex() % hopRowsC.length].success * 100,
+  ),
+});
+```
+
+```js
+debouncedLoggers.estimateQuantityD({
+  estimateQuantityD: estimateValueQuantityD,
+  trueQuantityD: Math.round(
+    plotData.comparisonD.absoluteSuccessRates.bSuccess * 100,
+  ),
+  hopIndexD: readHopIndex(),
+  trueValueAtHopIndexD: Math.round(
+    hopRowsD[readHopIndex() % hopRowsD.length].success * 100,
+  ),
+});
 ```
 
 ```js
@@ -2579,19 +2699,27 @@ const updateChart = chartElement.updateChart({
 ```
 
 ```js
-const hopIndex = (async function* () {
-  for (
-    let j = 0;
+const hopIndex = Mutable(0);
+const setHopIndex = (x) => (hopIndex.value = x);
+const readHopIndex = () => hopIndex.value;
+```
+
+```js
+{
+  let isCancelled = false;
+  invalidation.then(() => (isCancelled = true));
+
+  const isHopVariant =
     stepProps.variant === "hop" ||
     stepProps.variant === "hop_traced" ||
     (variant === "hop" && stepProps.comparison) ||
     (variant === "hop_traced" && stepProps.comparison);
-    ++j
-  ) {
-    yield j;
+
+  for (let j = 0; isHopVariant && !isCancelled; ++j) {
+    setHopIndex(j);
     await new Promise((resolve) => setTimeout(resolve, hopDuration));
   }
-})();
+}
 ```
 
 <!-- --- Observer -->
@@ -2970,7 +3098,7 @@ Was würden Sie schätzen, wie viel Prozent der ${estimatePercentageSetup.D.age}
 <div class="scroll-section card" data-step="14">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.A) * 100)}% der Gleichaltrigen **weniger** schlafen als der ${estimateSleepSetup.A.age}-jährige **${estimateSleepSetup.A.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.A.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTruePercentage(dataSet, estimateSleepSetup.A) * 100)}% der Gleichaltrigen **weniger** schlafen als der ${estimateSleepSetup.A.age}-jährige **${estimateSleepSetup.A.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.A.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepAUi}
 
@@ -2982,7 +3110,7 @@ ${certaintySleepA}
 <div class="scroll-section card" data-step="15">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.B) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.B.age}-jährige **${estimateSleepSetup.B.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.B.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTruePercentage(dataSet, estimateSleepSetup.B) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.B.age}-jährige **${estimateSleepSetup.B.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.B.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepBUi}
 
@@ -2994,7 +3122,7 @@ ${certaintySleepB}
 <div class="scroll-section card" data-step="16">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.C) * 100)}% der Gleichaltrigen **weniger** schlafen als der ${estimateSleepSetup.C.age}-jährige **${estimateSleepSetup.C.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.C.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTruePercentage(dataSet, estimateSleepSetup.C) * 100)}% der Gleichaltrigen **weniger** schlafen als der ${estimateSleepSetup.C.age}-jährige **${estimateSleepSetup.C.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.C.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepCUi}
 
@@ -3006,7 +3134,7 @@ ${certaintySleepC}
 <div class="scroll-section card" data-step="17">
 
 <!-- prettier-ignore -->
-Wir wissen, dass ${Math.round(getTrueValue(dataSet, estimateSleepSetup.D) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.D.age}-jährige **${estimateSleepSetup.D.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.D.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
+Wir wissen, dass ${Math.round(getTruePercentage(dataSet, estimateSleepSetup.D) * 100)}% der Gleichaltrigen **weniger** schlafen als die ${estimateSleepSetup.D.age}-jährige **${estimateSleepSetup.D.name}**. Was schätzen Sie: auf welcher Höhe müsste der weiße Punkt für die Schlafdauer von **${estimateSleepSetup.D.name}** liegen, um genau das abzubilden? Sie können den Punkt verschieben, indem Sie den Regler bewegen.
 
 ${estimateInputSleepDUi}
 

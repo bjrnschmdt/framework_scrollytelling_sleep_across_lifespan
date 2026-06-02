@@ -129,10 +129,10 @@ export function getNearestPValue(dataSet, age, sleeptime) {
   return bestMatch ? bestMatch.nearestPValue : null;
 }
 
-export function getTrueValue(dataSet, stepProps) {
-  const age = stepProps.age;
-  const sleepTime = stepProps.sleepTime;
-
+export function getTruePercentage(
+  dataSet,
+  { age = undefined, sleepTime = undefined } = {},
+) {
   // Use optional chaining and fallback values
   const trueValue =
     dataSet.get(age)?.estimatesPlotData?.find((d) => d.sleeptime === sleepTime)
@@ -141,16 +141,36 @@ export function getTrueValue(dataSet, stepProps) {
   return trueValue;
 }
 
-export function getTrueSleepDuration(dataSet, stepProps) {
-  const age = stepProps.age;
-  const sleepTime = stepProps.sleepTime;
+export function getTrueSleep(
+  dataSet,
+  { age = undefined, percentage = undefined } = {},
+) {
+  const estimatesPlotData = dataSet.get(age)?.estimatesPlotData;
 
-  // Use optional chaining and fallback values
-  const trueValue =
-    dataSet.get(age)?.estimatesPlotData?.find((d) => d.sleeptime === sleepTime)
-      ?.nearestPValue ?? null;
+  if (
+    !Array.isArray(estimatesPlotData) ||
+    typeof percentage !== "number" ||
+    Number.isNaN(percentage)
+  ) {
+    return null;
+  }
 
-  return trueValue;
+  const bestMatch = estimatesPlotData.reduce((acc, cur) => {
+    if (
+      typeof cur.nearestPValue !== "number" ||
+      Number.isNaN(cur.nearestPValue)
+    ) {
+      return acc;
+    }
+
+    if (!acc) return cur;
+
+    const distAcc = Math.abs(acc.nearestPValue - percentage);
+    const distCur = Math.abs(cur.nearestPValue - percentage);
+    return distCur < distAcc ? cur : acc;
+  }, null);
+
+  return bestMatch ? bestMatch.sleeptime : null;
 }
 
 // probability density function
@@ -472,6 +492,6 @@ const DEBUG = {
   scroll: false,
   update: false,
   inputs: false,
-  analytics: false,
+  analytics: true,
   ScrollInteraction: false,
 };
