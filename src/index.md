@@ -697,6 +697,53 @@ const educationValue = Generators.input(educationInput);
 <!-- ********************************************************* -->
 
 ```js
+console.log("dataSet", dataSet);
+```
+
+```js
+function cumulativeHopPercentageAtIndex(
+  dataSet,
+  { age = undefined, sleepTime = undefined } = {},
+  hopIndex,
+) {
+  const hopRows = dataSet.get(age)?.hop ?? [];
+  if (hopRows.length === 0) return null;
+
+  let successes = 0;
+  const comparisons = hopIndex + 1;
+
+  for (let i = 0; i < comparisons; i++) {
+    const currentRow = hopRows[i % hopRows.length];
+    if (currentRow.sleepTime < sleepTime) successes++;
+  }
+
+  return successes / comparisons;
+}
+
+function getHopPercentageSnapshot(setup) {
+  const isHopVariant = variant === "hop" || variant === "hop_traced";
+  if (!isHopVariant) return {};
+
+  const currentHopIndex = readHopIndex();
+  const truePercentageAtHopIndex = cumulativeHopPercentageAtIndex(
+    dataSet,
+    setup,
+    currentHopIndex,
+  );
+
+  return {
+    hopIndex: currentHopIndex,
+    truePercentageAtHopIndex:
+      truePercentageAtHopIndex == null
+        ? null
+        : Math.round(truePercentageAtHopIndex * 100),
+  };
+}
+```
+
+```js
+const hopPercentageA = getHopPercentageSnapshot(estimatePercentageSetup.A);
+
 debouncedLoggers.estimatePercentageA({
   estimatePercentageA: estimateValuePercentageA,
   truePercentageA: Math.round(
@@ -705,10 +752,18 @@ debouncedLoggers.estimatePercentageA({
       sleepTime: estimatePercentageSetup.A.sleepTime,
     }) * 100,
   ),
+  ...(hopPercentageA.hopIndex == null
+    ? {}
+    : {
+        hopIndexA: hopPercentageA.hopIndex,
+        truePercentageAtHopIndexA: hopPercentageA.truePercentageAtHopIndex,
+      }),
 });
 ```
 
 ```js
+const hopPercentageB = getHopPercentageSnapshot(estimatePercentageSetup.B);
+
 debouncedLoggers.estimatePercentageB({
   estimatePercentageB: estimateValuePercentageB,
   truePercentageB: Math.round(
@@ -717,10 +772,18 @@ debouncedLoggers.estimatePercentageB({
       sleepTime: estimatePercentageSetup.B.sleepTime,
     }) * 100,
   ),
+  ...(hopPercentageB.hopIndex == null
+    ? {}
+    : {
+        hopIndexB: hopPercentageB.hopIndex,
+        truePercentageAtHopIndexB: hopPercentageB.truePercentageAtHopIndex,
+      }),
 });
 ```
 
 ```js
+const hopPercentageC = getHopPercentageSnapshot(estimatePercentageSetup.C);
+
 debouncedLoggers.estimatePercentageC({
   estimatePercentageC: estimateValuePercentageC,
   truePercentageC: Math.round(
@@ -729,10 +792,18 @@ debouncedLoggers.estimatePercentageC({
       sleepTime: estimatePercentageSetup.C.sleepTime,
     }) * 100,
   ),
+  ...(hopPercentageC.hopIndex == null
+    ? {}
+    : {
+        hopIndexC: hopPercentageC.hopIndex,
+        truePercentageAtHopIndexC: hopPercentageC.truePercentageAtHopIndex,
+      }),
 });
 ```
 
 ```js
+const hopPercentageD = getHopPercentageSnapshot(estimatePercentageSetup.D);
+
 debouncedLoggers.estimatePercentageD({
   estimatePercentageD: estimateValuePercentageD,
   truePercentageD: Math.round(
@@ -741,6 +812,12 @@ debouncedLoggers.estimatePercentageD({
       sleepTime: estimatePercentageSetup.D.sleepTime,
     }) * 100,
   ),
+  ...(hopPercentageD.hopIndex == null
+    ? {}
+    : {
+        hopIndexD: hopPercentageD.hopIndex,
+        truePercentageAtHopIndexD: hopPercentageD.truePercentageAtHopIndex,
+      }),
 });
 ```
 
