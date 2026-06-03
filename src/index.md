@@ -97,6 +97,7 @@ const {
   ageMax,
   sleepMin,
   sleepMax,
+  thresholdsSleep,
   margin,
   canvasScaleFactor,
   relativeHeight,
@@ -900,42 +901,151 @@ const certaintyPercentageD = createSemanticDifferentialInput(
 <!-- ********************************************************* -->
 
 ```js
+function getDisplayedPercentageSleep(setup) {
+  return Math.round(getTruePercentage(dataSet, setup) * 100);
+}
+
+function cumulativeHopSleepAtPercentage(
+  dataSet,
+  { age = undefined } = {},
+  displayedPercentage,
+  hopIndex,
+) {
+  const hopRows = dataSet.get(age)?.hop ?? [];
+  if (hopRows.length === 0 || displayedPercentage == null) return null;
+
+  const comparisons = hopIndex + 1;
+  const targetSuccess = displayedPercentage / 100;
+  const sample = [];
+
+  for (let i = 0; i < comparisons; i++) {
+    sample.push(hopRows[i % hopRows.length].sleepTime);
+  }
+
+  let bestSleepTime = null;
+  let bestDistance = Infinity;
+
+  for (const threshold of thresholdsSleep) {
+    const successes = sample.filter(
+      (sleepTime) => sleepTime < threshold,
+    ).length;
+    const success = successes / comparisons;
+    const distance = Math.abs(success - targetSuccess);
+
+    if (distance < bestDistance) {
+      bestSleepTime = threshold;
+      bestDistance = distance;
+    }
+  }
+
+  return bestSleepTime;
+}
+
+function getHopSleepSnapshot(setup, displayedPercentage) {
+  const isHopVariant = variant === "hop" || variant === "hop_traced";
+  if (!isHopVariant) return {};
+
+  const currentHopIndex = readHopIndex();
+
+  console.log("currentHopIndex", currentHopIndex);
+
+  return {
+    hopIndex: currentHopIndex,
+    trueSleepAtHopIndex: cumulativeHopSleepAtPercentage(
+      dataSet,
+      setup,
+      displayedPercentage,
+      currentHopIndex,
+    ),
+  };
+}
+```
+
+```js
+const displayedPercentageSleepA = getDisplayedPercentageSleep(
+  estimateSleepSetup.A,
+);
+const hopSleepA = getHopSleepSnapshot(
+  estimateSleepSetup.A,
+  displayedPercentageSleepA,
+);
+
 debouncedLoggers.estimateSleepA({
   estimateSleepA: estimateValueSleepA,
   trueSleepA: estimateSleepSetup.A.sleepTime,
-  displayedPercentageSleepA: Math.round(
-    getTruePercentage(dataSet, estimateSleepSetup.A) * 100,
-  ),
+  displayedPercentageSleepA,
+  ...(hopSleepA.hopIndex == null
+    ? {}
+    : {
+        hopIndexA: hopSleepA.hopIndex,
+        trueSleepAtHopIndexA: hopSleepA.trueSleepAtHopIndex,
+      }),
 });
 ```
 
 ```js
+const displayedPercentageSleepB = getDisplayedPercentageSleep(
+  estimateSleepSetup.B,
+);
+const hopSleepB = getHopSleepSnapshot(
+  estimateSleepSetup.B,
+  displayedPercentageSleepB,
+);
+
 debouncedLoggers.estimateSleepB({
   estimateSleepB: estimateValueSleepB,
   trueSleepB: estimateSleepSetup.B.sleepTime,
-  displayedPercentageSleepB: Math.round(
-    getTruePercentage(dataSet, estimateSleepSetup.B) * 100,
-  ),
+  displayedPercentageSleepB,
+  ...(hopSleepB.hopIndex == null
+    ? {}
+    : {
+        hopIndexB: hopSleepB.hopIndex,
+        trueSleepAtHopIndexB: hopSleepB.trueSleepAtHopIndex,
+      }),
 });
 ```
 
 ```js
+const displayedPercentageSleepC = getDisplayedPercentageSleep(
+  estimateSleepSetup.C,
+);
+const hopSleepC = getHopSleepSnapshot(
+  estimateSleepSetup.C,
+  displayedPercentageSleepC,
+);
+
 debouncedLoggers.estimateSleepC({
   estimateSleepC: estimateValueSleepC,
   trueSleepC: estimateSleepSetup.C.sleepTime,
-  displayedPercentageSleepC: Math.round(
-    getTruePercentage(dataSet, estimateSleepSetup.C) * 100,
-  ),
+  displayedPercentageSleepC,
+  ...(hopSleepC.hopIndex == null
+    ? {}
+    : {
+        hopIndexC: hopSleepC.hopIndex,
+        trueSleepAtHopIndexC: hopSleepC.trueSleepAtHopIndex,
+      }),
 });
 ```
 
 ```js
+const displayedPercentageSleepD = getDisplayedPercentageSleep(
+  estimateSleepSetup.D,
+);
+const hopSleepD = getHopSleepSnapshot(
+  estimateSleepSetup.D,
+  displayedPercentageSleepD,
+);
+
 debouncedLoggers.estimateSleepD({
   estimateSleepD: estimateValueSleepD,
   trueSleepD: estimateSleepSetup.D.sleepTime,
-  displayedPercentageSleepD: Math.round(
-    getTruePercentage(dataSet, estimateSleepSetup.D) * 100,
-  ),
+  displayedPercentageSleepD,
+  ...(hopSleepD.hopIndex == null
+    ? {}
+    : {
+        hopIndexD: hopSleepD.hopIndex,
+        trueSleepAtHopIndexD: hopSleepD.trueSleepAtHopIndex,
+      }),
 });
 ```
 
@@ -2789,13 +2899,16 @@ const readHopIndex = () => hopIndex.value;
   let isCancelled = false;
   invalidation.then(() => (isCancelled = true));
 
-  const isHopVariant =
-    stepProps.variant === "hop" ||
-    stepProps.variant === "hop_traced" ||
-    (variant === "hop" && stepProps.comparison) ||
-    (variant === "hop_traced" && stepProps.comparison);
+  const isHopVariant = variant === "hop" || variant === "hop_traced";
+  const hopScrollSteps = new Set([
+    6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+  ]);
 
-  for (let j = 0; isHopVariant && !isCancelled; ++j) {
+  for (
+    let j = 0;
+    isHopVariant && hopScrollSteps.has(scrollyStep) && !isCancelled;
+    ++j
+  ) {
     setHopIndex(j);
     await new Promise((resolve) => setTimeout(resolve, hopDuration));
   }
