@@ -479,7 +479,10 @@ export function cumulativeQuantityAtIndex(hopA, hopB, i, tie = "split") {
   };
 }
 
-export function getHopQuantitySnapshot(comparisonData, hopIndex) {
+export function getHopQuantitySnapshot(comparisonData, hopIndex, variant) {
+  const isHopVariant = variant === "hop" || variant === "hop_traced";
+  if (!isHopVariant) return {};
+
   const { bSuccess } = cumulativeQuantityAtIndex(
     comparisonData.hopCumulative.A,
     comparisonData.hopCumulative.B,

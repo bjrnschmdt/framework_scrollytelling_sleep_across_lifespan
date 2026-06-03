@@ -323,12 +323,9 @@ debouncedLoggers.estimate({
       sleepTime: sleepTimeInput.value,
     }) * 100,
   ),
-  ...(hopPercentage.hopIndex == null
-    ? {}
-    : {
-        hopIndexPercentage: hopPercentage.hopIndex,
-        truePercentageAtHopIndex: hopPercentage.truePercentageAtHopIndex,
-      }),
+
+  hopIndexPercentage: hopPercentage.hopIndex,
+  truePercentageAtHopIndex: hopPercentage.truePercentageAtHopIndex,
 });
 ```
 
@@ -735,12 +732,9 @@ debouncedLoggers.estimatePercentageA({
       sleepTime: estimatePercentageSetup.A.sleepTime,
     }) * 100,
   ),
-  ...(hopPercentageA.hopIndex == null
-    ? {}
-    : {
-        hopIndexPercentageA: hopPercentageA.hopIndex,
-        truePercentageAtHopIndexA: hopPercentageA.truePercentageAtHopIndex,
-      }),
+
+  hopIndexPercentageA: hopPercentageA.hopIndex,
+  truePercentageAtHopIndexA: hopPercentageA.truePercentageAtHopIndex,
 });
 ```
 
@@ -760,12 +754,9 @@ debouncedLoggers.estimatePercentageB({
       sleepTime: estimatePercentageSetup.B.sleepTime,
     }) * 100,
   ),
-  ...(hopPercentageB.hopIndex == null
-    ? {}
-    : {
-        hopIndexPercentageB: hopPercentageB.hopIndex,
-        truePercentageAtHopIndexB: hopPercentageB.truePercentageAtHopIndex,
-      }),
+
+  hopIndexPercentageB: hopPercentageB.hopIndex,
+  truePercentageAtHopIndexB: hopPercentageB.truePercentageAtHopIndex,
 });
 ```
 
@@ -785,12 +776,9 @@ debouncedLoggers.estimatePercentageC({
       sleepTime: estimatePercentageSetup.C.sleepTime,
     }) * 100,
   ),
-  ...(hopPercentageC.hopIndex == null
-    ? {}
-    : {
-        hopIndexPercentageC: hopPercentageC.hopIndex,
-        truePercentageAtHopIndexC: hopPercentageC.truePercentageAtHopIndex,
-      }),
+
+  hopIndexPercentageC: hopPercentageC.hopIndex,
+  truePercentageAtHopIndexC: hopPercentageC.truePercentageAtHopIndex,
 });
 ```
 
@@ -810,12 +798,9 @@ debouncedLoggers.estimatePercentageD({
       sleepTime: estimatePercentageSetup.D.sleepTime,
     }) * 100,
   ),
-  ...(hopPercentageD.hopIndex == null
-    ? {}
-    : {
-        hopIndexPercentageD: hopPercentageD.hopIndex,
-        truePercentageAtHopIndexD: hopPercentageD.truePercentageAtHopIndex,
-      }),
+
+  hopIndexPercentageD: hopPercentageD.hopIndex,
+  truePercentageAtHopIndexD: hopPercentageD.truePercentageAtHopIndex,
 });
 ```
 
@@ -920,12 +905,9 @@ debouncedLoggers.estimateSleepA({
   estimateSleepA: estimateValueSleepA,
   trueSleepA: estimateSleepSetup.A.sleepTime,
   displayedPercentageSleepA,
-  ...(hopSleepA.hopIndex == null
-    ? {}
-    : {
-        hopIndexSleepA: hopSleepA.hopIndex,
-        trueSleepAtHopIndexA: hopSleepA.trueSleepAtHopIndex,
-      }),
+
+  hopIndexSleepA: hopSleepA.hopIndex,
+  trueSleepAtHopIndexA: hopSleepA.trueSleepAtHopIndex,
 });
 ```
 
@@ -946,12 +928,9 @@ debouncedLoggers.estimateSleepB({
   estimateSleepB: estimateValueSleepB,
   trueSleepB: estimateSleepSetup.B.sleepTime,
   displayedPercentageSleepB,
-  ...(hopSleepB.hopIndex == null
-    ? {}
-    : {
-        hopIndexSleepB: hopSleepB.hopIndex,
-        trueSleepAtHopIndexB: hopSleepB.trueSleepAtHopIndex,
-      }),
+
+  hopIndexSleepB: hopSleepB.hopIndex,
+  trueSleepAtHopIndexB: hopSleepB.trueSleepAtHopIndex,
 });
 ```
 
@@ -972,12 +951,9 @@ debouncedLoggers.estimateSleepC({
   estimateSleepC: estimateValueSleepC,
   trueSleepC: estimateSleepSetup.C.sleepTime,
   displayedPercentageSleepC,
-  ...(hopSleepC.hopIndex == null
-    ? {}
-    : {
-        hopIndexSleepC: hopSleepC.hopIndex,
-        trueSleepAtHopIndexC: hopSleepC.trueSleepAtHopIndex,
-      }),
+
+  hopIndexSleepC: hopSleepC.hopIndex,
+  trueSleepAtHopIndexC: hopSleepC.trueSleepAtHopIndex,
 });
 ```
 
@@ -998,12 +974,9 @@ debouncedLoggers.estimateSleepD({
   estimateSleepD: estimateValueSleepD,
   trueSleepD: estimateSleepSetup.D.sleepTime,
   displayedPercentageSleepD,
-  ...(hopSleepD.hopIndex == null
-    ? {}
-    : {
-        hopIndexSleepD: hopSleepD.hopIndex,
-        trueSleepAtHopIndexD: hopSleepD.trueSleepAtHopIndex,
-      }),
+
+  hopIndexSleepD: hopSleepD.hopIndex,
+  trueSleepAtHopIndexD: hopSleepD.trueSleepAtHopIndex,
 });
 ```
 
@@ -1118,6 +1091,7 @@ const plotsD = createPlots(plotData.comparisonD);
 const hopQuantityA = getHopQuantitySnapshot(
   plotData.comparisonA,
   readHopIndex(),
+  variant,
 );
 
 debouncedLoggers.estimateQuantityA({
@@ -1134,6 +1108,7 @@ debouncedLoggers.estimateQuantityA({
 const hopQuantityB = getHopQuantitySnapshot(
   plotData.comparisonB,
   readHopIndex(),
+  variant,
 );
 
 debouncedLoggers.estimateQuantityB({
@@ -1150,6 +1125,7 @@ debouncedLoggers.estimateQuantityB({
 const hopQuantityC = getHopQuantitySnapshot(
   plotData.comparisonC,
   readHopIndex(),
+  variant,
 );
 
 debouncedLoggers.estimateQuantityC({
@@ -1166,6 +1142,7 @@ debouncedLoggers.estimateQuantityC({
 const hopQuantityD = getHopQuantitySnapshot(
   plotData.comparisonD,
   readHopIndex(),
+  variant,
 );
 
 debouncedLoggers.estimateQuantityD({
