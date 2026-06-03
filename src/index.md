@@ -970,67 +970,70 @@ const plotsD = createPlots(plotData.comparisonD);
 ```
 
 ```js
-console.log("plotData", plotData);
+function getHopSuccessSnapshot(comparisonData) {
+  const currentHopIndex = readHopIndex();
+  const { bSuccess } = cumulativeSuccessAtIndex(
+    comparisonData.hopCumulative.A,
+    comparisonData.hopCumulative.B,
+    currentHopIndex,
+  );
+
+  return {
+    hopIndex: currentHopIndex,
+    trueValueAtHopIndex: Math.round(bSuccess * 100),
+  };
+}
 ```
 
 ```js
-/* const isHopVariant = variant === "hop" || variant === "hop_traced"; */
-const hopRowsA = plotData.comparisonA.hopCumulative.B;
-const hopRowsB = plotData.comparisonB.hopCumulative.B;
-const hopRowsC = plotData.comparisonC.hopCumulative.B;
-const hopRowsD = plotData.comparisonD.hopCumulative.B;
-```
+const hopSuccessA = getHopSuccessSnapshot(plotData.comparisonA);
 
-```js
-plotData;
 debouncedLoggers.estimateQuantityA({
   estimateQuantityA: estimateValueQuantityA,
   trueQuantityA: Math.round(
     plotData.comparisonA.absoluteSuccessRates.bSuccess * 100,
   ),
-  hopIndexA: readHopIndex(),
-  trueValueAtHopIndexA: Math.round(
-    hopRowsA[readHopIndex() % hopRowsA.length].success * 100,
-  ),
+  hopIndexA: hopSuccessA.hopIndex,
+  trueValueAtHopIndexA: hopSuccessA.trueValueAtHopIndex,
 });
 ```
 
 ```js
+const hopSuccessB = getHopSuccessSnapshot(plotData.comparisonB);
+
 debouncedLoggers.estimateQuantityB({
   estimateQuantityB: estimateValueQuantityB,
   trueQuantityB: Math.round(
     plotData.comparisonB.absoluteSuccessRates.bSuccess * 100,
   ),
-  hopIndexB: readHopIndex(),
-  trueValueAtHopIndexB: Math.round(
-    hopRowsB[readHopIndex() % hopRowsB.length].success * 100,
-  ),
+  hopIndexB: hopSuccessB.hopIndex,
+  trueValueAtHopIndexB: hopSuccessB.trueValueAtHopIndex,
 });
 ```
 
 ```js
+const hopSuccessC = getHopSuccessSnapshot(plotData.comparisonC);
+
 debouncedLoggers.estimateQuantityC({
   estimateQuantityC: estimateValueQuantityC,
   trueQuantityC: Math.round(
     plotData.comparisonC.absoluteSuccessRates.bSuccess * 100,
   ),
-  hopIndexC: readHopIndex(),
-  trueValueAtHopIndexC: Math.round(
-    hopRowsC[readHopIndex() % hopRowsC.length].success * 100,
-  ),
+  hopIndexC: hopSuccessC.hopIndex,
+  trueValueAtHopIndexC: hopSuccessC.trueValueAtHopIndex,
 });
 ```
 
 ```js
+const hopSuccessD = getHopSuccessSnapshot(plotData.comparisonD);
+
 debouncedLoggers.estimateQuantityD({
   estimateQuantityD: estimateValueQuantityD,
   trueQuantityD: Math.round(
     plotData.comparisonD.absoluteSuccessRates.bSuccess * 100,
   ),
-  hopIndexD: readHopIndex(),
-  trueValueAtHopIndexD: Math.round(
-    hopRowsD[readHopIndex() % hopRowsD.length].success * 100,
-  ),
+  hopIndexD: hopSuccessD.hopIndex,
+  trueValueAtHopIndexD: hopSuccessD.trueValueAtHopIndex,
 });
 ```
 

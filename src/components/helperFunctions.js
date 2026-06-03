@@ -452,16 +452,14 @@ export function cumulativeSuccessAtIndex(hopA, hopB, i, tie = "split") {
   const n = Math.min(hopA.length, hopB.length);
   if (n === 0)
     return { aWins: 0, bWins: 0, comparisons: 0, aSuccess: 0, bSuccess: 0 };
-
   let aWins = 0,
     bWins = 0;
   const comparisons = i + 1;
 
   for (let k = 0; k < comparisons; k++) {
     const idx = k % n; // wrap around
-    const av = hopA[idx].value,
-      bv = hopB[idx].value;
-
+    const av = hopA[idx].p,
+      bv = hopB[idx].p;
     if (av > bv) aWins++;
     else if (bv > av) bWins++;
     else {
@@ -472,7 +470,6 @@ export function cumulativeSuccessAtIndex(hopA, hopB, i, tie = "split") {
       else if (tie === "favorB") bWins++;
     }
   }
-
   return {
     aWins,
     bWins,
