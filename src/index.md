@@ -305,14 +305,30 @@ debouncedLoggers.sleepTime(sleepTimeValue);
 ```
 
 ```js
+const hopPercentage = getHopPercentageSnapshot(
+  dataSet,
+  {
+    age: ageValue,
+    sleepTime: sleepTimeValue,
+  },
+  variant,
+  readHopIndex(),
+);
+
 debouncedLoggers.estimate({
-  estimate: estimateValue,
-  true: Math.round(
+  estimatePercentage: estimateValue,
+  truePercentage: Math.round(
     getTruePercentage(dataSet, {
       age: ageValue,
       sleepTime: sleepTimeValue,
     }) * 100,
   ),
+  ...(hopPercentage.hopIndex == null
+    ? {}
+    : {
+        hopIndexPercentage: hopPercentage.hopIndex,
+        truePercentageAtHopIndex: hopPercentage.truePercentageAtHopIndex,
+      }),
 });
 ```
 
