@@ -30,7 +30,7 @@ import {
   initializeCrosshair,
   updateCrosshairs,
 } from "./components/crosshair.js";
-import { PointerInteraction } from "./components/pointerInteraction.js";
+import { PointerInteraction } from "./components/PointerInteraction.js";
 import { ScrollInteraction } from "./components/scrollInteraction.js";
 import { createAxes } from "./components/createAxes.js";
 import { Pointcloud } from "./components/pointcloud.js";
