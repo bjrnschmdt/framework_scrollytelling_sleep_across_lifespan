@@ -308,8 +308,8 @@ debouncedLoggers.sleepTime(sleepTimeValue);
 const hopPercentage = getHopPercentageSnapshot(
   dataSet,
   {
-    age: ageValue,
-    sleepTime: sleepTimeValue,
+    age: ageInput.value,
+    sleepTime: sleepTimeInput.value,
   },
   variant,
   readHopIndex(),
@@ -319,8 +319,8 @@ debouncedLoggers.estimate({
   estimatePercentage: estimateValue,
   truePercentage: Math.round(
     getTruePercentage(dataSet, {
-      age: ageValue,
-      sleepTime: sleepTimeValue,
+      age: ageInput.value,
+      sleepTime: sleepTimeInput.value,
     }) * 100,
   ),
   ...(hopPercentage.hopIndex == null
