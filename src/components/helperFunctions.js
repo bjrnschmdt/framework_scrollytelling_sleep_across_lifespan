@@ -448,7 +448,7 @@ function splitTopLevelByComma(s) {
 export const getCssVar = (name) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-export function cumulativeSuccessAtIndex(hopA, hopB, i, tie = "split") {
+export function cumulativeQuantityAtIndex(hopA, hopB, i, tie = "split") {
   const n = Math.min(hopA.length, hopB.length);
   if (n === 0)
     return { aWins: 0, bWins: 0, comparisons: 0, aSuccess: 0, bSuccess: 0 };
@@ -476,6 +476,117 @@ export function cumulativeSuccessAtIndex(hopA, hopB, i, tie = "split") {
     comparisons,
     aSuccess: aWins / comparisons,
     bSuccess: bWins / comparisons,
+  };
+}
+
+export function getHopQuantitySnapshot(comparisonData, hopIndex) {
+  const { bSuccess } = cumulativeQuantityAtIndex(
+    comparisonData.hopCumulative.A,
+    comparisonData.hopCumulative.B,
+    hopIndex,
+  );
+
+  return {
+    hopIndex,
+    trueQuantityAtHopIndex: Math.round(bSuccess * 100),
+  };
+}
+
+export function cumulativeHopPercentageAtIndex(
+  dataSet,
+  { age = undefined, sleepTime = undefined } = {},
+  hopIndex,
+) {
+  const hopRows = dataSet.get(age)?.hop ?? [];
+  if (hopRows.length === 0) return null;
+
+  let successes = 0;
+  const comparisons = hopIndex + 1;
+
+  for (let i = 0; i < comparisons; i++) {
+    const currentRow = hopRows[i % hopRows.length];
+    if (currentRow.sleepTime < sleepTime) successes++;
+  }
+
+  return successes / comparisons;
+}
+
+export function getHopPercentageSnapshot(dataSet, setup, variant, hopIndex) {
+  const isHopVariant = variant === "hop" || variant === "hop_traced";
+  if (!isHopVariant) return {};
+
+  const truePercentageAtHopIndex = cumulativeHopPercentageAtIndex(
+    dataSet,
+    setup,
+    hopIndex,
+  );
+
+  return {
+    hopIndex,
+    truePercentageAtHopIndex:
+      truePercentageAtHopIndex == null
+        ? null
+        : Math.round(truePercentageAtHopIndex * 100),
+  };
+}
+
+export function cumulativeHopSleepAtPercentage(
+  dataSet,
+  { age = undefined } = {},
+  displayedPercentage,
+  hopIndex,
+  thresholdsSleep,
+) {
+  const hopRows = dataSet.get(age)?.hop ?? [];
+  if (hopRows.length === 0 || displayedPercentage == null) return null;
+
+  const comparisons = hopIndex + 1;
+  const targetSuccess = displayedPercentage / 100;
+  const sample = [];
+
+  for (let i = 0; i < comparisons; i++) {
+    sample.push(hopRows[i % hopRows.length].sleepTime);
+  }
+
+  let bestSleepTime = null;
+  let bestDistance = Infinity;
+
+  for (const threshold of thresholdsSleep) {
+    const successes = sample.filter(
+      (sleepTime) => sleepTime < threshold,
+    ).length;
+    const success = successes / comparisons;
+    const distance = Math.abs(success - targetSuccess);
+
+    if (distance < bestDistance) {
+      bestSleepTime = threshold;
+      bestDistance = distance;
+    }
+  }
+
+  return bestSleepTime;
+}
+
+export function getHopSleepSnapshot(
+  dataSet,
+  setup,
+  displayedPercentage,
+  variant,
+  hopIndex,
+  thresholdsSleep,
+) {
+  const isHopVariant = variant === "hop" || variant === "hop_traced";
+  if (!isHopVariant) return {};
+
+  return {
+    hopIndex,
+    trueSleepAtHopIndex: cumulativeHopSleepAtPercentage(
+      dataSet,
+      setup,
+      displayedPercentage,
+      hopIndex,
+      thresholdsSleep,
+    ),
   };
 }
 

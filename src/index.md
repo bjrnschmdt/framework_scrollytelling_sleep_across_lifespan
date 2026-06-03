@@ -14,7 +14,9 @@ import {
   updateXDomain,
   programmaticScroll,
   debugLog,
-  cumulativeSuccessAtIndex,
+  getHopPercentageSnapshot,
+  getHopSleepSnapshot,
+  getHopQuantitySnapshot,
 } from "./components/helperFunctions.js";
 import isMobile from "./components/isMobile.js";
 import { dataSet, simulatedData } from "./components/data.js";
@@ -702,48 +704,12 @@ console.log("dataSet", dataSet);
 ```
 
 ```js
-function cumulativeHopPercentageAtIndex(
+const hopPercentageA = getHopPercentageSnapshot(
   dataSet,
-  { age = undefined, sleepTime = undefined } = {},
-  hopIndex,
-) {
-  const hopRows = dataSet.get(age)?.hop ?? [];
-  if (hopRows.length === 0) return null;
-
-  let successes = 0;
-  const comparisons = hopIndex + 1;
-
-  for (let i = 0; i < comparisons; i++) {
-    const currentRow = hopRows[i % hopRows.length];
-    if (currentRow.sleepTime < sleepTime) successes++;
-  }
-
-  return successes / comparisons;
-}
-
-function getHopPercentageSnapshot(setup) {
-  const isHopVariant = variant === "hop" || variant === "hop_traced";
-  if (!isHopVariant) return {};
-
-  const currentHopIndex = readHopIndex();
-  const truePercentageAtHopIndex = cumulativeHopPercentageAtIndex(
-    dataSet,
-    setup,
-    currentHopIndex,
-  );
-
-  return {
-    hopIndex: currentHopIndex,
-    truePercentageAtHopIndex:
-      truePercentageAtHopIndex == null
-        ? null
-        : Math.round(truePercentageAtHopIndex * 100),
-  };
-}
-```
-
-```js
-const hopPercentageA = getHopPercentageSnapshot(estimatePercentageSetup.A);
+  estimatePercentageSetup.A,
+  variant,
+  readHopIndex(),
+);
 
 debouncedLoggers.estimatePercentageA({
   estimatePercentageA: estimateValuePercentageA,
@@ -756,14 +722,19 @@ debouncedLoggers.estimatePercentageA({
   ...(hopPercentageA.hopIndex == null
     ? {}
     : {
-        hopIndexA: hopPercentageA.hopIndex,
+        hopIndexPercentageA: hopPercentageA.hopIndex,
         truePercentageAtHopIndexA: hopPercentageA.truePercentageAtHopIndex,
       }),
 });
 ```
 
 ```js
-const hopPercentageB = getHopPercentageSnapshot(estimatePercentageSetup.B);
+const hopPercentageB = getHopPercentageSnapshot(
+  dataSet,
+  estimatePercentageSetup.B,
+  variant,
+  readHopIndex(),
+);
 
 debouncedLoggers.estimatePercentageB({
   estimatePercentageB: estimateValuePercentageB,
@@ -776,14 +747,19 @@ debouncedLoggers.estimatePercentageB({
   ...(hopPercentageB.hopIndex == null
     ? {}
     : {
-        hopIndexB: hopPercentageB.hopIndex,
+        hopIndexPercentageB: hopPercentageB.hopIndex,
         truePercentageAtHopIndexB: hopPercentageB.truePercentageAtHopIndex,
       }),
 });
 ```
 
 ```js
-const hopPercentageC = getHopPercentageSnapshot(estimatePercentageSetup.C);
+const hopPercentageC = getHopPercentageSnapshot(
+  dataSet,
+  estimatePercentageSetup.C,
+  variant,
+  readHopIndex(),
+);
 
 debouncedLoggers.estimatePercentageC({
   estimatePercentageC: estimateValuePercentageC,
@@ -796,14 +772,19 @@ debouncedLoggers.estimatePercentageC({
   ...(hopPercentageC.hopIndex == null
     ? {}
     : {
-        hopIndexC: hopPercentageC.hopIndex,
+        hopIndexPercentageC: hopPercentageC.hopIndex,
         truePercentageAtHopIndexC: hopPercentageC.truePercentageAtHopIndex,
       }),
 });
 ```
 
 ```js
-const hopPercentageD = getHopPercentageSnapshot(estimatePercentageSetup.D);
+const hopPercentageD = getHopPercentageSnapshot(
+  dataSet,
+  estimatePercentageSetup.D,
+  variant,
+  readHopIndex(),
+);
 
 debouncedLoggers.estimatePercentageD({
   estimatePercentageD: estimateValuePercentageD,
@@ -816,7 +797,7 @@ debouncedLoggers.estimatePercentageD({
   ...(hopPercentageD.hopIndex == null
     ? {}
     : {
-        hopIndexD: hopPercentageD.hopIndex,
+        hopIndexPercentageD: hopPercentageD.hopIndex,
         truePercentageAtHopIndexD: hopPercentageD.truePercentageAtHopIndex,
       }),
 });
@@ -904,61 +885,6 @@ const certaintyPercentageD = createSemanticDifferentialInput(
 function getDisplayedPercentageSleep(setup) {
   return Math.round(getTruePercentage(dataSet, setup) * 100);
 }
-
-function cumulativeHopSleepAtPercentage(
-  dataSet,
-  { age = undefined } = {},
-  displayedPercentage,
-  hopIndex,
-) {
-  const hopRows = dataSet.get(age)?.hop ?? [];
-  if (hopRows.length === 0 || displayedPercentage == null) return null;
-
-  const comparisons = hopIndex + 1;
-  const targetSuccess = displayedPercentage / 100;
-  const sample = [];
-
-  for (let i = 0; i < comparisons; i++) {
-    sample.push(hopRows[i % hopRows.length].sleepTime);
-  }
-
-  let bestSleepTime = null;
-  let bestDistance = Infinity;
-
-  for (const threshold of thresholdsSleep) {
-    const successes = sample.filter(
-      (sleepTime) => sleepTime < threshold,
-    ).length;
-    const success = successes / comparisons;
-    const distance = Math.abs(success - targetSuccess);
-
-    if (distance < bestDistance) {
-      bestSleepTime = threshold;
-      bestDistance = distance;
-    }
-  }
-
-  return bestSleepTime;
-}
-
-function getHopSleepSnapshot(setup, displayedPercentage) {
-  const isHopVariant = variant === "hop" || variant === "hop_traced";
-  if (!isHopVariant) return {};
-
-  const currentHopIndex = readHopIndex();
-
-  console.log("currentHopIndex", currentHopIndex);
-
-  return {
-    hopIndex: currentHopIndex,
-    trueSleepAtHopIndex: cumulativeHopSleepAtPercentage(
-      dataSet,
-      setup,
-      displayedPercentage,
-      currentHopIndex,
-    ),
-  };
-}
 ```
 
 ```js
@@ -966,8 +892,12 @@ const displayedPercentageSleepA = getDisplayedPercentageSleep(
   estimateSleepSetup.A,
 );
 const hopSleepA = getHopSleepSnapshot(
+  dataSet,
   estimateSleepSetup.A,
   displayedPercentageSleepA,
+  variant,
+  readHopIndex(),
+  thresholdsSleep,
 );
 
 debouncedLoggers.estimateSleepA({
@@ -977,7 +907,7 @@ debouncedLoggers.estimateSleepA({
   ...(hopSleepA.hopIndex == null
     ? {}
     : {
-        hopIndexA: hopSleepA.hopIndex,
+        hopIndexSleepA: hopSleepA.hopIndex,
         trueSleepAtHopIndexA: hopSleepA.trueSleepAtHopIndex,
       }),
 });
@@ -988,8 +918,12 @@ const displayedPercentageSleepB = getDisplayedPercentageSleep(
   estimateSleepSetup.B,
 );
 const hopSleepB = getHopSleepSnapshot(
+  dataSet,
   estimateSleepSetup.B,
   displayedPercentageSleepB,
+  variant,
+  readHopIndex(),
+  thresholdsSleep,
 );
 
 debouncedLoggers.estimateSleepB({
@@ -999,7 +933,7 @@ debouncedLoggers.estimateSleepB({
   ...(hopSleepB.hopIndex == null
     ? {}
     : {
-        hopIndexB: hopSleepB.hopIndex,
+        hopIndexSleepB: hopSleepB.hopIndex,
         trueSleepAtHopIndexB: hopSleepB.trueSleepAtHopIndex,
       }),
 });
@@ -1010,8 +944,12 @@ const displayedPercentageSleepC = getDisplayedPercentageSleep(
   estimateSleepSetup.C,
 );
 const hopSleepC = getHopSleepSnapshot(
+  dataSet,
   estimateSleepSetup.C,
   displayedPercentageSleepC,
+  variant,
+  readHopIndex(),
+  thresholdsSleep,
 );
 
 debouncedLoggers.estimateSleepC({
@@ -1021,7 +959,7 @@ debouncedLoggers.estimateSleepC({
   ...(hopSleepC.hopIndex == null
     ? {}
     : {
-        hopIndexC: hopSleepC.hopIndex,
+        hopIndexSleepC: hopSleepC.hopIndex,
         trueSleepAtHopIndexC: hopSleepC.trueSleepAtHopIndex,
       }),
 });
@@ -1032,8 +970,12 @@ const displayedPercentageSleepD = getDisplayedPercentageSleep(
   estimateSleepSetup.D,
 );
 const hopSleepD = getHopSleepSnapshot(
+  dataSet,
   estimateSleepSetup.D,
   displayedPercentageSleepD,
+  variant,
+  readHopIndex(),
+  thresholdsSleep,
 );
 
 debouncedLoggers.estimateSleepD({
@@ -1043,7 +985,7 @@ debouncedLoggers.estimateSleepD({
   ...(hopSleepD.hopIndex == null
     ? {}
     : {
-        hopIndexD: hopSleepD.hopIndex,
+        hopIndexSleepD: hopSleepD.hopIndex,
         trueSleepAtHopIndexD: hopSleepD.trueSleepAtHopIndex,
       }),
 });
@@ -1157,70 +1099,66 @@ const plotsD = createPlots(plotData.comparisonD);
 ```
 
 ```js
-function getHopSuccessSnapshot(comparisonData) {
-  const currentHopIndex = readHopIndex();
-  const { bSuccess } = cumulativeSuccessAtIndex(
-    comparisonData.hopCumulative.A,
-    comparisonData.hopCumulative.B,
-    currentHopIndex,
-  );
-
-  return {
-    hopIndex: currentHopIndex,
-    trueValueAtHopIndex: Math.round(bSuccess * 100),
-  };
-}
-```
-
-```js
-const hopSuccessA = getHopSuccessSnapshot(plotData.comparisonA);
+const hopQuantityA = getHopQuantitySnapshot(
+  plotData.comparisonA,
+  readHopIndex(),
+);
 
 debouncedLoggers.estimateQuantityA({
   estimateQuantityA: estimateValueQuantityA,
   trueQuantityA: Math.round(
     plotData.comparisonA.absoluteSuccessRates.bSuccess * 100,
   ),
-  hopIndexA: hopSuccessA.hopIndex,
-  trueValueAtHopIndexA: hopSuccessA.trueValueAtHopIndex,
+  hopIndexQuantityA: hopQuantityA.hopIndex,
+  trueQuantityAtHopIndexA: hopQuantityA.trueQuantityAtHopIndex,
 });
 ```
 
 ```js
-const hopSuccessB = getHopSuccessSnapshot(plotData.comparisonB);
+const hopQuantityB = getHopQuantitySnapshot(
+  plotData.comparisonB,
+  readHopIndex(),
+);
 
 debouncedLoggers.estimateQuantityB({
   estimateQuantityB: estimateValueQuantityB,
   trueQuantityB: Math.round(
     plotData.comparisonB.absoluteSuccessRates.bSuccess * 100,
   ),
-  hopIndexB: hopSuccessB.hopIndex,
-  trueValueAtHopIndexB: hopSuccessB.trueValueAtHopIndex,
+  hopIndexQuantityB: hopQuantityB.hopIndex,
+  trueQuantityAtHopIndexB: hopQuantityB.trueQuantityAtHopIndex,
 });
 ```
 
 ```js
-const hopSuccessC = getHopSuccessSnapshot(plotData.comparisonC);
+const hopQuantityC = getHopQuantitySnapshot(
+  plotData.comparisonC,
+  readHopIndex(),
+);
 
 debouncedLoggers.estimateQuantityC({
   estimateQuantityC: estimateValueQuantityC,
   trueQuantityC: Math.round(
     plotData.comparisonC.absoluteSuccessRates.bSuccess * 100,
   ),
-  hopIndexC: hopSuccessC.hopIndex,
-  trueValueAtHopIndexC: hopSuccessC.trueValueAtHopIndex,
+  hopIndexQuantityC: hopQuantityC.hopIndex,
+  trueQuantityAtHopIndexC: hopQuantityC.trueQuantityAtHopIndex,
 });
 ```
 
 ```js
-const hopSuccessD = getHopSuccessSnapshot(plotData.comparisonD);
+const hopQuantityD = getHopQuantitySnapshot(
+  plotData.comparisonD,
+  readHopIndex(),
+);
 
 debouncedLoggers.estimateQuantityD({
   estimateQuantityD: estimateValueQuantityD,
   trueQuantityD: Math.round(
     plotData.comparisonD.absoluteSuccessRates.bSuccess * 100,
   ),
-  hopIndexD: hopSuccessD.hopIndex,
-  trueValueAtHopIndexD: hopSuccessD.trueValueAtHopIndex,
+  hopIndexQuantityD: hopQuantityD.hopIndex,
+  trueQuantityAtHopIndexD: hopQuantityD.trueQuantityAtHopIndex,
 });
 ```
 
