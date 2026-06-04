@@ -713,7 +713,7 @@ const educationValue = Generators.input(educationInput);
 <!-- ********************************************************* -->
 
 ```js
-console.log("dataSet", dataSet);
+debugLog("general", "dataSet", dataSet);
 ```
 
 ```js

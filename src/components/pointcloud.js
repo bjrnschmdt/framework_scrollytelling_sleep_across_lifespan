@@ -192,7 +192,6 @@ export class Pointcloud {
   }
 
   updateScales(xScale, yScale) {
-    console.log("Updating scales");
     this.xScale = xScale;
     this.yScale = yScale;
     this.draw(this.alpha); // Redraw points with the current alpha
