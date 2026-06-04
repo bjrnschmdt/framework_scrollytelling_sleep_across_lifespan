@@ -4,6 +4,7 @@ import {
   generateParticipantData,
   calculateQuantiles,
   calculatePercentiles,
+  calculateFullRangePercentiles,
 } from "./helperFunctions.js";
 
 import { settings } from "./settings.js";
@@ -118,6 +119,15 @@ const dataPercentilePlot = ageBinnedData.map((ageBin) => {
   return percentileResults;
 });
 
+const dataEstimatePercentilePlot = ageBinnedData.map((ageBin) => {
+  const percentileResults = calculateFullRangePercentiles(ageBin);
+
+  percentileResults.x0 = ageBin.x0;
+  percentileResults.x1 = ageBin.x1;
+
+  return percentileResults;
+});
+
 // Bin the data and derive the values (inter-quartile range, outliers…) for each bin.
 const dataBoxPlot = d3
   .bin()
@@ -204,8 +214,8 @@ export const dataEstimates = (() => {
     const x0 = thresholdsAge[i];
     const x1 = thresholdsAge[i + 1];
 
-    // Find the corresponding percentile data for this bin
-    const percentilePlot = dataPercentilePlot.find(
+    // Find the corresponding full-range percentile data for this bin
+    const percentilePlot = dataEstimatePercentilePlot.find(
       (item) => item.x0 === x0 && item.x1 === x1
     );
     if (!percentilePlot) {

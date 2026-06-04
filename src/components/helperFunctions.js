@@ -65,6 +65,21 @@ export function calculatePercentiles(data) {
   return agePercentiles;
 }
 
+export function calculateFullRangePercentiles(data) {
+  const filteredData = data
+    .map((d) => d.sleepTime)
+    .filter((d) => d !== null && !isNaN(d));
+
+  return Array.from({ length: 101 }, (v, i) => {
+    const p = i / 100;
+    return {
+      age: data.x0,
+      p,
+      q: d3.quantileSorted(filteredData, p),
+    };
+  });
+}
+
 /**
  * Retrieves the nearestPValue for a given age and sleeptime from the dataSet Map.
  * Safely handles undefined values for age or sleeptime.
