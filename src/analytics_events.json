@@ -34,8 +34,8 @@
     "fields": {
       "estimatePercentage": "number",
       "truePercentage": "number",
-      "hopIndexPercentage": "number",
-      "truePercentageAtHopIndex": "number"
+      "hopIndexPercentage": "number|undefined",
+      "truePercentageAtHopIndex": "number|undefined"
     }
   },
   {
@@ -43,8 +43,8 @@
     "fields": {
       "estimatePercentageA": "number",
       "truePercentageA": "number",
-      "hopIndexPercentageA": "number",
-      "truePercentageAtHopIndexA": "number"
+      "hopIndexPercentageA": "number|undefined",
+      "truePercentageAtHopIndexA": "number|undefined"
     }
   },
   {
@@ -52,8 +52,8 @@
     "fields": {
       "estimatePercentageB": "number",
       "truePercentageB": "number",
-      "hopIndexPercentageB": "number",
-      "truePercentageAtHopIndexB": "number"
+      "hopIndexPercentageB": "number|undefined",
+      "truePercentageAtHopIndexB": "number|undefined"
     }
   },
   {
@@ -61,8 +61,8 @@
     "fields": {
       "estimatePercentageC": "number",
       "truePercentageC": "number",
-      "hopIndexPercentageC": "number",
-      "truePercentageAtHopIndexC": "number"
+      "hopIndexPercentageC": "number|undefined",
+      "truePercentageAtHopIndexC": "number|undefined"
     }
   },
   {
@@ -70,8 +70,8 @@
     "fields": {
       "estimatePercentageD": "number",
       "truePercentageD": "number",
-      "hopIndexPercentageD": "number",
-      "truePercentageAtHopIndexD": "number"
+      "hopIndexPercentageD": "number|undefined",
+      "truePercentageAtHopIndexD": "number|undefined"
     }
   },
   {
@@ -80,8 +80,8 @@
       "estimateSleepA": "number",
       "trueSleepA": "number",
       "displayedPercentageSleepA": "number",
-      "hopIndexSleepA": "number",
-      "trueSleepAtHopIndexA": "number"
+      "hopIndexSleepA": "number|undefined",
+      "trueSleepAtHopIndexA": "number|undefined"
     }
   },
   {
@@ -90,8 +90,8 @@
       "estimateSleepB": "number",
       "trueSleepB": "number",
       "displayedPercentageSleepB": "number",
-      "hopIndexSleepB": "number",
-      "trueSleepAtHopIndexB": "number"
+      "hopIndexSleepB": "number|undefined",
+      "trueSleepAtHopIndexB": "number|undefined"
     }
   },
   {
@@ -100,8 +100,8 @@
       "estimateSleepC": "number",
       "trueSleepC": "number",
       "displayedPercentageSleepC": "number",
-      "hopIndexSleepC": "number",
-      "trueSleepAtHopIndexC": "number"
+      "hopIndexSleepC": "number|undefined",
+      "trueSleepAtHopIndexC": "number|undefined"
     }
   },
   {
@@ -110,8 +110,8 @@
       "estimateSleepD": "number",
       "trueSleepD": "number",
       "displayedPercentageSleepD": "number",
-      "hopIndexSleepD": "number",
-      "trueSleepAtHopIndexD": "number"
+      "hopIndexSleepD": "number|undefined",
+      "trueSleepAtHopIndexD": "number|undefined"
     }
   },
   {
@@ -119,8 +119,8 @@
     "fields": {
       "estimateQuantityA": "number",
       "trueQuantityA": "number",
-      "hopIndexQuantityA": "number",
-      "trueQuantityAtHopIndexA": "number"
+      "hopIndexQuantityA": "number|undefined",
+      "trueQuantityAtHopIndexA": "number|undefined"
     }
   },
   {
@@ -128,8 +128,8 @@
     "fields": {
       "estimateQuantityB": "number",
       "trueQuantityB": "number",
-      "hopIndexQuantityB": "number",
-      "trueQuantityAtHopIndexB": "number"
+      "hopIndexQuantityB": "number|undefined",
+      "trueQuantityAtHopIndexB": "number|undefined"
     }
   },
   {
@@ -137,8 +137,8 @@
     "fields": {
       "estimateQuantityC": "number",
       "trueQuantityC": "number",
-      "hopIndexQuantityC": "number",
-      "trueQuantityAtHopIndexC": "number"
+      "hopIndexQuantityC": "number|undefined",
+      "trueQuantityAtHopIndexC": "number|undefined"
     }
   },
   {
@@ -146,8 +146,8 @@
     "fields": {
       "estimateQuantityD": "number",
       "trueQuantityD": "number",
-      "hopIndexQuantityD": "number",
-      "trueQuantityAtHopIndexD": "number"
+      "hopIndexQuantityD": "number|undefined",
+      "trueQuantityAtHopIndexD": "number|undefined"
     }
   },
   {
