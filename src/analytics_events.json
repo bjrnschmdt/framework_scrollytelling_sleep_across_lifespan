@@ -12,6 +12,12 @@
     }
   },
   {
+    "event_name": "kielscn_schlafdauer_prolific_pid",
+    "fields": {
+      "prolificPid": "string"
+    }
+  },
+  {
     "event_name": "kielscn_schlafdauer_input_age",
     "fields": {
       "age": "number"
@@ -26,79 +32,122 @@
   {
     "event_name": "kielscn_schlafdauer_input_estimate",
     "fields": {
-      "estimate": "number"
+      "estimatePercentage": "number",
+      "truePercentage": "number",
+      "hopIndexPercentage": "number",
+      "truePercentageAtHopIndex": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_percentage_a",
     "fields": {
-      "estimatePercentageA": "number"
+      "estimatePercentageA": "number",
+      "truePercentageA": "number",
+      "hopIndexPercentageA": "number",
+      "truePercentageAtHopIndexA": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_percentage_b",
     "fields": {
-      "estimatePercentageB": "number"
+      "estimatePercentageB": "number",
+      "truePercentageB": "number",
+      "hopIndexPercentageB": "number",
+      "truePercentageAtHopIndexB": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_percentage_c",
     "fields": {
-      "estimatePercentageC": "number"
+      "estimatePercentageC": "number",
+      "truePercentageC": "number",
+      "hopIndexPercentageC": "number",
+      "truePercentageAtHopIndexC": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_percentage_d",
     "fields": {
-      "estimatePercentageD": "number"
+      "estimatePercentageD": "number",
+      "truePercentageD": "number",
+      "hopIndexPercentageD": "number",
+      "truePercentageAtHopIndexD": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_sleep_a",
     "fields": {
-      "estimateSleepA": "number"
+      "estimateSleepA": "number",
+      "trueSleepA": "number",
+      "displayedPercentageSleepA": "number",
+      "hopIndexSleepA": "number",
+      "trueSleepAtHopIndexA": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_sleep_b",
     "fields": {
-      "estimateSleepB": "number"
+      "estimateSleepB": "number",
+      "trueSleepB": "number",
+      "displayedPercentageSleepB": "number",
+      "hopIndexSleepB": "number",
+      "trueSleepAtHopIndexB": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_sleep_c",
     "fields": {
-      "estimateSleepC": "number"
+      "estimateSleepC": "number",
+      "trueSleepC": "number",
+      "displayedPercentageSleepC": "number",
+      "hopIndexSleepC": "number",
+      "trueSleepAtHopIndexC": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_sleep_d",
     "fields": {
-      "estimateSleepD": "number"
+      "estimateSleepD": "number",
+      "trueSleepD": "number",
+      "displayedPercentageSleepD": "number",
+      "hopIndexSleepD": "number",
+      "trueSleepAtHopIndexD": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_quantity_a",
     "fields": {
-      "estimateQuantityA": "number"
+      "estimateQuantityA": "number",
+      "trueQuantityA": "number",
+      "hopIndexQuantityA": "number",
+      "trueQuantityAtHopIndexA": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_quantity_b",
     "fields": {
-      "estimateQuantityB": "number"
+      "estimateQuantityB": "number",
+      "trueQuantityB": "number",
+      "hopIndexQuantityB": "number",
+      "trueQuantityAtHopIndexB": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_quantity_c",
     "fields": {
-      "estimateQuantityC": "number"
+      "estimateQuantityC": "number",
+      "trueQuantityC": "number",
+      "hopIndexQuantityC": "number",
+      "trueQuantityAtHopIndexC": "number"
     }
   },
   {
     "event_name": "kielscn_schlafdauer_input_estimate_quantity_d",
     "fields": {
-      "estimateQuantityD": "number"
+      "estimateQuantityD": "number",
+      "trueQuantityD": "number",
+      "hopIndexQuantityD": "number",
+      "trueQuantityAtHopIndexD": "number"
     }
   },
   {
